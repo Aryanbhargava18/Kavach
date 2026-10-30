@@ -205,8 +205,10 @@
       });
       body.innerHTML = items.join("") || `<p class="ph-hint">No messages yet.</p>`;
     } else if (inc && inc.kind === "freeze") {
-      top.innerHTML = `<i class="ph-av">§</i><div><b>Case file</b><span>Account hold · built by Kavach</span></div>`;
-      cap.textContent = "Meena's case file";
+      const guarded = inc.decisive && inc.decisive.label === "Why Kavach held back";
+      top.innerHTML = guarded ? `<i class="ph-av">R</i><div><b>Paytm Risk view</b><span>Not shown to Meena · EDD queue</span></div>`
+        : `<i class="ph-av">§</i><div><b>Case file</b><span>Account hold · built by Kavach</span></div>`;
+      cap.textContent = guarded ? "Paytm Risk's screen (Meena never sees this)" : "Meena's case file";
       cf.hidden = true;
       const f = inc.facts || {};
       const doc = (S.steps[inc.id] || []).find((s) => s.kind === "tool" && s.tool === "read_document");
@@ -491,12 +493,17 @@
         if (s.kind === "verify" && s.ok && (s.action === "reconcile_payment" || s.action === "final re-check")) { ST.lcd = "FIXED ✓"; box("fixed", ST.lcd, 2600); }
         if (s.kind === "action" && s.action === "resolve_incident") { ST.lcd = "CLOSED ✓"; box("fixed", ST.lcd, 3000); }
         if (s.kind === "intake") ST.lcd = "ON DUTY";
-        if (s.kind === "evidence") { ST.lcd = s.stamp || "ON DUTY"; box("idle", ST.lcd); }
+        // The Soundbox sits on Meena's counter. In a freeze case nothing case-specific reaches its screen until Kavach has
+        // checked Paytm Risk; under the tipping-off guard it only ever says the Paytm team has it.
+        const riskStep = (S.steps[s.incident] || []).find((x) => x.kind === "tool" && x.tool === "get_risk_signals");
+        const freezeLike = (inc.kind === "freeze" || inc.kind === "settlement") && inc.facts && inc.facts.proactive;
+        if (s.kind === "evidence") { if (freezeLike && !riskStep) { ST.pendingStamp = s.stamp; ST.lcd = "CHECKING"; } else ST.lcd = s.stamp || "ON DUTY"; box("idle", ST.lcd); }
+        if (s.kind === "tool" && s.tool === "get_risk_signals") { ST.lcd = (s.result || {}).guard ? "PAYTM TEAM" : (ST.pendingStamp || ST.lcd); ST.pendingStamp = null; box("idle", ST.lcd); }
         repaint(true);
       }, 0);
       return;
     }
-    if (ev.type === "incident") { setTimeout(() => { if (ev.incident.id === S.sel) { paintNodes(ev.incident); renderBand(); } }, 0); return; }
+    if (ev.type === "incident") { setTimeout(() => { if (ev.incident.id === S.sel) { paintNodes(ev.incident); renderRight(); renderBand(); } }, 0); return; }
     if (ev.type === "world_event" && ev.event.kind === "soundbox") {
       box("speaking", `+${rs(ev.event.amount)}`, 3200);
       setTimeout(() => fly("switch", `UPI · +${rs(ev.event.amount)} SUCCESS`, "ok", false), 200);

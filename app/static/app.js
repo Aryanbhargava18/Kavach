@@ -520,7 +520,7 @@ function suggestOpts() {
   if (i && i.status !== "resolved") {
     if (i.kind === "payment_claim" && i.status === "watching" && i.facts.txn_id && i.recon.switch && i.recon.switch.status === "PENDING") opts.push({ cls: "as-m", label: "Dobara pay karwa do", as: "merchant", draft: { text: "Customer se dobara pay karwa do" } });
     if (i.channel === "whatsapp") opts.push({ cls: "as-c", label: "Any update?", as: "customer", draft: { text: "Any update on my payment?" } });
-    if (i.kind === "freeze") {
+    if (i.kind === "freeze" && !(i.decisive && i.decisive.label === "Why Kavach held back")) {
       const f = i.facts || {};
       if (f.pack && !(f.case_events || {}).bank_complaint) opts.push({ cls: "doc", label: "Bank ne complaint le li ✓", as: "merchant", draft: { text: "Bank ne complaint le li, acknowledgement mil gaya." } });
       opts.push({ cls: "as-m", label: "Bank ko kitne din milte hain?", as: "merchant", draft: { text: "Bank ko meri shikayat aage bhejne ke liye kitne din milte hain?" } });
