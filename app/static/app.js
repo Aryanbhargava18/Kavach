@@ -749,6 +749,7 @@ $("#open-eval").onclick = async () => {
       ${r.metrics.map((m) => `<tr><td>${esc(m.label)}</td><td class="k">${esc(m.kavach)}</td><td class="b">${esc(m.baseline)}</td></tr>`).join("")}</tbody></table>
       <p class="caveat">${esc(r.caveat)}</p>`;
   $("#eval-dialog").showModal();
+  requestAnimationFrame(() => { $("#eval-dialog").scrollTop = 0; body.scrollTop = 0; body.firstElementChild && body.firstElementChild.scrollIntoView({ block: "start" }); });
 };
 
 boot();

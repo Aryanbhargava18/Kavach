@@ -1,8 +1,8 @@
 {
  "n": 243,
  "desk_merchants": 800,
- "ran_at": "30 Oct 2026 16:19",
- "seconds": 138.6,
+ "ran_at": "30 Oct 2026 20:08",
+ "seconds": 151.0,
  "planner": "offline rules",
  "metrics": [
   {
@@ -82,7 +82,7 @@
   },
   {
    "label": "Actions re-checked against the source of truth after executing",
-   "kavach": "1509/1509",
+   "kavach": "1605/1605",
    "baseline": "0 (never checks)"
   },
   {
@@ -249,7 +249,7 @@
   "failures": [],
   "honest_limit": "debit_freeze_no_signal expects NO case: with no payout return and no declined payment, Paytm sees nothing and Kavach claims nothing.",
   "label": "Synthetic evaluation in a closed simulator: checks the watchers' logic and guardrails, not real-world detection rates.",
-  "generated_at": "2026-10-30T20:00:35",
+  "generated_at": "2026-10-30T20:08:51",
   "mutation_check": [
    {
     "variant": "intact",

@@ -7,6 +7,13 @@ Everything here runs on synthetic data. No real money, messages, banks or police
 
 ---
 
+## Start here
+* `docs/STRATEGY.md`: what this is, who at Paytm pays for it, where it plugs in, and what's still simulated.
+* `docs/DEMO_SCRIPT.md`: the 3-minute run, with a judge holding Meena's phone (`make lan`, then **Judge's phone**).
+* `docs/JUDGE_QA.md`: the hard questions, answered honestly.
+
+What Kavach catches on its own: a **total freeze** (the next payout bounces), a **debit freeze** (her own UPI payment through the Paytm app is declined `YE`), and neither when Paytm has no signal. It checks **Paytm Risk before warning anyone** (rule P17). It drafts **Paytm's own SOP 9.5(ii) upload** and **a request in Meena's name to limit the hold to the disputed amount**. The pack's verify page doubles as **the bank grievance officer's checklist**.
+
 ## The problem
 
 Rahul pays Meena Kirana ₹4,200 by UPI. His bank says SUCCESS. Meena's billing app still shows the bill as unpaid, because Paytm's webhook to her POS failed three times. Rahul has a green screenshot; Meena has an unpaid bill; both are right about what they can see. Today this becomes a support ticket, an argument at the counter, or a second payment.
@@ -82,8 +89,8 @@ make demo          # http://127.0.0.1:8000
 Needs Python 3.11+ and Tesseract OCR (`brew install tesseract`). Without Tesseract everything works except reading screenshots, and Kavach asks for the UPI reference instead. Chrome gives Hindi voice input and output through the browser; typing always works.
 
 ```sh
-make test          # 39 tests: both proactive watchers (billing app, payouts), policy invariants, hero + every judge challenge, tamper detection, desk, clocks, both LLM paths (scripted)
-make eval          # 243 generated incidents + 800 desk merchants, Kavach vs naive baselines (≈2–3 min, offline, no credits)
+make test          # 43 tests: both proactive watchers (billing app, payouts), policy invariants, hero + every judge challenge, tamper detection, desk, clocks, both LLM paths (scripted)
+make eval          # 243 everyday incidents + 800 desk merchants vs naive baselines, then 180 freeze-watch scenarios with a mutation check (≈3–4 min, offline)
 make sarvam-check  # with SARVAM_API_KEY: one live call to each Sarvam API Kavach uses
 make llm-check     # with SARVAM_API_KEY (or ANTHROPIC_API_KEY): hero scenarios on the live planner, safety + timing
 make lan           # serve on the venue Wi-Fi so a judge's phone can scan the pack's QR

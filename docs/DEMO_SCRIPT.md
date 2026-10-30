@@ -1,57 +1,62 @@
-# 3-minute demo script · Live screen
+# 3-minute demo script
 
-**Setup.** Run `make demo` and open Chrome at http://127.0.0.1:8000, full screen and at least 1280 px wide. Turn the sound on, then click the page once so Chrome lets it play audio. Press **Reset**. One person drives and one person talks.
+**Setup (before you walk up).**
+1. Run `make lan`, not `make demo`, so phones on the venue Wi-Fi can reach the laptop. If the venue Wi-Fi blocks device-to-device traffic, use a phone hotspot that both the laptop and the judge's phone join.
+2. Open Chrome full screen at the LAN address the terminal prints. Turn the sound on, click the page once, then press **Reset**.
+3. Run `make sarvam-check` with the key in `.env`. The top bar should show **Sarvam** lit. If not, Kavach runs on its rules planner and says so. Don't hide that.
+4. Click **Judge's phone** in the top bar and keep the QR dialog ready.
 
-**Before going on stage.** Run `make sarvam-check`, which needs your key in `.env`. The top bar should show **Sarvam** lit and **sarvam planner**. If the check fails, Kavach still runs on its rules planner and says so in the top bar. Don't hide that.
-
-**The screen**
-- Left: Meena's phone, where she talks to Kavach.
-- Centre: her Soundbox with Kavach inside, wired to Paytm's systems. Each system lights up, and its real value flies to the Soundbox, only when Kavach actually checks it.
-- Right: the other side of the story: the case file, the shop's billing app, or the customer's WhatsApp.
-- Top: the loop: Detect, Investigate, Reconcile, Act, Verify, Follow up.
-- Bottom: the result, plus presenter buttons.
-
-Everything in Paytm's systems on this screen is a **simulation**. Say so once, early.
+One person drives the laptop. One person talks. **The judge holds Meena's phone.**
 
 ---
 
-**0:00 · Hook (over the idle screen)**
-> "A shop in Andhra Pradesh took a ₹1,000 UPI payment. The customer was later named in a cheating case in Bihar, and the shop's whole account, ₹8.26 lakh, was frozen for ten months until the High Court called it illegal. That's not rare: I4C's own table shows about ₹303 crore frozen against ₹29 crore actually disputed. And the shopkeeper usually finds out last, when a supplier payment bounces."
+**0:00 · Hook (idle screen)**
+> "A shop took a ₹1,000 UPI payment. The customer was later named in a fraud case, and the shop's whole account, ₹8.26 lakh, was frozen for ten months. I4C's own table shows about ₹303 crore frozen against ₹29 crore actually disputed. And the shopkeeper finds out last, when her supplier payment bounces. Paytm finds out first. Nobody acts on that."
 
-**0:20 · Hero: Kavach notices first** (click **Meena's bank freezes her account**)
-1. The clock jumps to the next 9:00 payout. Meena's bank sends it back. **Detect** lights up: *"Meena's bank just sent her payout back."* Nobody has typed anything.
-   > "Only Paytm sees this signal: the payout return code. Meena doesn't know yet."
-2. **Investigate**: Kavach checks the payout and what Paytm can see of her bank. The Soundbox shows **ACCOUNT FROZEN**. The case file on the right shows the returned payout.
-3. Meena's phone gets a Hinglish warning, and the Soundbox *says it out loud in Hindi*: don't pay suppliers yet. Then the three things to ask her branch for: the NCRP acknowledgement number, the police notice, and the disputed amount.
-4. **Act, with two keys**: Kavach asks to hold new payouts with Paytm. Tap **Haan, karo** on Meena's phone, then **Approve as Paytm Risk** at the bottom.
-   > "It can't do this alone. Meena and a Paytm Risk human both approve, and the money stays in Paytm's settlement balance. It never moves to another account."
-5. Tap **📎 Meena forwards the bank notice**. Kavach reads it, **ignores the instruction hidden in it**, finds the one disputed ₹2,400 payment in Paytm's records, and checks that the facts agree. It routes the case under the MHA/I4C SOP and builds a **signed evidence pack**.
-6. Point at the case file: **Disputed vs frozen, 129×**: ₹2,400 disputed (Paytm record) against ₹3.1 lakh frozen (Meena's own figure, marked unverified).
-7. Bottom line: *"Meena warned in N s, before her first supplier payment bounced."* Open **Verify it** on the pack; the tampered copy fails.
+**0:20 · Give the judge Meena's phone**
+Show the QR. The judge scans it and taps **Main Meena hoon · Start**.
+> "You're Meena now. Keep the sound on."
 
-**1:40 · Push it** (tap the chips on Meena's phone)
-* **Payout doosre account mein.** Refused: moving money during a cyber-cell freeze could look like evading a lawful order.
-* **Caller wants ₹20,000.** Flagged as extortion: nothing in the SOP involves paying anyone. Report to 1930.
-* **Bank ne complaint le li ✓.** The bank's 7-day clock starts from her dated acknowledgement, never from her message to Kavach. Kavach will remind her on day 5 and draft a letter on day 7.
+**0:35 · Kavach notices first** (click **Meena's bank freezes her account**)
+1. The clock jumps to the 9:00 payout run. Meena's bank sends the payout back. **Detect** lights up. Nobody typed anything.
+2. The Soundbox shows CHECKING, then **checks Paytm Risk before saying a word**.
+   > "If Risk already had two independent signals on this shop, Kavach would stay quiet. Telling a possible mule operator would tip them off."
+3. **The judge's phone buzzes and speaks in Hindi:** don't pay suppliers yet; ask the branch for the NCRP number, the notice and the disputed amount.
+4. The phone asks to hold new payouts with Paytm. **The judge taps "Haan, karo".** The driver clicks **Approve as Paytm Risk**.
+   > "Two keys: hers and Paytm Risk's. The money stays with Paytm and never moves to another account."
 
-**2:05 · Same engine, everyday incidents** (Run a scenario → **A payment comes in; the billing app misses it**)
-> "The same watcher catches small things too." The billing app misses a ₹4,200 payment; Kavach repairs bill B-2209 from the UPI switch record, re-checks it, and tells Meena. *"Fixed in N s, before anyone complained."*
+**1:15 · The case builds itself** (judge taps **📎 Bank ka SMS + notice bhejo** on the phone)
+1. Kavach reads the notice, **ignores the instruction hidden in it**, matches the one ₹2,400 payment, and refuses to go on if the amounts disagree.
+2. It routes the case under the MHA/I4C SOP and drafts **Paytm's own SOP 9.5(ii) upload** for the nodal officer.
+3. It signs the pack. On the case file: **₹2,400 disputed vs ₹3.1 lakh frozen, 129×.**
+4. The phone asks: write to the bank, in her name, to limit the hold to ₹2,400? **The judge approves.**
+   > "It cites the SOP, three High Courts and the RBI's September draft, labelled as a draft. She signs; the bank decides."
 
-If a judge wants more: **Screenshot ₹4,200, bank says ₹2,400** (QR for exactly the ₹1,800 still due, nobody called a fraud) or **Payment still pending** (type *"Customer se dobara pay karwa do"*; refused, because the customer would be charged twice).
+**1:55 · The bank's side, on the judge's phone** (judge taps **Signed pack · verify on this phone**)
+1. Green: **Valid**. Tap **Check a copy with one digit changed**: red, **TAMPERED**.
+2. Scroll to **For the bank's grievance officer**: what's signed, what's drafted, and what the bank still owes (CDD/EDD and the 7-day submission).
+   > "This is the input a bank-side Paytm Intelligence agent reads. The merchant side keeps her on Paytm; the bank side is a Pi product."
+
+**2:20 · Push it** (chips on the phone)
+* **Payout doosre account mein** → refused (P6).
+* **Caller ₹20,000 maang raha** → flagged as extortion; report to 1930.
 
 **2:35 · Proof** (top bar **Results**)
-> "We generated 243 incidents in a simulator. A bot that trusts screenshots marked 34 bills paid with money that was short, already used or being refunded. Kavach marked none, and re-checked every one of its 1,509 actions. These are synthetic tests, and the 4 cases it still gets wrong are listed."
+> "180 freeze scenarios from a separate generator: caught 90 of 90 when Paytm has a signal, zero false alarms, zero leaks, zero re-routes. We also broke our own guard on purpose. Remove one layer and the policy still blocks every leak; remove both and 30 of 30 leak. So the test has teeth. All synthetic, and labelled."
 
 **2:50 · Close**
 > "The Soundbox tells a shop it got paid. Kavach makes sure it keeps the money, and tells her before the bank does."
 
 ---
 
-### The honest limit (say it before a judge does)
-Paytm only sees a freeze when the bank also refuses credits, so the payout comes back. A **debit-only** freeze stays invisible: payouts keep landing in an account she can't withdraw from. For those, Kavach starts from Meena's report (Run a scenario → **Bank froze Meena's account**) and says on screen that Paytm can't see it.
+### If a judge asks "what about a debit freeze?"
+Run a scenario → **Debit freeze: her payment to a supplier is refused**. Payouts still land, so the payout watcher is blind. But her own ₹18,000 payment through the Paytm app comes back `YE`, and Kavach opens the case from that. If neither signal exists, Kavach sees nothing and claims nothing.
+
+### If a judge asks "what if she's a mule?"
+Run a scenario → **Payout bounces, but Risk has mule signals**. Her phone gets one neutral line, the Soundbox shows PAYTM TEAM, and the case file turns into **Paytm Risk's view (Meena never sees this)**.
 
 ### If something breaks
-* No sound: click the page once (Chrome autoplay). Subtitles and the waveform still show.
-* Sarvam or Wi-Fi down: the case falls back to the rules planner and the top bar says so. Typing works if the mic doesn't.
-* **Console** (top) shows every tool call, policy decision and verification as a trace. **Systems** shows the simulated switch, billing app, payouts and message outbox.
-* Start over: **Reset**.
+* **The phone can't connect:** run the same flow on the laptop's left phone; everything mirrors.
+* **No sound:** tap the phone screen once. Subtitles still show on the laptop.
+* **Sarvam down:** the rules planner takes over and the top bar says so.
+* **Start over:** **Reset** (the judge's phone clears itself).
