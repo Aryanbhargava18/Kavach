@@ -17,18 +17,18 @@ const S = { incidents: {}, steps: {}, sel: null, follow: true, filter: "all", as
 const STATUS = { investigating: "Investigating", watching: "Watching", waiting_approval: "Needs your OK", waiting_merchant: "Waiting for Meena",
   waiting_customer: "Waiting for customer", with_human: "With a human", resolved: "Resolved", refused: "Refused" };
 const KIND = { payment_claim: "Payment claim", duplicate: "Charged twice", settlement: "Missing payout", freeze: "Account hold · high risk",
-  scam: "Scam call", account_change: "Payout account", question: "SOP question", unknown: "Message" };
+  scam: "Scam call", account_change: "Payout account", question: "SOP question", chargeback: "Chargeback", unknown: "Message" };
 const APPROVER = { merchant: "Meena", paytm_ops: "Paytm Risk" };
 const ACTION_NAMES = { create_support_case: "Opened a support case", reconcile_payment: "Repaired the shop's ledger", replay_soundbox: "Replayed it on the Soundbox",
   initiate_refund: "Refunded the duplicate", schedule_followup: "Scheduled a follow-up", request_settlement_hold: "Held payouts with Paytm",
   change_settlement_account: "Change payout account", generate_evidence_pack: "Built a signed evidence pack", escalate_to_human: "Handed to a human",
-  resolve_incident: "Closed the case", draft_escalation: "Escalation letter (Meena signed)", draft_lien_request: "Lien-limiting request (Meena signed)", prepare_pa_upload: "Paytm's SOP 9.5(ii) upload, drafted", record_case_event: "Started the bank's 7-day clock",
+  resolve_incident: "Closed the case", draft_escalation: "Escalation letter (Meena signed)", draft_lien_request: "Lien-limiting request (Meena signed)", prepare_pa_upload: "Paytm's SOP 9.5(ii) upload, drafted", submit_dispute_response: "Chargeback reply filed (Meena approved)", accept_chargeback: "Chargeback accepted (Meena's word)", record_case_event: "Started the bank's 7-day clock",
   issue_verified_receipt: "Verified receipt", request_payment: "QR for the exact amount due", send_customer_update_simulated: "Customer update", notify_merchant: "Told Meena" };
 const DENY_NAMES = { request_payment: "asking the customer to pay again", issue_verified_receipt: "issuing a receipt", reconcile_payment: "recording this payment in the ledger",
   initiate_refund: "refunding", change_settlement_account: "sending payouts to another account", generate_evidence_pack: "building an evidence pack",
   file_grievance: "filing on Meena's behalf", send_customer_update_simulated: "that customer message", resolve_incident: "closing the case",
-  request_settlement_hold: "holding payouts", notify_merchant: "telling the merchant case details", schedule_followup: "another follow-up", replay_soundbox: "replaying the Soundbox" };
-const VERB = { draft_escalation: "send a letter in Meena's name", draft_lien_request: "send a request in Meena's name", request_settlement_hold: "hold payouts with Paytm", initiate_refund: "refund the duplicate", change_settlement_account: "change the payout account" };
+  request_settlement_hold: "holding payouts", submit_dispute_response: "that chargeback reply", notify_merchant: "telling the merchant case details", schedule_followup: "another follow-up", replay_soundbox: "replaying the Soundbox" };
+const VERB = { submit_dispute_response: "reply to the chargeback in Meena's name", draft_escalation: "send a letter in Meena's name", draft_lien_request: "send a request in Meena's name", request_settlement_hold: "hold payouts with Paytm", initiate_refund: "refund the duplicate", change_settlement_account: "change the payout account" };
 const MSG_ACTIONS = new Set(["notify_merchant", "send_customer_update_simulated", "issue_verified_receipt", "request_payment"]);
 const ICON = {
   switch: "M4 8h15l-3-3M20 16H5l3 3", ledger: "M5 3h11l3 3v15H5zM8 9h8M8 13h8M8 17h5", refund: "M4 12a8 8 0 1 0 3-6M4 4v4h4",

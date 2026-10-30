@@ -7,7 +7,7 @@ re-verified, and follow-ups run on the clock.
 from __future__ import annotations
 
 import re
-from datetime import timedelta
+from datetime import datetime, timedelta
 from typing import Any
 
 from .world import MERCHANT
@@ -627,6 +627,77 @@ class OfflinePlanner:
         inc.money = {"amount": b["amount"], "label": "payout bounced, safe with Paytm"}
         await self._propose_hold(inc)
 
+    # ------------------------------------------------------- chargeback clock
+    async def proactive_dispute(self, inc, d):
+        """A chargeback landed. If nobody replies by the deadline, it is deemed valid and netted from her payout."""
+        e = self.e
+        due = hm(d["respond_by"])
+        if datetime.fromisoformat(d["respond_by"]).date() != e.world.now.date():
+            due = "kal " + due
+        plan = ["Notice the chargeback", "Gather what Paytm's records prove", "Say what they don't prove", "Ask Meena one question", "Reply before the deadline", "Watch the outcome"]
+        e.set_plan(inc, plan)
+        await e.step(inc, "intake", text=f"Dispute desk: chargeback {d['dispute_id']} on {rs(d['amount'])} · \"{d['reason']}\" · reply by {due} or it is deemed valid",
+                     intent="chargeback", amount=d["amount"], utrs=[d["utr"]], language="system", engine="dispute-monitor", sender="monitor")
+        await self.think(inc, f"Nobody has told Meena. If nobody replies by {due}, the chargeback is deemed valid and {rs(d['amount'])} comes out of her next payout. "
+                              "She doesn't watch the dispute desk. I do.", "warn")
+        e.tick_plan(inc, plan[0])
+        await e.act(inc, "create_support_case", {"summary": f"Chargeback {d['dispute_id']} {rs(d['amount'])} ({d['reason']}); found by Kavach's dispute monitor", "channel": "monitor"})
+        await e.call(inc, "get_disputes", {})
+        st = await e.call(inc, "get_payment_status", {"txn_id": d["txn_id"]})
+        led = await e.call(inc, "get_merchant_ledger", {"utr": d["utr"]})
+        sb = await e.call(inc, "get_soundbox_log", {"minutes_back": 600})
+        entry = (led.get("entries") or [None])[0]
+        bill = next((b for b in led.get("bills", []) if entry and b["bill_id"] == entry["bill_id"]), None)
+        heard = any(x["txn_id"] == d["txn_id"] for x in sb.get("announcements", []))
+        if bill:
+            inc.facts["bill_id"] = bill["bill_id"]
+        ev = [{"kind": "switch", "label": f"UPI switch: SUCCESS {rs(st['amount'])} to {MERCHANT['vpa']} at {hm(st['created_at'])}", "tier": "T1"}]
+        if entry:
+            ev.append({"kind": "ledger", "label": f"Shop's bill {entry['bill_id']} marked paid by this UTR" + (f" ({', '.join(bill['items'])})" if bill else ""), "tier": "T1"})
+        if heard:
+            ev.append({"kind": "soundbox", "label": "Soundbox announced the payment at the counter", "claim": "payment notification played", "tier": "T2"})
+        inc.facts["dispute_evidence"] = ev
+        e.tick_plan(inc, plan[1])
+        await e.step(inc, "evidence", stamp="PAYMENT PROVEN", title="What Paytm's records prove", tone="good",
+                     verdict="The payment and the bill are proven. Handing over the goods is not.",
+                     rows=[{"field": "Payment", "claim": d["reason"], "truth": f"SUCCESS {rs(st['amount'])}", "match": True},
+                           {"field": "Bill", "claim": "—", "truth": f"{entry['bill_id']} paid" if entry else "no bill", "match": bool(entry)},
+                           {"field": "Soundbox", "claim": "—", "truth": "announced" if heard else "silent", "match": heard},
+                           {"field": "Goods handed over", "claim": "not received", "truth": "no record can show this", "match": False}])
+        await self.think(inc, "The Soundbox proves the notification played, not that the goods changed hands, and no Paytm record can prove a handover. "
+                              "I won't invent delivery proof. Only Meena can say it, and her answer goes in labelled as hers.", "warn")
+        e.tick_plan(inc, plan[2])
+        inc.decisive = {"label": "Decisive evidence", "text": f"Payment and bill proven; handover only Meena can state"}
+        inc.money = {"amount": d["amount"], "label": f"at stake · reply by {due}"}
+        res = await e.act(inc, "submit_dispute_response", {"dispute_id": d["dispute_id"], "evidence": ev, "merchant_attests_handover": True})
+        if res["status"] == "NEEDS_APPROVAL":
+            await e.act(inc, "notify_merchant", {
+                "text": (f"⏱️ {rs(d['amount'])} ka chargeback aaya hai: customer ke bank ka kehna hai \"{d['reason']}\" (bill {inc.facts.get('bill_id', '')}). "
+                         f"{due} tak jawab nahi diya to yeh paisa aapke agle payout se kat jayega.\n"
+                         "Payment aur bill ka saboot mere paas hai. Sirf ek baat aap bata sakti hain: kya aapne saman diya tha?"),
+                "speak": f"{d['amount']} रुपये का चार्जबैक आया है। क्या आपने सामान दिया था?", "extra": {"approval": inc.id}})
+            e.tick_plan(inc, plan[3])
+            await e.act(inc, "schedule_followup", {"after_seconds": max(600, int((datetime.fromisoformat(d["respond_by"]) - e.world.now).total_seconds()) - 6 * 3600),
+                                                  "purpose": "Remind Meena: chargeback reply due in 6 hours"})
+            inc.status = "waiting_approval"
+            inc.headline = f"Chargeback {rs(d['amount'])}: waiting for Meena's one answer before {due}."
+
+    async def after_decline(self, inc, action) -> bool:
+        """Meena said no. For a chargeback that means the goods were not handed over: accept it, don't fight it."""
+        e = self.e
+        if action != "submit_dispute_response":
+            return False
+        await self.think(inc, "Meena says she didn't hand over the goods. Fighting it would mean a false reply in her name. Accepting is the honest outcome.")
+        inc.approvals.setdefault("accept_chargeback", set()).add("merchant")
+        d = inc.facts["dispute_id"]
+        await e.act(inc, "accept_chargeback", {"dispute_id": d})
+        await e.act(inc, "notify_merchant", {"text": "Theek hai. Chargeback maan liya, customer ko paisa wapas jayega. Galat jawab dena aapke liye aur nuksaan karta.",
+                                            "speak": "ठीक है, चार्जबैक मान लिया।"})
+        inc.outcome_verified = True
+        inc.headline = "Chargeback accepted honestly on Meena's word."
+        await e.act(inc, "resolve_incident", {"outcome": f"{d} accepted: merchant says goods were not handed over"})
+        return True
+
     async def _risk_guarded(self, inc) -> bool:
         """Check Paytm Risk's signals BEFORE telling the merchant anything about a freeze (tipping-off guard, P17)."""
         e = self.e
@@ -896,6 +967,18 @@ class OfflinePlanner:
             await e.act(inc, "notify_merchant", {"text": "✅ Chitthi taiyaar. Branch mein de dijiye ya email kar dijiye; signed pack saath mein hai. Main aage bhi nazar rakhunga."})
             inc.headline = "Escalation letter signed off by Meena."
             inc.status = "with_human"
+        elif action == "submit_dispute_response":
+            for f in e.followups:
+                if f["incident"] == inc.id and not f.get("fired") and f["purpose"].startswith("Remind Meena: chargeback"):
+                    f["fired"], f["cancelled"] = True, "replied"
+            dd = next(x for x in e.world.disputes if x["dispute_id"] == inc.facts["dispute_id"])
+            left = datetime.fromisoformat(dd["respond_by"]) - e.world.now
+            e.tick_plan(inc, "Ask Meena one question"); e.tick_plan(inc, "Reply before the deadline")
+            await e.act(inc, "notify_merchant", {"text": f"✅ Jawab chala gaya, deadline se {int(left.total_seconds() // 3600)} ghante pehle: payment ka record, bill, aur aapki baat (aapke naam se). Faisla aate hi bataunga.",
+                                                "speak": "जवाब चला गया। फैसला आते ही बताऊँगा।"})
+            await e.act(inc, "schedule_followup", {"after_seconds": 8 * 3600, "purpose": "Check the chargeback outcome"})
+            inc.status = "watching"
+            inc.headline = f"Replied {int(left.total_seconds() // 3600)} h before the deadline. Watching the outcome."
         elif action == "draft_lien_request":
             L = inc.facts.get("lien_request", {})
             await e.act(inc, "notify_merchant", {"text": f"✅ Request taiyaar: hold sirf {L.get('disputed_text', '')} tak. Ise signed pack ke saath branch mein dijiye aur dated acknowledgement lijiye.",
@@ -913,6 +996,28 @@ class OfflinePlanner:
 
     async def followup(self, inc, purpose):
         e = self.e
+        if purpose.startswith("Remind Meena: chargeback"):
+            await e.act(inc, "notify_merchant", {"text": f"⏱️ Yaad dilana: {rs(inc.money.get('amount'))} ke chargeback ka jawab 6 ghante mein dena hai. Kya aapne saman diya tha?",
+                                                "speak": "चार्जबैक का जवाब छह घंटे में देना है।", "extra": {"approval": inc.id}})
+            return
+        if purpose.startswith("Check the chargeback outcome"):
+            r = await e.call(inc, "get_disputes", {})
+            dd = next(x for x in r["disputes"] if x["dispute_id"] == inc.facts["dispute_id"])
+            if dd["status"] == "REPRESENTED":
+                await e.act(inc, "schedule_followup", {"after_seconds": 3600, "purpose": "Check the chargeback outcome"})
+                return
+            won = dd["status"] == "WON"
+            await e.step(inc, "evidence", stamp="KEPT" if won else dd["status"], title="Follow-up: dispute desk re-checked", tone="good" if won else "bad",
+                         verdict=f"{rs(dd['amount'])} stays with Meena" if won else f"Decided for the payer ({dd['status']})",
+                         rows=[{"field": "Decision", "claim": "replied in time", "truth": dd["status"], "match": won}])
+            await e.act(inc, "notify_merchant", {"text": f"✅ Chargeback jeet gaye: {rs(dd['amount'])} aapka hi raha." if won else f"Chargeback ka faisla customer ke haq mein gaya. Kavach ne waqt par jawab diya tha.",
+                                                "speak": "चार्जबैक जीत गए, पैसा आपका रहा।" if won else None})
+            inc.outcome_verified = True
+            for p in inc.plan:
+                p["state"] = "done"
+            inc.headline = f"Replied before the deadline and kept {rs(dd['amount'])}." if won else "Replied in time; decided for the payer."
+            await e.act(inc, "resolve_incident", {"outcome": f"{dd['dispute_id']} {dd['status']} after a reply filed before the deadline"})
+            return
         if purpose.startswith("Confirm tomorrow"):
             txn = inc.facts["txn_id"]
             r = await e.call(inc, "get_settlement_status", {"txn_id": txn})

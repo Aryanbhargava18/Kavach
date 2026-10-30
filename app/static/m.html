@@ -153,9 +153,30 @@ main { padding: 14px 14px 0; display: flex; flex-direction: column; gap: 12px; }
 #gate button { background: #fff; color: var(--navy); border: 0; border-radius: 16px; min-height: 56px; font-size: 18px; font-weight: 800; cursor: pointer; margin-top: 8px; }
 #gate small { color: rgba(255,255,255,.65); font-size: 12.5px; text-align: center; }
 .embed #gate, .embed .bar .tag { display: none; }
-.embed .ask { left: auto; right: 12px; transform: none; padding: 7px; font-size: 0; gap: 0; }
+.embed .ask { display: none; }
 .embed .ask .n { font-size: 11px; position: absolute; top: -4px; right: -4px; }
 .embed body, body.embed { padding-bottom: 80px; }
+
+/* clocks Kavach is holding */
+.clk-wrap h2 { margin-bottom: 10px; }
+.clks { display: flex; gap: 10px; overflow-x: auto; margin: 0 -16px; padding: 0 16px 2px; scrollbar-width: none; }
+.clk { flex: none; width: 168px; border: 1px solid var(--line); border-radius: 16px; padding: 12px; background: #fff; display: grid; grid-template-columns: 44px 1fr; gap: 8px; align-items: center; }
+.clk.bad { border-color: #F5C2B8; background: #FFF8F6; }
+.clk svg.ring { width: 44px; height: 44px; transform: rotate(-90deg); }
+.clk .ring circle { fill: none; stroke-width: 5; } .clk .ring .bg { stroke: var(--line); }
+.clk .ring .fg { stroke: var(--sky); stroke-linecap: round; transition: stroke-dashoffset .6s; }
+.clk.bad .ring .fg { stroke: var(--bad); } .clk.wait .ring .fg { stroke: var(--warn); }
+.clk b { font-size: 13.5px; display: block; line-height: 1.2; } .clk .t { font-size: 16px; font-weight: 800; color: var(--navy); }
+.clk.bad .t { color: var(--bad); } .clk small { grid-column: 1 / -1; color: var(--ink-3); font-size: 11.5px; line-height: 1.3; }
+/* chargeback */
+.stake { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.stake .amt { font-size: 30px; font-weight: 800; font-stretch: 108%; } .stake .left { text-align: right; }
+.stake .left b { font-size: 28px; font-weight: 800; color: var(--bad); display: block; line-height: 1; } .stake .left small { color: var(--ink-3); font-size: 12px; }
+.proof { list-style: none; margin: 12px 0 0; padding: 0; display: grid; gap: 8px; }
+.proof li { display: grid; grid-template-columns: 26px 1fr auto; gap: 8px; align-items: start; font-size: 14px; line-height: 1.35; }
+.proof .m { width: 22px; height: 22px; border-radius: 50%; display: grid; place-items: center; font-size: 12px; font-weight: 800; background: var(--good-2); color: var(--good); }
+.proof li.no .m { background: var(--warn-2); color: var(--warn); }
+.proof .tier { font-size: 11px; font-weight: 700; color: var(--ink-3); border: 1px solid var(--line); border-radius: 999px; padding: 1px 7px; }
 @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition: none !important; } }
 </style>
 </head>
@@ -219,9 +240,10 @@ function say(t) {
 function render() {
   const v = S.view; if (!v) return;
   const app = $("#app");
-  if (v.mode === "home") app.innerHTML = home(v);
+  if (v.mode === "home") app.innerHTML = home(v) + clocksHtml(v.clocks);
+  else if (v.case === "chargeback") app.innerHTML = [hero(v.shield.tone, v.shield.account, v.shield.title, v.shield.sub, true), action(v.action), stake(v), clocksHtml(v.clocks), tracker(v.steps)].join("");
   else if (v.mode === "neutral") app.innerHTML = hero("wait", "Paytm team", v.shield.title, v.shield.sub);
-  else app.innerHTML = [hero("bad", "Account " + esc(v.shield.account), v.shield.title, v.shield.sub, true), action(v.action), money(v), tracker(v.steps), docs(v.docs)].join("");
+  else app.innerHTML = [hero("bad", "Account " + esc(v.shield.account), v.shield.title, v.shield.sub, true), action(v.action), money(v), clocksHtml(v.clocks), tracker(v.steps), docs(v.docs)].join("");
   bind();
 }
 function hero(tone, pill, title, sub, listen) {
@@ -235,6 +257,21 @@ function home(v) {
       <div class="kv"><div>Aaj ki sale<b>${rs(v.today.sales)}</b></div><div>Payments<b>${v.today.count}</b></div><div>Agla payout<b>${nx.toLocaleDateString("en-IN", { day: "numeric", month: "short" })}, ${tm(v.today.next_payout)}</b></div></div></section>
     <section class="card"><h2>Kavach ne kya kiya</h2>${v.feed.length ? `<div class="feed">${v.feed.map((f) => `<div class="fi"><span class="ok">✓</span><div><b>${esc(f.title)}</b><small>${esc(f.text)}</small></div></div>`).join("")}</div>`
       : `<p class="empty">Abhi kuch karna nahi pada. Kavach payout, refund aur har payment par nazar rakh raha hai.</p>`}</section>`;
+}
+const left = (secs) => secs >= 86400 ? `${Math.floor(secs / 86400)} din` : secs >= 3600 ? `${Math.floor(secs / 3600)} ghante` : `${Math.max(1, Math.round(secs / 60))} min`;
+function clocksHtml(c) {
+  if (!c || !c.length) return "";
+  const R = 18, C = 2 * Math.PI * R;
+  return `<section class="card clk-wrap"><h2>Kavach in ghadiyon par nazar rakh raha hai</h2><div class="clks">${c.map((k) => {
+    const frac = Math.min(1, k.secs_left / (k.key === "payout" ? 86400 : k.key.startsWith("CB") ? 86400 : 7 * 86400));
+    return `<div class="clk ${k.tone}"><svg class="ring" viewBox="0 0 44 44"><circle class="bg" cx="22" cy="22" r="${R}"/><circle class="fg" cx="22" cy="22" r="${R}" stroke-dasharray="${C}" stroke-dashoffset="${C * (1 - frac)}"/></svg>
+      <div><b>${esc(k.label)}</b><span class="t">${left(k.secs_left)}</span></div><small>${k.amount != null ? rs(k.amount) + " · " : ""}${esc(k.note)}</small></div>`;
+  }).join("")}</div></section>`;
+}
+function stake(v) {
+  if (!v.stake) return "";
+  return `<section class="card"><h2>Daav par</h2><div class="stake"><div class="amt">${rs(v.stake.amount)}</div><div class="left">${v.stake.replied ? `<b style="color:var(--good)">✓ Jawab gaya</b><small>deadline se ${left(v.stake.secs_left)} pehle</small>` : `<b>${left(v.stake.secs_left)}</b><small>jawab ki deadline</small>`}</div></div>
+    <ul class="proof">${v.proof.map((p) => `<li class="${p.ok ? "" : "no"}"><span class="m">${p.ok ? "✓" : "?"}</span><span>${esc(p.label)}</span><span class="tier">${esc(p.tier)}</span></li>`).join("")}</ul></section>`;
 }
 function money(v) {
   if (!v.money.length) return "";
@@ -280,7 +317,8 @@ function renderChat() {
     : `<p class="empty" style="text-align:center;margin-top:30px">Kuch bhi poochiye: payout, refund, freeze, SOP.</p>`;
   $("#chat").scrollTop = 1e9;
   const v = S.view, out = [];
-  if (v && v.mode === "case") out.push("Bank ko kitne din milte hain?", "Payout doosre account mein bhej do", "Ek aadmi 20 hazaar maang raha hai complaint wapas lene ke liye");
+  if (v && v.case === "chargeback") out.push("Chargeback kya hota hai?", "Kal ka paisa kab aayega?");
+  else if (v && v.mode === "case") out.push("Bank ko kitne din milte hain?", "Payout doosre account mein bhej do", "Ek aadmi 20 hazaar maang raha hai complaint wapas lene ke liye");
   else out.push("Kal ka paisa kab aayega?");
   $("#chips").innerHTML = ""; out.forEach((t) => { const b = document.createElement("button"); b.type = "button"; b.textContent = t; b.onclick = () => send(t); $("#chips").appendChild(b); });
   const n = $("#unread"); n.hidden = !S.unread; n.textContent = S.unread;

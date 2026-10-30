@@ -84,6 +84,7 @@ class Engine:
         self.seen_webhooks: set[str] = set()   # failed POS deliveries Kavach has already picked up
         self.seen_returns: set[str] = set()    # payout batches the merchant's bank sent back that Kavach has already picked up
         self.seen_declines: set[str] = set()   # Meena's own UPI payments her bank declined as frozen (YE)
+        self.seen_disputes: set[str] = set()   # chargebacks on the dispute desk Kavach has already picked up
         self.alive = True   # set False on reset so a run still in flight can't paint the new screen
         from .llm import make_planner
         self.planner = make_planner(self)
@@ -241,7 +242,8 @@ class Engine:
         await self.step(inc, "action", action=action, args=_redact(args), summary=res.get("summary", ""), result=res)
         ev = {"schedule_followup": "followup_scheduled", "escalate_to_human": "escalated_to_human", "generate_evidence_pack": "evidence_pack_issued",
               "request_settlement_hold": "payouts_held", "draft_escalation": "escalation_letter_approved", "record_case_event": "case_event_recorded",
-              "initiate_refund": "refund_initiated", "draft_lien_request": "lien_request_approved"}.get(action)
+              "initiate_refund": "refund_initiated", "draft_lien_request": "lien_request_approved", "submit_dispute_response": "chargeback_represented",
+              "accept_chargeback": "chargeback_accepted"}.get(action)
         if ev:
             self._automation(ev, inc, {"action": action, "args": _redact(args), "summary": res.get("summary", "")})
         if verify:
@@ -332,6 +334,15 @@ class Engine:
             m = w.send_message("merchant", "app", letter["en"], inc.id)
             self._phone("kavach", "✉️ Bank ke grievance officer ke liye chitthi taiyaar hai (aapke naam se). Neeche padh lijiye:\n\n" + letter["en"], inc.id)
             return {"msg_id": m["msg_id"], "summary": f"Escalation letter to {a['to']} approved by Meena; ready to hand in or email"}
+        if action == "submit_dispute_response":
+            resp = {"evidence": a.get("evidence") or [], "merchant_attests_handover": bool(a.get("merchant_attests_handover")),
+                    "statement": "Merchant states the goods were handed over at the counter (her statement, T3)" if a.get("merchant_attests_handover") else None}
+            dd = w.respond_dispute(a["dispute_id"], resp)
+            inc.facts["dispute_response"] = resp
+            return {"dispute_id": dd["dispute_id"], "status": dd["status"], "summary": f"Reply filed on {dd['dispute_id']} with {len(resp['evidence'])} record-backed items" + (" + Meena's statement" if resp["statement"] else "")}
+        if action == "accept_chargeback":
+            dd = w.accept_dispute(a["dispute_id"])
+            return {"dispute_id": dd["dispute_id"], "status": dd["status"], "summary": f"{dd['dispute_id']} accepted; ₹{dd['amount']:,} goes back to the payer"}
         if action == "prepare_pa_upload":
             t = w.txn_by_id(a["txn_id"])
             stl = next((x for x in w.settlements if x["batch_id"] == t.get("settlement_batch")), {})
@@ -393,6 +404,10 @@ class Engine:
                 return a["event"] in inc.facts.get("case_events", {}), "Case event is on the incident record"
             if action == "draft_escalation":
                 return bool(inc.facts.get("escalation_letter")), "Letter stored on the case"
+            if action in ("submit_dispute_response", "accept_chargeback"):
+                dd = next((x for x in w.disputes if x["dispute_id"] == a["dispute_id"]), {})
+                want = "REPRESENTED" if action == "submit_dispute_response" else "ACCEPTED"
+                return dd.get("status") == want, f"Dispute desk re-read: {a['dispute_id']} is {dd.get('status')}"
             if action == "prepare_pa_upload":
                 tk = next((x for x in w.ops_queue if x["ticket_id"] == res.get("ticket_id")), None)
                 t = w.txn_by_id(a["txn_id"])
@@ -550,6 +565,9 @@ class Engine:
                 await self.step(inc, "approval_result", approver=approver, approved=False)
                 action = inc.pending["action"]
                 inc.pending = None
+                if hasattr(self.planner, "after_decline") and await self.planner.after_decline(inc, action):
+                    self._emit("incident", {"incident": inc.summary()})
+                    return {"ok": True}
                 inc.status = "with_human" if inc.kind == "freeze" else "resolved"
                 inc.outcome = f"{approver} declined {action.replace('_', ' ')}"
                 return {"ok": True}
@@ -595,6 +613,13 @@ class Engine:
                 self.seen_returns.add(ev["batch_id"])
                 returned.append(ev["batch_id"])
         self._emit("clock", {"now": self.world.now.isoformat()})
+        for d in [x for x in self.world.disputes if x.get("watched") and x["status"] == "OPEN"]:   # the dispute-desk watcher
+            if d["dispute_id"] not in self.seen_disputes:
+                self.seen_disputes.add(d["dispute_id"])
+                if background:
+                    asyncio.create_task(self._safe(self.proactive_dispute(d["dispute_id"])))
+                else:
+                    await self.proactive_dispute(d["dispute_id"])
         for p in self.world.declines_due():   # the PSP watcher: her own payment bounced off a debit freeze
             if p["pay_id"] not in self.seen_declines:
                 self.seen_declines.add(p["pay_id"])
@@ -665,6 +690,22 @@ class Engine:
         self._emit("incident", {"incident": inc.summary()})
         return inc
 
+    async def proactive_dispute(self, dispute_id: str) -> Incident | None:
+        """Kavach on duty: a chargeback landed on the dispute desk. Silence past the deadline costs Meena the amount."""
+        d = next((x for x in self.world.disputes if x["dispute_id"] == dispute_id), None)
+        if not d or any(i.facts.get("dispute_id") == dispute_id for i in self.incidents.values()):
+            return None
+        self._msg_ctx = {"channel": "merchant", "customer": {}}
+        try:
+            inc = self.new_incident("chargeback", f"Chargeback · ₹{d['amount']:,} · reply by {d['respond_by'][11:16]}")
+        finally:
+            self._msg_ctx = {}
+        inc.facts.update({"proactive": True, "dispute_id": dispute_id, "txn_id": d["txn_id"]})
+        async with self.locks[inc.id]:
+            await self.planner.proactive_dispute(inc, d)
+        self._emit("incident", {"incident": inc.summary()})
+        return inc
+
     async def proactive_decline(self, pay_id: str) -> Incident | None:
         """Kavach on duty: Meena's own payment from her bank account was declined with YE (account blocked/frozen).
         For a debit-only freeze this is the one signal that reaches Paytm: payouts still land."""
@@ -701,6 +742,13 @@ class Engine:
                     for f in self.followups:
                         if f["incident"] == inc.id and not f.get("fired") and "payout" in f["purpose"]:
                             f["due"], f["via"] = self.world.now, "settlement-engine callback"
+            return
+        if ev.get("dispute_id"):     # the dispute desk decided: wake the case watching it
+            for inc in self.incidents.values():
+                if inc.status not in ("resolved", "refused") and inc.facts.get("dispute_id") == ev["dispute_id"]:
+                    for f in self.followups:
+                        if f["incident"] == inc.id and not f.get("fired") and "outcome" in f["purpose"]:
+                            f["due"], f["via"] = self.world.now, "dispute-desk callback"
             return
         key, val = ("txn_id", ev.get("txn_id")) if ev.get("txn_id") else ("refund_id", ev.get("refund_id"))
         if not val:

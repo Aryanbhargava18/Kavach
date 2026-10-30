@@ -38,6 +38,7 @@ RULES = {
     "P14": "Money that is being refunded is never counted as paid: no receipt and no ledger entry for it.",
     "P15": "One payment settles one bill. A UTR already in the shop's ledger is never applied again.",
     "P16": "A ledger entry is posted only for a switch-confirmed payment that fits the amount still due on that bill.",
+    "P18": "A chargeback reply carries only evidence that exists in Paytm's records, says goods were handed over only if Meena says so (labelled as her statement), goes out only with her approval, and never after the deadline.",
     "P17": "When Paytm Risk holds two or more independent signals on a merchant, Kavach does not tell them about a freeze, notice or report. Only Legal's neutral template goes out, and Paytm Risk decides.",
 }
 
@@ -46,6 +47,7 @@ RULES_BY_KIND = {
     "duplicate": ["P4", "P5", "P8", "P11", "P12"],
     "freeze": ["P6", "P7", "P9", "P10", "P13", "P17"],
     "settlement": ["P6", "P7", "P9", "P17"],
+    "chargeback": ["P12", "P13", "P18"],
 }
 
 AUTONOMY = {
@@ -252,6 +254,36 @@ def _evidence(world, args, ctx):
     return allow("One exact Paytm record; amounts agree.", "P10")
 
 
+def _dispute_reply(world, args, ctx):
+    from datetime import datetime as _dt
+    d = next((x for x in world.disputes if x["dispute_id"] == args.get("dispute_id")), None)
+    if not d or d["status"] != "OPEN":
+        return deny("P18", "No open chargeback with this id.")
+    if world.now >= _dt.fromisoformat(d["respond_by"]):
+        return deny("P18", "The reply deadline has passed.")
+    t = world.txn_by_id(d["txn_id"])
+    for e in args.get("evidence") or []:
+        k = e.get("kind")
+        ok = (k == "switch" and t and t["status"] == "SUCCESS") or \
+             (k == "ledger" and any(x["utr"] == d["utr"] for x in world.ledger)) or \
+             (k == "soundbox" and any(x["txn_id"] == d["txn_id"] for x in world.soundbox_log))
+        if not ok:
+            return deny("P18", f"Evidence item '{k}' is not backed by a Paytm record for this payment. Kavach does not invent evidence.")
+        if k == "soundbox" and re.search(r"deliver|handed|received the goods|saman diya", str(e.get("claim", "")), re.I):
+            return deny("P18", "A Soundbox announcement shows the payment notification played, not that goods were handed over.")
+    if args.get("merchant_attests_handover") and "merchant" not in ctx.get("approvals", set()):
+        return Decision("NEEDS_APPROVAL", "P18", "Only Meena can say she handed over the goods, and the reply goes out in her name.", ["merchant"])
+    if "merchant" not in ctx.get("approvals", set()):
+        return Decision("NEEDS_APPROVAL", "P18", "The reply goes out in Meena's name.", ["merchant"])
+    return allow("Evidence matches Paytm records; Meena approved; before the deadline.", "P18")
+
+
+def _accept_cb(world, args, ctx):
+    if "merchant" not in ctx.get("approvals", set()):
+        return Decision("NEEDS_APPROVAL", "P18", "Accepting returns the money to the payer; Meena decides.", ["merchant"])
+    return allow("Meena says the goods were not handed over; accepting is the honest outcome.", "P18")
+
+
 def _pa_upload(world, args, ctx):
     t = world.txn_by_id(args.get("txn_id", ""))
     if not t or t["payee_vpa"] != MERCHANT["vpa"] or not t.get("settlement_batch"):
@@ -292,6 +324,8 @@ _CHECKS = {
     "draft_escalation": _draft,
     "draft_lien_request": _draft,
     "prepare_pa_upload": _pa_upload,
+    "submit_dispute_response": _dispute_reply,
+    "accept_chargeback": _accept_cb,
     "issue_verified_receipt": _receipt,
     "replay_soundbox": _soundbox,
     "request_payment": _request_payment,

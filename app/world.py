@@ -83,6 +83,7 @@ class World:
     support_cases: list[dict[str, Any]] = field(default_factory=list)
     own_payments: list[dict[str, Any]] = field(default_factory=list)  # Meena's own UPI payments via the Paytm app (Paytm = her PSP)
     risk_signals: list[dict[str, Any]] = field(default_factory=list)  # Paytm Risk's review signals on this merchant (never a verdict)
+    disputes: list[dict[str, Any]] = field(default_factory=list)      # Paytm dispute desk: chargebacks raised by payers' banks
     lock: threading.RLock = field(default_factory=threading.RLock, repr=False)
 
     def __post_init__(self) -> None:
@@ -202,6 +203,12 @@ class World:
         else:
             b = self._post_settlement(d, due, status="SETTLED")
             b["credited_at"] = self.now
+            net = [x for x in self.disputes if x["status"] in ("DEEMED_VALID", "ACCEPTED", "LOST") and not x.get("netted_in")]
+            for x in net:
+                x["netted_in"] = b["batch_id"]
+                b["amount"] -= x["amount"]
+            if net:
+                b["chargebacks_netted"] = [x["dispute_id"] for x in net]
         return self._event("settlement", f"Settlement engine: {b['batch_id']} ₹{b['amount']:,} ({b['txn_count']} payments) {b['status']}",
                            batch_id=b["batch_id"], txn_ids=list(b["txn_ids"]), status=b["status"], return_code=b.get("return_code"))
 
@@ -260,6 +267,7 @@ class World:
                 elif t["status"] == "FAILED":
                     t["status_reason"] = "Remitter bank timeout. Customer debit auto-reverses (T+1, RBI TAT framework)." if t["debited"] else "Declined before debit."
                     happened.append(self._event("switch", f"UPI switch: {t['txn_id']} moved PENDING → FAILED", txn_id=t["txn_id"]))
+        happened += self._process_disputes()
         for r in self.refunds:
             if r["status"] == "PENDING" and self.now >= r["resolve_at"]:
                 r["status"] = "SUCCESS"
@@ -481,6 +489,46 @@ class World:
             self.own_payments.append(p)
             self._event("psp", f"Paytm app: Meena's ₹{amount:,} to {payee} {'DECLINED by her bank · YE' if frozen else 'paid'}", pay_id=p["pay_id"])
             return p
+
+    def inject_chargeback(self, *, reason: str = "Goods not received", hours: int = 22) -> dict[str, Any]:
+        """A payer's bank raises a chargeback on one of today's counter sales. If the merchant does not reply by
+        respond_by, the dispute is deemed valid and the amount is netted from her next payout (synthetic TAT)."""
+        with self.lock:
+            today = [t for t in self.transactions if t["status"] == "SUCCESS" and t.get("bill_id") and t["created_at"].date() == self.now.date()
+                     and not any(d["txn_id"] == t["txn_id"] for d in self.disputes)]
+            t = max(today, key=lambda x: x["amount"])
+            d = {"dispute_id": f"CB-{77101 + len(self.disputes)}", "txn_id": t["txn_id"], "utr": t["utr"], "amount": t["amount"], "reason": reason,
+                 "raised_at": self.now.isoformat(), "respond_by": (self.now + timedelta(hours=hours)).isoformat(), "status": "OPEN",
+                 "watched": True, "response": None, "decided_at": None, "source": "Paytm dispute desk (synthetic)"}
+            self.disputes.append(d)
+            self._event("dispute", f"Dispute desk: chargeback {d['dispute_id']} ₹{t['amount']:,} · {reason} · reply by {d['respond_by'][11:16]}", dispute_id=d["dispute_id"])
+            return d
+
+    def respond_dispute(self, dispute_id: str, response: dict[str, Any]) -> dict[str, Any]:
+        d = next(x for x in self.disputes if x["dispute_id"] == dispute_id)
+        d.update({"status": "REPRESENTED", "response": response, "responded_at": self.now.isoformat(),
+                  "decide_at": (self.now + timedelta(hours=6)).isoformat()})
+        self._event("dispute", f"Dispute desk: {dispute_id} representation received with {len(response.get('evidence', []))} evidence items", dispute_id=dispute_id)
+        return d
+
+    def accept_dispute(self, dispute_id: str) -> dict[str, Any]:
+        d = next(x for x in self.disputes if x["dispute_id"] == dispute_id)
+        d.update({"status": "ACCEPTED", "decided_at": self.now.isoformat()})
+        self._event("dispute", f"Dispute desk: {dispute_id} accepted by merchant; ₹{d['amount']:,} returns to the payer", dispute_id=dispute_id)
+        return d
+
+    def _process_disputes(self) -> list[dict[str, Any]]:
+        out = []
+        for d in self.disputes:
+            if d["status"] == "OPEN" and self.now >= datetime.fromisoformat(d["respond_by"]):
+                d.update({"status": "DEEMED_VALID", "decided_at": self.now.isoformat()})
+                out.append(self._event("dispute", f"Dispute desk: {d['dispute_id']} no reply by deadline · deemed valid · ₹{d['amount']:,} netted from next payout", dispute_id=d["dispute_id"]))
+            elif d["status"] == "REPRESENTED" and self.now >= datetime.fromisoformat(d["decide_at"]):
+                ev = {e["kind"] for e in d["response"].get("evidence", [])}
+                won = {"switch", "ledger"} <= ev and d["response"].get("merchant_attests_handover")
+                d.update({"status": "WON" if won else "LOST", "decided_at": self.now.isoformat()})
+                out.append(self._event("dispute", f"Dispute desk: {d['dispute_id']} decided {'in the merchant’s favour' if won else 'for the payer'} (simulated issuer decision)", dispute_id=d["dispute_id"]))
+        return out
 
     def declines_due(self) -> list[dict[str, Any]]:
         return [p for p in self.own_payments if p.get("watched") and p["code"] == "YE"]

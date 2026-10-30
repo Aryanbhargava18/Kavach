@@ -296,6 +296,11 @@ async def scenario(name: str, s: Scenario):
         cust = {"name": "Sunita", "wa": "+91 98•• ••418"}
         run_bg(E().customer_message(f"I was charged twice for ₹{d['amount']:,} at Meena Kirana. Please refund one.", None, cust))
         return {"ok": True}
+    elif name == "chargeback":
+        # A payer's bank raises a chargeback on one of today's sales. Silence past the deadline = deemed valid, netted from the payout.
+        w.inject_chargeback(reason="Goods not received")
+        bus.publish({"type": "world", "world": w.snapshot()})
+        return {"ok": True}
     elif name == "supplier_declined":
         # Debit-only freeze: credits still land, so payouts tell Paytm nothing. Meena pays her supplier through the Paytm app;
         # her bank declines it with YE. Kavach's PSP watcher has to notice on its own.

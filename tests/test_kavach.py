@@ -502,3 +502,36 @@ def test_merchant_view_is_a_tracker_and_respects_the_guard():
         gv = mv.build(g, ge)
         assert gv["mode"] == "neutral" and not policy.CASE_DETAIL.search(_json.dumps(gv, ensure_ascii=False))
     run(go())
+
+
+def test_chargeback_clock_reply_in_time_and_honest_accept():
+    async def go():
+        # yes: she handed over the goods -> reply with record-backed evidence before the deadline, then win
+        w = World(); e = Engine(w); d = w.inject_chargeback()
+        await e.tick(1)
+        inc = next(iter(e.incidents.values()))
+        assert inc.kind == "chargeback" and inc.pending["action"] == "submit_dispute_response" and inc.pending["approvers"] == ["merchant"]
+        kinds = {x["kind"] for x in inc.facts["dispute_evidence"]}
+        assert {"switch", "ledger"} <= kinds and all("deliver" not in x["label"].lower() for x in inc.facts["dispute_evidence"])
+        await e.approve(inc.id, "merchant")
+        assert d["status"] == "REPRESENTED" and d["response"]["merchant_attests_handover"]
+        await e.tick(8 * 3600 + 5)
+        assert d["status"] == "WON" and inc.status == "resolved"
+        # no: she didn't -> accept, never a false reply
+        w2 = World(); e2 = Engine(w2); d2 = w2.inject_chargeback()
+        await e2.tick(1); inc2 = next(iter(e2.incidents.values()))
+        await e2.approve(inc2.id, "merchant", yes=False)
+        assert d2["status"] == "ACCEPTED" and d2["response"] is None and inc2.status == "resolved"
+        # silence: past the deadline it is deemed valid and netted from the next payout
+        w3 = World(); d3 = w3.inject_chargeback(hours=2)
+        w3.advance(3 * 3600); assert d3["status"] == "DEEMED_VALID"
+        w3.advance((w3.next_settlement - w3.now).total_seconds() + 60)
+        assert d3.get("netted_in") and d3["dispute_id"] in w3.settlements[-1]["chargebacks_netted"]
+        # P18: no invented evidence, no reply after the deadline
+        w4 = World(); d4 = w4.inject_chargeback()
+        bad = policy.evaluate(w4, "submit_dispute_response", {"dispute_id": d4["dispute_id"], "evidence": [{"kind": "soundbox", "claim": "goods delivered"}]}, {"approvals": {"merchant"}})
+        assert bad.verdict == "DENY" and bad.rule == "P18"
+        w4.advance(23 * 3600)
+        late = policy.evaluate(w4, "submit_dispute_response", {"dispute_id": d4["dispute_id"], "evidence": []}, {"approvals": {"merchant"}})
+        assert late.verdict == "DENY"
+    run(go())

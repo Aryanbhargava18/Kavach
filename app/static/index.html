@@ -70,7 +70,7 @@
       <p class="sub" id="sub">It watches every payment, refund and payout, fixes what it safely can, and tells Meena out loud.</p>
       <div class="go-row" id="go-row">
         <button class="go" data-scn="payout_bounce">Meena's bank freezes her account</button>
-        <button class="ghost" data-scn="live_payment">Take a ₹4,200 payment</button>
+        <button class="ghost" data-scn="chargeback">A chargeback clock</button>
         <button class="ghost" id="st-menu-open2">Judge challenges</button>
       </div>
     </div>
@@ -94,6 +94,7 @@
     <div class="st-menu" id="st-menu" hidden>
       <p>Each one changes what really happened in Paytm's systems (simulated). Kavach has to find out on its own.</p>
       <button data-scn="payout_bounce" class="hero"><b>Meena's bank freezes her account</b><small>Nobody tells her. The next payout bounces; Kavach notices first.</small></button>
+      <button data-scn="chargeback" class="hero"><b>Chargeback: a reply clock nobody is watching</b><small>Silence = money netted. Kavach proves what it can, asks Meena the rest.</small></button>
       <button data-scn="supplier_declined" class="hero"><b>Debit freeze: her payment to a supplier is refused</b><small>Payouts still land. Kavach reads her bank's YE code.</small></button>
       <button data-scn="payout_bounce" data-mule="true"><b>Payout bounces, but Risk has mule signals</b><small>Kavach checks first and withholds details</small></button>
       <button data-scn="live_payment" class="hero"><b>A payment comes in; the billing app misses it</b><small>Nobody complains. Kavach catches it.</small></button>
@@ -135,6 +136,7 @@
         <button data-scn="customer_claim" data-mode="wrong_merchant"><b>Paid a different shop</b><small>Sanjay</small></button>
         <button data-scn="duplicate"><b>Charged twice</b><small>Sunita · ₹2,450, 37 s apart</small></button>
         <button data-scn="duplicate" data-genuine="false"><b>Two customers, same amount</b><small>not a duplicate</small></button>
+        <button data-scn="chargeback"><b>Chargeback with a reply deadline</b><small>dispute-desk watcher · P18 no invented proof</small></button>
         <button data-scn="supplier_declined"><b>Debit freeze: her own payment declined (YE)</b><small>PSP watcher; payouts still land</small></button>
         <button data-scn="payout_bounce" data-mule="true"><b>Payout bounces on a merchant with mule signals</b><small>tipping-off guard (P17)</small></button>
         <button data-scn="payout_bounce"><b>Payout bounces before Meena knows</b><small>bank froze debit and credit; Kavach's payout watcher</small></button>

@@ -16,11 +16,11 @@
   };
   const T2N = { read_screenshot: "customer", lookup_transaction: "switch", get_payment_status: "switch", find_duplicate_payments: "switch", check_sale_pattern: "switch",
     get_merchant_ledger: "ledger", get_refund_status: "refund", get_settlement_status: "payout", get_bank_signal: "payout", get_incident_policy: "policy",
-    get_own_payment_declines: "switch", get_risk_signals: "policy",
+    get_own_payment_declines: "switch", get_risk_signals: "policy", get_disputes: "refund",
     route_sop: "policy", get_sop_clocks: "policy", ask_sop: "policy", read_document: "policy", parse_notice: "policy" };
   const A2N = { reconcile_payment: "ledger", initiate_refund: "refund", request_settlement_hold: "payout", change_settlement_account: "payout",
     send_customer_update_simulated: "customer", issue_verified_receipt: "customer", request_payment: "customer", generate_evidence_pack: "policy",
-    create_support_case: "policy", record_case_event: "policy", draft_escalation: "policy", draft_lien_request: "policy", prepare_pa_upload: "payout", escalate_to_human: "policy", replay_soundbox: null };
+    create_support_case: "policy", record_case_event: "policy", draft_escalation: "policy", draft_lien_request: "policy", prepare_pa_upload: "payout", submit_dispute_response: "refund", accept_chargeback: "refund", escalate_to_human: "policy", replay_soundbox: null };
   const COL2N = { switch: "switch", ledger: "ledger", refund: "refund", settlement: "payout", claim: "customer" };
   const TVERB = { read_screenshot: "Reading the customer's screenshot", lookup_transaction: "Finding the payment at the UPI switch",
     get_payment_status: "Asking the UPI switch what really happened", get_merchant_ledger: "Checking Meena's billing app",
@@ -29,8 +29,8 @@
     find_duplicate_payments: "Looking for a double charge", get_bank_signal: "Checking what Paytm can see of her bank",
     read_document: "Reading the bank notice", parse_notice: "Pulling the facts out of the notice", route_sop: "Finding the right step in the cyber-fraud SOP",
     get_sop_clocks: "Working out the deadlines", ask_sop: "Looking it up in the SOP", check_sale_pattern: "Comparing with her usual sales",
-    get_own_payment_declines: "Checking her own payments through the Paytm app", get_risk_signals: "Checking with Paytm Risk before saying anything" };
-  const FIXES = new Set(["prepare_pa_upload", "draft_lien_request", "reconcile_payment", "issue_verified_receipt", "initiate_refund", "request_settlement_hold", "request_payment", "generate_evidence_pack", "send_customer_update_simulated"]);
+    get_own_payment_declines: "Checking her own payments through the Paytm app", get_disputes: "Reading the dispute desk", get_risk_signals: "Checking with Paytm Risk before saying anything" };
+  const FIXES = new Set(["submit_dispute_response", "accept_chargeback", "prepare_pa_upload", "draft_lien_request", "reconcile_payment", "issue_verified_receipt", "initiate_refund", "request_settlement_hold", "request_payment", "generate_evidence_pack", "send_customer_update_simulated"]);
 
   const ST = { nodeState: {}, activeNode: null, seenM: new Set(), billStatus: {}, sig: "", boxTimer: null, q: [], qBusy: false };
 
@@ -119,6 +119,7 @@
   function captionFor(s, inc) {
     switch (s.kind) {
       case "intake":
+        if (s.sender === "monitor" && s.engine === "dispute-monitor") return ["A chargeback clock just started. Nobody is watching it.", s.text, "warn", 2800];
         if (s.sender === "monitor" && s.engine === "psp-monitor") return ["Meena's bank just refused her own payment.", s.text + " · nobody has told Meena what it means", "warn", 2800];
         if (s.sender === "monitor" && s.engine === "payout-monitor") return ["Meena's bank just sent her payout back.", s.text + " · nobody has told Meena", "warn", 2800];
         if (s.sender === "monitor") return ["Meena's billing app never heard about this payment.", s.text, "warn", 2600];
@@ -289,6 +290,11 @@
         : `Meena warned in <b class="good">${dur(secs(inc.created_at, warned.at))}</b>, before her first supplier payment bounced.`;
       if (inc.money && inc.money.amount) h += ` <b class="amt-b">${rs(inc.money.amount)}</b> ${esc(inc.money.label)}.`;
       if (denies) h += ` Stopped <b class="bad">${denies}</b> unsafe step${denies > 1 ? "s" : ""}.`;
+    } else if (inc.kind === "chargeback") {
+      const intake = steps.find((x) => x.kind === "intake");
+      const reply = steps.find((x) => x.kind === "verify" && x.ok && x.action === "submit_dispute_response");
+      h = reply ? esc(inc.headline || "") : `Caught in <b class="good">${dur(secs(inc.created_at, (steps.find((x) => x.kind === "action" && x.action === "notify_merchant") || intake || {}).at || inc.created_at))}</b>, with the reply clock still running. <b class="amt-b">${rs((inc.money || {}).amount)}</b> at stake.`;
+      if (denies) h += ` Stopped <b class="bad">${denies}</b> unsafe step${denies > 1 ? "s" : ""}.`;
     } else if (fix) {
       const proactive = inc.facts && inc.facts.proactive;
       const repaired = steps.some((x) => x.kind === "verify" && x.ok && x.action === "reconcile_payment");
@@ -303,7 +309,7 @@
     }
     const fu = (S.followups || []).filter((f) => f.incident === inc.id && !f.fired)[0];
     const handled = all.length, stopped = all.reduce((n, i) => n + (S.steps[i.id] || []).filter((s) => s.kind === "policy" && s.verdict === "DENY").length, 0);
-    const money = all.filter((i) => i.kind !== "freeze").reduce((n, i) => n + ((i.money && i.money.amount) || 0), 0);
+    const money = all.filter((i) => i.kind !== "freeze" && (i.kind !== "chargeback" || /WON/.test(i.outcome || ""))).reduce((n, i) => n + ((i.money && i.money.amount) || 0), 0);
     const small = inc.status === "resolved" ? `Closed: ${inc.outcome || ""}` : fu ? `Next, on its own: ${fu.purpose.toLowerCase()} (${dayTm(fu.due)})` : "";
     r.innerHTML = `${h}<small>${esc(small)}${small ? " · " : ""}Today: ${handled} case${handled > 1 ? "s" : ""}, ${money ? rs(money) + " kept right, " : ""}${stopped} unsafe step${stopped === 1 ? "" : "s"} stopped, 0 support tickets.</small>`;
   }
@@ -339,7 +345,7 @@
 
   // ------------------------------------------------------------------ phases: detect → investigate → reconcile → act → verify → follow up
   const ACT = new Set(["reconcile_payment", "issue_verified_receipt", "request_payment", "initiate_refund", "request_settlement_hold", "generate_evidence_pack",
-    "replay_soundbox", "record_case_event", "change_settlement_account", "draft_escalation", "draft_lien_request"]);
+    "replay_soundbox", "record_case_event", "change_settlement_account", "draft_escalation", "draft_lien_request", "submit_dispute_response", "accept_chargeback"]);
   const PH = ["detect", "investigate", "reconcile", "act", "verify", "follow"];
   function phaseOf(s) {
     switch (s.kind) {

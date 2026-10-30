@@ -38,6 +38,8 @@ READ_TOOLS: dict[str, dict[str, Any]] = {
                            "params": {"txn_id": "string"}},
     "get_own_payment_declines": {"desc": "The merchant's own outgoing UPI payments made through the Paytm app (Paytm is her PSP), with her bank's response codes. YE = remitting account blocked/frozen.",
                                  "params": {}},
+    "get_disputes": {"desc": "Paytm dispute desk: chargebacks on this merchant's payments, with reason, amount and the reply deadline (silence = deemed valid).",
+                     "params": {}},
     "get_risk_signals": {"desc": "Paytm Risk's review signals on this merchant (repeat CFCFRMS reports, fan-in, shared accounts). Review signals only, never a verdict.",
                          "params": {}},
 }
@@ -65,6 +67,9 @@ WRITE_TOOLS: dict[str, dict[str, Any]] = {
                          "params": {"to": "string", "reason": "string"}},
     "prepare_pa_upload": {"desc": "Prepare Paytm's own SOP 9.5(ii) duty as payment aggregator: the settlement details for a reported payment, for Paytm's nodal officer to review and upload to CFCFRMS. Kavach never uploads.",
                           "params": {"txn_id": "string"}},
+    "submit_dispute_response": {"desc": "Reply to a chargeback on Meena's behalf with evidence items drawn from Paytm records (kind: switch|ledger|soundbox) and, only if she says so, her statement that she handed over the goods. Needs her approval; never after the deadline.",
+                                "params": {"dispute_id": "string", "evidence": "array", "merchant_attests_handover": "boolean?"}},
+    "accept_chargeback": {"desc": "Accept a chargeback (the payer gets the money back). Only when Meena says she did not hand over the goods.", "params": {"dispute_id": "string"}},
     "draft_lien_request": {"desc": "Draft a request, in Meena's name, asking her bank to limit the hold to the disputed amount and to tell her the reason, officer and removal process. Never sent without her approval.",
                            "params": {"reason": "string?"}},
     "escalate_to_human": {"desc": "Hand the incident to a Paytm human (Support/Risk).", "params": {"queue": "string", "summary": "string"}},
@@ -335,6 +340,12 @@ def _declines(w: World, a):
             (f"{len(ye)} of her own payments declined by her bank · YE (account blocked/frozen)" if ye else "no declines on her own payments"))
 
 
+def _disputes(w: World, a):
+    out = [{k: d.get(k) for k in ("dispute_id", "txn_id", "utr", "amount", "reason", "raised_at", "respond_by", "status", "netted_in")} for d in w.disputes]
+    op = [d for d in out if d["status"] == "OPEN"]
+    return {"disputes": out[::-1], "open": len(op)}, (f"{len(op)} open chargeback{'s' if len(op) != 1 else ''}" + (f" · reply by {op[0]['respond_by'][11:16]}" if op else ""))
+
+
 def _risk(w: World, a):
     sig = list(w.risk_signals)
     kinds = {x["signal"] for x in sig}
@@ -344,6 +355,7 @@ def _risk(w: World, a):
 
 _READ_IMPL = {
     "get_own_payment_declines": _declines,
+    "get_disputes": _disputes,
     "get_risk_signals": _risk,
     "get_merchant_ledger": _ledger,
     "get_incident_policy": _policy,
