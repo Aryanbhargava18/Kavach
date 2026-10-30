@@ -1,169 +1,333 @@
 <!doctype html>
-<html lang="en">
+<html lang="hi">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="theme-color" content="#06163A">
-<title>Kavach · Meena's phone</title>
+<meta name="theme-color" content="#002E6E">
+<title>Kavach Shield</title>
 <style>
-@font-face { font-family: "Anek"; src: url(/static/fonts/anek-latin.woff2) format("woff2"); font-weight: 100 800; }
-@font-face { font-family: "Anek"; src: url(/static/fonts/anek-devanagari.woff2) format("woff2"); font-weight: 100 800;
+@font-face { font-family: "Anek"; src: url(/static/fonts/anek-latin.woff2) format("woff2"); font-weight: 100 800; font-stretch: 75% 125%; }
+@font-face { font-family: "Anek"; src: url(/static/fonts/anek-devanagari.woff2) format("woff2"); font-weight: 100 800; font-stretch: 75% 125%;
   unicode-range: U+0900-097F,U+1CD0-1CF9,U+200C-200D,U+20A8,U+20B9,U+20F0,U+25CC,U+A830-A839,U+A8E0-A8FF; }
-:root { --navy: #06163A; --navy-2: #0D2A63; --ink: #14213D; --ink-2: #4A5873; --line: #DCE3EF; --bg: #F4F6FA; --amber: #FFB020;
-  --good: #0E7A4E; --bad: #B32A1B; }
-* { box-sizing: border-box; }
-html, body { margin: 0; height: 100%; background: var(--bg); color: var(--ink); font-family: "Anek", system-ui, sans-serif; }
-body { display: flex; flex-direction: column; max-width: 560px; margin: 0 auto; }
-header { background: var(--navy); color: #EEF4FF; padding: 14px 16px; display: flex; gap: 12px; align-items: center; position: sticky; top: 0; z-index: 2; }
-header .av { width: 40px; height: 40px; border-radius: 50%; background: #1FB6F0; color: var(--navy); display: grid; place-items: center; font-weight: 800; font-size: 20px; flex: none; }
-header b { display: block; font-size: 18px; } header span { font-size: 13px; color: #A9C3EA; }
-header .sim { margin-left: auto; font-size: 11px; color: #A9C3EA; border: 1px dashed #4A6AA8; border-radius: 999px; padding: 3px 8px; white-space: nowrap; }
-main { flex: 1; overflow-y: auto; padding: 14px 12px 8px; display: flex; flex-direction: column; gap: 10px; }
-.msg { max-width: 88%; padding: 10px 12px; border-radius: 16px; font-size: 16px; line-height: 1.4; white-space: pre-wrap; word-wrap: break-word; }
-.msg.k { background: #fff; border: 1px solid var(--line); align-self: flex-start; border-top-left-radius: 4px; }
-.msg.m { background: var(--navy-2); color: #fff; align-self: flex-end; border-top-right-radius: 4px; }
-.msg small { display: block; margin-top: 4px; font-size: 11px; color: #8A96AE; }
-.msg.m small { color: #A9C3EA; }
-.msg .who { font-size: 12px; font-weight: 700; color: var(--navy-2); margin-bottom: 2px; }
-.acts { display: flex; gap: 8px; margin-top: 10px; flex-wrap: wrap; }
-.acts button { flex: 1; min-height: 44px; border-radius: 12px; border: 0; font: 600 16px "Anek", sans-serif; cursor: pointer; }
-.yes { background: var(--navy-2); color: #fff; } .no { background: #E8ECF4; color: var(--ink); }
-.done { color: var(--good); font-weight: 700; font-size: 14px; margin-top: 8px; }
-.pack { margin-top: 8px; display: inline-block; background: #EAF7F0; color: var(--good); border-radius: 10px; padding: 8px 10px; font-weight: 700; text-decoration: none; }
-.hint { color: var(--ink-2); text-align: center; font-size: 14px; margin: 24px 12px; }
-.chips { display: flex; gap: 8px; overflow-x: auto; padding: 8px 12px; scrollbar-width: none; }
-.chips button { flex: none; border: 1px solid var(--line); background: #fff; border-radius: 999px; padding: 9px 14px; font: 500 14px "Anek", sans-serif; color: var(--navy-2); min-height: 40px; cursor: pointer; }
-.chips button.doc { border-color: var(--navy-2); font-weight: 700; }
-form { display: flex; gap: 8px; padding: 8px 12px calc(10px + env(safe-area-inset-bottom)); background: #fff; border-top: 1px solid var(--line); }
-form input[type=text] { flex: 1; min-width: 0; border: 1px solid var(--line); border-radius: 999px; padding: 0 16px; font: 16px "Anek", sans-serif; min-height: 46px; }
-.ibtn { width: 46px; height: 46px; border-radius: 50%; border: 0; background: var(--navy-2); color: #fff; display: grid; place-items: center; cursor: pointer; flex: none; }
-.ibtn.cam { background: #E8ECF4; color: var(--navy-2); }
-.ibtn svg { width: 22px; height: 22px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
-#gate { position: fixed; inset: 0; background: var(--navy); color: #EEF4FF; display: flex; flex-direction: column; justify-content: center; padding: 32px 24px; gap: 18px; z-index: 5; }
-#gate h1 { font-size: 34px; line-height: 1.1; margin: 0; } #gate p { color: #A9C3EA; font-size: 17px; line-height: 1.45; margin: 0; }
-#gate button { background: var(--amber); color: var(--navy); border: 0; border-radius: 14px; min-height: 56px; font: 800 19px "Anek", sans-serif; cursor: pointer; }
-#gate small { color: #6F8FC0; font-size: 13px; }
-.toast { position: fixed; left: 50%; top: 76px; transform: translateX(-50%); background: var(--ink); color: #fff; padding: 8px 14px; border-radius: 999px; font-size: 14px; z-index: 4; opacity: 0; transition: opacity .2s; pointer-events: none; }
-.toast.on { opacity: 1; }
-@media (prefers-reduced-motion: reduce) { .toast { transition: none; } }
+:root {
+  --navy: #002E6E; --sky: #00BAF2; --sky-2: #E6F7FD; --ink: #0B1B33; --ink-2: #4B5B73; --ink-3: #8794A8; --line: #E4E9F0; --bg: #F3F6FA; --card: #fff;
+  --good: #0E8A55; --good-2: #E5F6EE; --warn: #B76B00; --warn-2: #FFF3DF; --bad: #C2341F; --bad-2: #FDECE8;
+  --r: 18px; --sh: 0 1px 2px rgba(11,27,51,.06), 0 6px 18px rgba(11,27,51,.06);
+}
+* { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+html, body { margin: 0; background: var(--bg); color: var(--ink); font-family: "Anek", system-ui, sans-serif; font-stretch: 100%; }
+body { max-width: 480px; margin: 0 auto; min-height: 100dvh; padding-bottom: 84px; }
+button { font: inherit; color: inherit; }
+.bar { position: sticky; top: 0; z-index: 5; background: #fff; border-bottom: 1px solid var(--line); padding: 10px 16px; display: flex; align-items: center; gap: 10px; }
+.bar .logo { width: 34px; height: 34px; border-radius: 10px; background: linear-gradient(135deg, var(--sky), var(--navy)); display: grid; place-items: center; color: #fff; flex: none; }
+.bar .logo svg { width: 19px; height: 19px; fill: none; stroke: #fff; stroke-width: 2.2; stroke-linejoin: round; }
+.bar small { display: block; font-size: 11.5px; color: var(--ink-3); letter-spacing: .02em; }
+.bar b { font-size: 17px; font-weight: 750; }
+.bar .tag { margin-left: auto; font-size: 10.5px; font-weight: 700; color: var(--ink-3); border: 1px dashed var(--ink-3); border-radius: 999px; padding: 2px 8px; }
+main { padding: 14px 14px 0; display: flex; flex-direction: column; gap: 12px; }
+
+/* status hero */
+.hero { border-radius: 22px; padding: 18px 18px 16px; color: #fff; position: relative; overflow: hidden; box-shadow: var(--sh); }
+.hero.ok { background: linear-gradient(140deg, #00A5E0 0%, #0062B0 55%, #002E6E 100%); }
+.hero.bad { background: linear-gradient(140deg, #13336B 0%, #0B2350 60%, #2A1240 100%); }
+.hero.wait { background: linear-gradient(140deg, #3A4A63 0%, #1F2C44 100%); }
+.hero .row { display: flex; align-items: center; gap: 10px; }
+.hero .shield { width: 44px; height: 44px; border-radius: 14px; background: rgba(255,255,255,.14); display: grid; place-items: center; flex: none; position: relative; }
+.hero .shield svg { width: 24px; height: 24px; fill: none; stroke: #fff; stroke-width: 2; stroke-linejoin: round; stroke-linecap: round; }
+.hero.bad .shield::after { content: ""; position: absolute; inset: -4px; border-radius: 18px; border: 2px solid #FF8A73; animation: ring 1.8s ease-out infinite; }
+@keyframes ring { from { opacity: .9; transform: scale(.9); } to { opacity: 0; transform: scale(1.25); } }
+.hero .pill { font-size: 12px; font-weight: 700; background: rgba(255,255,255,.16); border-radius: 999px; padding: 3px 10px; }
+.hero.bad .pill { background: #FF6A4F; color: #fff; }
+.hero h1 { font-size: 27px; line-height: 1.12; margin: 14px 0 6px; font-weight: 750; font-stretch: 105%; }
+.hero p { margin: 0; font-size: 15px; line-height: 1.4; color: rgba(255,255,255,.86); }
+.hero .listen { margin-top: 14px; display: inline-flex; align-items: center; gap: 8px; background: rgba(255,255,255,.14); border: 0; border-radius: 999px; padding: 8px 14px; color: #fff; font-weight: 600; font-size: 14px; cursor: pointer; }
+.hero .listen svg { width: 16px; height: 16px; fill: #fff; }
+.hero .big { font-size: 40px; font-weight: 800; font-stretch: 110%; margin: 10px 0 0; letter-spacing: -.01em; }
+.hero .kv { display: flex; gap: 18px; margin-top: 10px; font-size: 13px; color: rgba(255,255,255,.8); }
+.hero .kv b { display: block; color: #fff; font-size: 15px; }
+
+/* cards */
+.card { background: var(--card); border-radius: var(--r); box-shadow: var(--sh); padding: 16px; }
+.card h2 { font-size: 13px; text-transform: uppercase; letter-spacing: .06em; color: var(--ink-3); margin: 0 0 12px; font-weight: 700; }
+
+/* money map */
+.money .top { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; }
+.money .top .amt { font-size: 30px; font-weight: 800; font-stretch: 108%; letter-spacing: -.01em; }
+.money .ratio { font-size: 13px; font-weight: 800; color: var(--bad); background: var(--bad-2); border-radius: 999px; padding: 4px 10px; white-space: nowrap; }
+.money .bar2 { height: 14px; border-radius: 999px; background: #F6D8D1; margin: 12px 0 14px; overflow: hidden; display: flex; }
+.money .bar2 i { display: block; height: 100%; background: var(--warn); min-width: 4px; border-radius: 999px; transition: width .8s cubic-bezier(.2,.8,.2,1); }
+.mrow { display: flex; align-items: center; gap: 10px; padding: 10px 0; border-top: 1px solid var(--line); }
+.mrow .dot { width: 10px; height: 10px; border-radius: 50%; flex: none; }
+.mrow .dot.bad { background: #E8A597; } .mrow .dot.warn { background: var(--warn); } .mrow .dot.good { background: var(--good); }
+.mrow div { flex: 1; min-width: 0; } .mrow b { font-size: 15px; } .mrow small { display: block; color: var(--ink-3); font-size: 12px; }
+.mrow .v { font-size: 17px; font-weight: 750; flex: none; }
+.mrow .v.good { color: var(--good); }
+
+/* the one action */
+.act { border: 2px solid var(--sky); background: linear-gradient(180deg, var(--sky-2), #fff 60%); }
+.act .eyebrow { font-size: 12px; font-weight: 800; color: #0079B8; letter-spacing: .06em; text-transform: uppercase; display: flex; align-items: center; gap: 6px; }
+.act .eyebrow::before { content: ""; width: 8px; height: 8px; border-radius: 50%; background: var(--sky); animation: blink 1.4s ease-in-out infinite; }
+@keyframes blink { 50% { opacity: .25; } }
+.act h3 { font-size: 21px; line-height: 1.2; margin: 8px 0 6px; font-weight: 750; }
+.act p { margin: 0 0 14px; color: var(--ink-2); font-size: 15px; line-height: 1.45; }
+.cta { width: 100%; min-height: 52px; border: 0; border-radius: 14px; background: var(--navy); color: #fff; font-size: 17px; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; }
+.cta:active { transform: scale(.985); }
+.cta.alt { background: #fff; color: var(--navy); border: 1.5px solid var(--line); margin-top: 8px; min-height: 46px; font-size: 15px; }
+.cta[disabled] { opacity: .55; }
+.act.wait { border-color: var(--line); background: #fff; }
+.act.wait .eyebrow::before { background: var(--ink-3); animation: none; }
+.count { font-size: 44px; font-weight: 800; font-stretch: 110%; color: var(--navy); line-height: 1; }
+
+/* tracker */
+.trk { list-style: none; margin: 0; padding: 0; }
+.trk li { display: grid; grid-template-columns: 26px 1fr; gap: 10px; position: relative; padding-bottom: 14px; }
+.trk li:last-child { padding-bottom: 0; }
+.trk li::before { content: ""; position: absolute; left: 12px; top: 24px; bottom: -2px; width: 2px; background: var(--line); }
+.trk li:last-child::before { display: none; }
+.trk li.done::before { background: var(--good); }
+.trk .k { width: 26px; height: 26px; border-radius: 50%; border: 2px solid var(--line); background: #fff; display: grid; place-items: center; z-index: 1; transition: background .3s, border-color .3s; }
+.trk .k svg { width: 14px; height: 14px; fill: none; stroke: #fff; stroke-width: 3; stroke-linecap: round; stroke-linejoin: round; opacity: 0; transition: opacity .3s; }
+.trk li.done .k { background: var(--good); border-color: var(--good); } .trk li.done .k svg { opacity: 1; }
+.trk li.now .k { border-color: var(--sky); box-shadow: 0 0 0 5px rgba(0,186,242,.18); }
+.trk li.now .k::after { content: ""; width: 10px; height: 10px; border-radius: 50%; background: var(--sky); animation: blink 1.2s ease-in-out infinite; }
+.trk li.blocked .k { border-color: var(--bad); background: var(--bad); }
+.trk b { font-size: 15.5px; font-weight: 650; display: block; padding-top: 2px; }
+.trk li.todo b { color: var(--ink-3); font-weight: 500; }
+.trk small { display: block; color: var(--ink-2); font-size: 13px; line-height: 1.35; }
+.trk li.todo small { color: var(--ink-3); }
+.trk li.blocked small { color: var(--bad); }
+
+/* documents */
+.docs { display: grid; gap: 10px; }
+.doc { display: flex; gap: 12px; align-items: center; border: 1px solid var(--line); border-radius: 14px; padding: 12px; background: #fff; text-decoration: none; color: inherit; cursor: pointer; text-align: left; width: 100%; }
+.doc .ic { width: 40px; height: 48px; border-radius: 8px; background: var(--sky-2); color: var(--navy); display: grid; place-items: center; font-size: 11px; font-weight: 800; flex: none; }
+.doc .ic.letter { background: var(--warn-2); color: var(--warn); }
+.doc div { flex: 1; min-width: 0; } .doc b { font-size: 15px; display: block; } .doc small { color: var(--ink-3); font-size: 12.5px; }
+.doc .go { color: var(--navy); font-weight: 700; font-size: 13px; flex: none; }
+
+/* home feed */
+.feed { display: grid; gap: 0; }
+.fi { display: flex; gap: 10px; padding: 10px 0; border-top: 1px solid var(--line); }
+.fi:first-child { border-top: 0; padding-top: 0; }
+.fi .ok { width: 28px; height: 28px; border-radius: 50%; background: var(--good-2); color: var(--good); display: grid; place-items: center; flex: none; font-weight: 800; }
+.fi b { font-size: 14.5px; display: block; } .fi small { color: var(--ink-2); font-size: 13px; }
+.empty { color: var(--ink-3); font-size: 14px; }
+
+/* ask Kavach */
+.ask { position: fixed; left: 50%; transform: translateX(-50%); bottom: calc(16px + env(safe-area-inset-bottom)); z-index: 6; display: flex; align-items: center; gap: 10px;
+  background: var(--navy); color: #fff; border: 0; border-radius: 999px; padding: 9px 16px 9px 10px; font-size: 15px; font-weight: 650; box-shadow: 0 8px 24px rgba(0,46,110,.35); cursor: pointer; white-space: nowrap; }
+.ask .mic { width: 30px; height: 30px; border-radius: 50%; background: var(--sky); display: grid; place-items: center; }
+.ask .mic svg { width: 16px; height: 16px; fill: none; stroke: #fff; stroke-width: 2.2; stroke-linecap: round; }
+.ask .n { background: #FF6A4F; border-radius: 999px; font-size: 11px; padding: 1px 7px; margin-left: 2px; }
+.sheet { position: fixed; inset: 0; z-index: 8; background: rgba(11,27,51,.42); display: none; }
+.sheet.on { display: block; }
+.sheet .panel { position: absolute; left: 50%; transform: translateX(-50%); bottom: 0; width: 100%; max-width: 480px; height: 82dvh; background: var(--bg); border-radius: 22px 22px 0 0; display: flex; flex-direction: column; overflow: hidden; animation: up .25s cubic-bezier(.2,.8,.2,1); }
+@keyframes up { from { transform: translate(-50%, 30px); opacity: 0; } }
+.sheet header { display: flex; align-items: center; justify-content: space-between; padding: 14px 16px; background: #fff; border-bottom: 1px solid var(--line); }
+.sheet header b { font-size: 17px; } .sheet header button { border: 0; background: var(--bg); border-radius: 999px; width: 34px; height: 34px; cursor: pointer; font-size: 16px; }
+.chat { flex: 1; overflow-y: auto; padding: 12px; display: flex; flex-direction: column; gap: 8px; }
+.msg { max-width: 86%; padding: 9px 12px; border-radius: 16px; font-size: 15px; line-height: 1.4; white-space: pre-wrap; overflow-wrap: anywhere; }
+.msg.k { background: #fff; align-self: flex-start; border-top-left-radius: 4px; box-shadow: var(--sh); }
+.msg.m { background: var(--navy); color: #fff; align-self: flex-end; border-top-right-radius: 4px; }
+.msg small { display: block; margin-top: 3px; font-size: 11px; color: var(--ink-3); } .msg.m small { color: #A9C3EA; }
+.chips { display: flex; gap: 8px; overflow-x: auto; padding: 8px 12px; scrollbar-width: none; background: var(--bg); }
+.chips button { flex: none; border: 1px solid var(--line); background: #fff; border-radius: 999px; padding: 8px 13px; font-size: 14px; color: var(--navy); min-height: 38px; cursor: pointer; }
+.compose { display: flex; gap: 8px; padding: 8px 12px calc(10px + env(safe-area-inset-bottom)); background: #fff; border-top: 1px solid var(--line); }
+.compose input[type=text] { flex: 1; min-width: 0; border: 1px solid var(--line); border-radius: 999px; padding: 0 16px; font: 16px "Anek", sans-serif; min-height: 44px; }
+.ib { width: 44px; height: 44px; border-radius: 50%; border: 0; background: var(--navy); color: #fff; display: grid; place-items: center; cursor: pointer; flex: none; }
+.ib.cam { background: var(--sky-2); color: var(--navy); }
+.ib svg { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.letter pre { white-space: pre-wrap; font: 13.5px/1.5 "Anek", sans-serif; margin: 0; padding: 16px; overflow-y: auto; flex: 1; background: #fff; }
+
+/* push banner */
+.push { position: fixed; left: 50%; top: 8px; transform: translate(-50%, -140%); width: calc(100% - 16px); max-width: 464px; z-index: 9; background: rgba(255,255,255,.97); border-radius: 18px;
+  box-shadow: 0 10px 30px rgba(11,27,51,.22); padding: 12px 14px; display: flex; gap: 10px; transition: transform .35s cubic-bezier(.2,.8,.2,1); cursor: pointer; }
+.push.on { transform: translate(-50%, 0); }
+.push .logo { width: 30px; height: 30px; border-radius: 9px; background: linear-gradient(135deg, var(--sky), var(--navy)); flex: none; }
+.push b { font-size: 13px; display: block; } .push span { font-size: 14px; color: var(--ink-2); display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+
+/* gate */
+#gate { position: fixed; inset: 0; z-index: 20; background: linear-gradient(160deg, #00A5E0, #002E6E 60%); color: #fff; display: flex; flex-direction: column; justify-content: flex-end; padding: 28px 22px calc(28px + env(safe-area-inset-bottom)); gap: 14px; }
+#gate h1 { font-size: 36px; line-height: 1.05; margin: 0; font-weight: 800; font-stretch: 110%; }
+#gate p { margin: 0; color: rgba(255,255,255,.85); font-size: 16px; line-height: 1.45; }
+#gate button { background: #fff; color: var(--navy); border: 0; border-radius: 16px; min-height: 56px; font-size: 18px; font-weight: 800; cursor: pointer; margin-top: 8px; }
+#gate small { color: rgba(255,255,255,.65); font-size: 12.5px; text-align: center; }
+.embed #gate, .embed .bar .tag { display: none; }
+.embed .ask { left: auto; right: 12px; transform: none; padding: 7px; font-size: 0; gap: 0; }
+.embed .ask .n { font-size: 11px; position: absolute; top: -4px; right: -4px; }
+.embed body, body.embed { padding-bottom: 80px; }
+@media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition: none !important; } }
 </style>
 </head>
 <body>
 <div id="gate">
-  <h1>You are Meena.</h1>
-  <p>Meena Kirana Store, Lucknow. Kavach is your teammate inside the Paytm for Business app. Keep this phone in your hand and the sound on. When something goes wrong with your money, Kavach tells you here, out loud in Hindi.</p>
-  <button id="start" type="button">Main Meena hoon · Start</button>
+  <h1>Aap Meena hain.</h1>
+  <p>Meena Kirana Store, Lucknow. Kavach Shield aapke Paytm for Business app ke andar hai. Phone haath mein rakhiye, awaaz chalu rakhiye. Paise ke saath kuch bhi galat ho, Kavach pehle batayega.</p>
+  <button id="start" type="button">Main Meena hoon · Shuru karo</button>
   <small>Synthetic demo. No real money, bank or police systems.</small>
 </div>
-<header><div class="av">K</div><div><b>Kavach</b><span>Paytm for Business · Meena Kirana Store</span></div><span class="sim">SIMULATED</span></header>
-<main id="feed" aria-live="polite"><p class="hint">Kavach writes here when something needs you.</p></main>
-<div class="chips" id="chips"></div>
-<form id="f" autocomplete="off">
-  <label class="ibtn cam" title="Photo of a bank SMS or notice"><input id="cam" type="file" accept="image/*" capture="environment" hidden><svg viewBox="0 0 24 24"><path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.5"/></svg></label>
-  <input id="t" type="text" placeholder="Likhiye…" aria-label="Message to Kavach">
-  <button class="ibtn" type="submit" aria-label="Send"><svg viewBox="0 0 24 24"><path d="M4 12h14M13 6l6 6-6 6"/></svg></button>
-</form>
-<div class="toast" id="toast"></div>
+<div class="bar">
+  <div class="logo"><svg viewBox="0 0 24 24"><path d="M12 3l7 3v6c0 4-3 7-7 9-4-2-7-5-7-9V6z"/></svg></div>
+  <div><small>Paytm for Business · Meena Kirana Store</small><b>Kavach Shield</b></div>
+  <span class="tag">SIMULATED</span>
+</div>
+<main id="app"></main>
+<button class="ask" id="ask" type="button"><span class="mic"><svg viewBox="0 0 24 24"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg></span>Poochiye<span class="n" id="unread" hidden></span></button>
+<div class="sheet" id="sheet"><div class="panel">
+  <header><b>Kavach</b><button type="button" data-close aria-label="Close">✕</button></header>
+  <div class="chat" id="chat"></div>
+  <div class="chips" id="chips"></div>
+  <form class="compose" id="compose" autocomplete="off">
+    <label class="ib cam" title="Photo of a bank SMS or notice"><input class="camin" type="file" accept="image/*" capture="environment" hidden><svg viewBox="0 0 24 24"><path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.5"/></svg></label>
+    <input id="t" type="text" placeholder="Likhiye…" aria-label="Message to Kavach">
+    <button class="ib" type="submit" aria-label="Send"><svg viewBox="0 0 24 24"><path d="M4 12h14M13 6l6 6-6 6"/></svg></button>
+  </form>
+</div></div>
+<div class="sheet letter" id="letter"><div class="panel"><header><b>Bank ke liye request</b><button type="button" data-close aria-label="Close">✕</button></header><pre id="lettertext"></pre></div></div>
+<div class="push" id="push"><div class="logo"></div><div><b>Kavach · abhi</b><span id="pushtext"></span></div></div>
+<input id="cam" class="camin" type="file" accept="image/*" capture="environment" hidden>
 <script>
 "use strict";
 const $ = (q) => document.querySelector(q);
-const S = { chat: [], incidents: {}, drafts: [], seen: 0, audio: false, sarvam: false };
+const EMBED = new URLSearchParams(location.search).has("embed");
+if (EMBED) { document.body.classList.add("embed"); document.documentElement.classList.add("embed"); }
+const S = { view: null, chat: [], drafts: [], audio: false, sarvam: false, unread: 0, lastSay: null };
 const esc = (s) => String(s ?? "").replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+const rs = (n) => n == null ? "₹?" : "₹" + Number(n).toLocaleString("en-IN");
 const tm = (iso) => { try { return new Date(iso).toLocaleTimeString("en-IN", { hour: "numeric", minute: "2-digit" }); } catch { return ""; } };
 const post = (u, b) => fetch(u, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify(b) }).then((r) => r.json()).catch(() => null);
-function toast(t) { const el = $("#toast"); el.textContent = t; el.classList.add("on"); clearTimeout(el._t); el._t = setTimeout(() => el.classList.remove("on"), 2200); }
+const SHIELD = '<svg viewBox="0 0 24 24"><path d="M12 3l7 3v6c0 4-3 7-7 9-4-2-7-5-7-9V6z"/><path d="M9 12l2 2 4-4"/></svg>';
+const CHECK = '<svg viewBox="0 0 24 24"><path d="M5 12l4 4 10-10"/></svg>';
 
-// ---- voice: Sarvam Bulbul through the server when it is live, else the phone's own Hindi voice
-const voiceQ = [];
-let speaking = false;
-function speak(text) { if (!S.audio || !text) return; voiceQ.push(text); if (!speaking) nextVoice(); }
+// ---------------------------------------------------------------- voice (Sarvam Bulbul when live, else the phone's Hindi voice)
+const voiceQ = []; let speaking = false;
+function speak(t) { if (!S.audio || !t || EMBED) return; voiceQ.push(t); if (!speaking) nextVoice(); }
 async function nextVoice() {
-  const text = voiceQ.shift(); if (!text) { speaking = false; return; }
+  const t = voiceQ.shift(); if (!t) { speaking = false; return; }
   speaking = true;
-  if (S.sarvam) {
-    try { const a = new Audio(`/api/tts?text=${encodeURIComponent(text)}&lang=hi-IN`); a.onended = nextVoice; a.onerror = () => { browserSay(text); }; await a.play(); return; } catch { /* fall through */ }
-  }
-  browserSay(text);
+  if (S.sarvam) { try { const a = new Audio(`/api/tts?text=${encodeURIComponent(t)}&lang=hi-IN`); a.onended = nextVoice; a.onerror = () => say(t); await a.play(); return; } catch { /* fall back */ } }
+  say(t);
 }
-function browserSay(text) {
-  if (!("speechSynthesis" in window)) { nextVoice(); return; }
-  const u = new SpeechSynthesisUtterance(text); u.lang = "hi-IN";
+function say(t) {
+  if (!("speechSynthesis" in window)) return nextVoice();
+  const u = new SpeechSynthesisUtterance(t); u.lang = "hi-IN";
   const v = speechSynthesis.getVoices().find((x) => /hi[-_]IN/i.test(x.lang)); if (v) u.voice = v;
   u.onend = nextVoice; u.onerror = nextVoice; speechSynthesis.speak(u);
-  if (navigator.vibrate) navigator.vibrate(60);
 }
 
-// ---- render
-function pendingFor(incId) { const i = S.incidents[incId]; return i && i.pending && (i.pending.approvers || []).includes("merchant") ? i : null; }
+// ---------------------------------------------------------------- render: state, not chat
 function render() {
-  const feed = $("#feed");
-  const items = S.chat.filter((m) => m.who === "kavach" || m.who === "merchant");
-  if (!items.length) { feed.innerHTML = `<p class="hint">Kavach writes here when something needs you.</p>`; renderChips(); return; }
-  feed.innerHTML = items.map((m, idx) => {
-    const ex = m.extra || {};
-    let extra = "";
-    if (ex.approval) {
-      const inc = pendingFor(ex.approval);
-      const lastAsk = !items.slice(idx + 1).some((x) => x.extra && x.extra.approval === ex.approval);
-      extra = inc && lastAsk ? `<div class="acts"><button class="yes" data-yes="${esc(ex.approval)}">Haan, karo</button><button class="no" data-no="${esc(ex.approval)}">Abhi nahi</button></div>`
-        : `<div class="done">✓ Aapne jawab de diya</div>`;
-    }
-    if (ex.verify_url) extra += `<a class="pack" href="${esc(ex.verify_url)}" target="_blank" rel="noopener">Signed pack · verify on this phone</a>`;
-    return `<div class="msg ${m.who === "merchant" ? "m" : "k"}">${m.who === "kavach" ? '<div class="who">Kavach</div>' : ""}${esc(m.text)}${extra}<small>${tm(m.at)}</small></div>`;
-  }).join("");
-  feed.querySelectorAll("[data-yes]").forEach((b) => b.onclick = () => { b.disabled = true; post("/api/approve", { incident_id: b.dataset.yes, approver: "merchant", yes: true }); toast("Approved"); });
-  feed.querySelectorAll("[data-no]").forEach((b) => b.onclick = () => { b.disabled = true; post("/api/approve", { incident_id: b.dataset.no, approver: "merchant", yes: false }); toast("Declined"); });
-  feed.scrollTop = 1e9;
-  renderChips();
+  const v = S.view; if (!v) return;
+  const app = $("#app");
+  if (v.mode === "home") app.innerHTML = home(v);
+  else if (v.mode === "neutral") app.innerHTML = hero("wait", "Paytm team", v.shield.title, v.shield.sub);
+  else app.innerHTML = [hero("bad", "Account " + esc(v.shield.account), v.shield.title, v.shield.sub, true), action(v.action), money(v), tracker(v.steps), docs(v.docs)].join("");
+  bind();
 }
-function liveFreeze() { return Object.values(S.incidents).reverse().find((i) => i.kind === "freeze" && !["resolved", "refused"].includes(i.status) && !(i.decisive && i.decisive.label === "Why Kavach held back")); }
-function renderChips() {
-  const box = $("#chips"); const out = [];
-  const d = (S.drafts || []).find((x) => x.next_doc);
-  if (d) out.push(["doc", "📎 Bank ka SMS + notice bhejo", { text: "Bank ka SMS aur police ka notice yeh hai. Account mein 3.1 lakh atak gaye.", doc_id: d.next_doc }]);
-  const f = liveFreeze();
-  if (f) {
-    const ev = (f.facts && f.facts.case_events) || {};
-    if (f.facts && f.facts.pack && !ev.bank_complaint) out.push(["", "Bank ne complaint le li ✓", { text: "Bank ne complaint le li, acknowledgement mil gaya." }]);
-    out.push(["", "Payout doosre account mein", { text: "Settlement doosre account mein bhej do" }]);
-    out.push(["", "Caller ₹20,000 maang raha", { text: "Ek aadmi phone karke 20 hazaar maang raha hai complaint wapas lene ke liye" }]);
-    out.push(["", "Bank ko kitne din?", { text: "Bank ko meri shikayat aage bhejne ke liye kitne din milte hain?" }]);
-  } else out.push(["", "Kal ka paisa kab aayega?", { text: "Kal ka paisa kab aayega?" }]);
-  box.innerHTML = ""; out.forEach(([cls, label, draft]) => { const b = document.createElement("button"); b.type = "button"; b.className = cls; b.textContent = label;
-    b.onclick = () => { send(draft.text, draft.doc_id); if (draft.doc_id) S.drafts = []; renderChips(); }; box.appendChild(b); });
+function hero(tone, pill, title, sub, listen) {
+  return `<section class="hero ${tone}"><div class="row"><div class="shield">${SHIELD}</div><span class="pill">${esc(pill)}</span></div>
+    <h1>${esc(title)}</h1><p>${esc(sub)}</p>${listen && S.lastSay ? `<button class="listen" data-listen type="button"><svg viewBox="0 0 24 24"><path d="M4 9v6h4l5 4V5L8 9zM16 8a5 5 0 0 1 0 8"/></svg>Kavach ko suniye</button>` : ""}</section>`;
 }
-function send(text, doc_id) { if (!text) return; post("/api/merchant/message", { text, shot_id: null, doc_id: doc_id || null }); }
+function home(v) {
+  const nx = new Date(v.today.next_payout);
+  return `<section class="hero ok"><div class="row"><div class="shield">${SHIELD}</div><span class="pill">Shield on</span></div>
+      <h1>${esc(v.shield.title)}</h1><p>${esc(v.shield.sub)}</p>
+      <div class="kv"><div>Aaj ki sale<b>${rs(v.today.sales)}</b></div><div>Payments<b>${v.today.count}</b></div><div>Agla payout<b>${nx.toLocaleDateString("en-IN", { day: "numeric", month: "short" })}, ${tm(v.today.next_payout)}</b></div></div></section>
+    <section class="card"><h2>Kavach ne kya kiya</h2>${v.feed.length ? `<div class="feed">${v.feed.map((f) => `<div class="fi"><span class="ok">✓</span><div><b>${esc(f.title)}</b><small>${esc(f.text)}</small></div></div>`).join("")}</div>`
+      : `<p class="empty">Abhi kuch karna nahi pada. Kavach payout, refund aur har payment par nazar rakh raha hai.</p>`}</section>`;
+}
+function money(v) {
+  if (!v.money.length) return "";
+  const L = v.money.find((m) => m.key === "locked"), D = v.money.find((m) => m.key === "disputed");
+  const pct = L && D ? Math.max(1.2, (D.amount / L.amount) * 100) : 100;
+  return `<section class="card money"><h2>Aapka paisa kahan hai</h2>
+    ${L ? `<div class="top"><div><div class="amt">${rs(L.amount)}</div><small style="color:var(--ink-3)">bank mein ruka hua · aapka bataya hua</small></div>${v.ratio ? `<span class="ratio">${v.ratio}× zyada</span>` : ""}</div>
+    ${D ? `<div class="bar2" role="img" aria-label="${rs(D.amount)} disputed of ${rs(L.amount)} frozen"><i style="width:${pct}%"></i></div>` : ""}` : ""}
+    ${v.money.map((m) => `<div class="mrow"><span class="dot ${m.tone}"></span><div><b>${esc(m.label)}</b><small>${esc(m.source)}</small></div><span class="v ${m.tone}">${rs(m.amount)}</span></div>`).join("")}
+  </section>`;
+}
+function action(a) {
+  if (!a) return "";
+  if (a.kind === "wait") return `<section class="card act wait"><div class="eyebrow">Kavach dekh raha hai</div><div class="count">${Math.max(a.days_left, 0)} din</div><h3>${esc(a.title)}</h3><p>${esc(a.body)}</p></section>`;
+  const btns = a.kind === "approve" ? `<button class="cta" data-yes="${esc(a.incident)}">${esc(a.cta)}</button><button class="cta alt" data-no="${esc(a.incident)}">${esc(a.secondary)}</button>`
+    : a.kind === "notice" ? `${S.drafts.find((d) => d.next_doc) ? `<button class="cta" data-fwd>Bank ka SMS + notice bhejo</button>` : ""}<button class="cta ${S.drafts.find((d) => d.next_doc) ? "alt" : ""}" data-cam>📷 Photo kheecho</button>`
+    : a.kind === "branch" ? `<button class="cta" data-branch>${esc(a.cta)}</button>` : "";
+  return `<section class="card act"><div class="eyebrow">Aapka agla kadam</div><h3>${esc(a.title)}</h3><p>${esc(a.body)}</p>${btns}</section>`;
+}
+function tracker(steps) {
+  return `<section class="card"><h2>Case kahan tak pahuncha</h2><ol class="trk">${steps.map((s) => `<li class="${s.state}"><span class="k">${CHECK}</span><div><b>${esc(s.label)}</b><small>${esc(s.sub)}</small></div></li>`).join("")}</ol></section>`;
+}
+function docs(d) {
+  if (!d.length) return "";
+  return `<section class="card"><h2>Aapke documents</h2><div class="docs">${d.map((x) => x.kind === "pack"
+    ? `<a class="doc" href="${esc(x.verify)}" target="_blank" rel="noopener"><span class="ic">PDF</span><div><b>${esc(x.label)}</b><small>${esc(x.sub)}</small></div><span class="go">Verify ›</span></a>`
+    : `<button class="doc" type="button" data-letter><span class="ic letter">✉</span><div><b>${esc(x.label)}</b><small>${esc(x.sub)}</small></div><span class="go">Padhiye ›</span></button>`).join("")}</div></section>`;
+}
+function bind() {
+  document.querySelectorAll("[data-yes]").forEach((b) => b.onclick = () => { b.disabled = true; post("/api/approve", { incident_id: b.dataset.yes, approver: "merchant", yes: true }); });
+  document.querySelectorAll("[data-no]").forEach((b) => b.onclick = () => { b.disabled = true; post("/api/approve", { incident_id: b.dataset.no, approver: "merchant", yes: false }); });
+  document.querySelectorAll("[data-fwd]").forEach((b) => b.onclick = () => { const d = S.drafts.find((x) => x.next_doc); if (!d) return; b.disabled = true; send("Bank ka SMS aur police ka notice yeh hai. Account mein 3.1 lakh atak gaye.", d.next_doc); S.drafts = []; });
+  document.querySelectorAll("[data-cam]").forEach((b) => b.onclick = () => $("#cam").click());
+  document.querySelectorAll("[data-branch]").forEach((b) => b.onclick = () => { b.disabled = true; send("Bank ne complaint le li, acknowledgement mil gaya."); });
+  document.querySelectorAll("[data-listen]").forEach((b) => b.onclick = () => { S.audio = true; speak(S.lastSay); });
+  document.querySelectorAll("[data-letter]").forEach((b) => b.onclick = () => { const d = S.view.docs.find((x) => x.kind === "letter"); $("#lettertext").textContent = d ? d.text : ""; $("#letter").classList.add("on"); });
+}
 
-// ---- live
+// ---------------------------------------------------------------- chat sheet (secondary)
+function renderChat() {
+  const items = S.chat.filter((m) => m.who === "kavach" || m.who === "merchant");
+  $("#chat").innerHTML = items.length ? items.map((m) => `<div class="msg ${m.who === "merchant" ? "m" : "k"}">${esc(m.text)}<small>${tm(m.at)}</small></div>`).join("")
+    : `<p class="empty" style="text-align:center;margin-top:30px">Kuch bhi poochiye: payout, refund, freeze, SOP.</p>`;
+  $("#chat").scrollTop = 1e9;
+  const v = S.view, out = [];
+  if (v && v.mode === "case") out.push("Bank ko kitne din milte hain?", "Payout doosre account mein bhej do", "Ek aadmi 20 hazaar maang raha hai complaint wapas lene ke liye");
+  else out.push("Kal ka paisa kab aayega?");
+  $("#chips").innerHTML = ""; out.forEach((t) => { const b = document.createElement("button"); b.type = "button"; b.textContent = t; b.onclick = () => send(t); $("#chips").appendChild(b); });
+  const n = $("#unread"); n.hidden = !S.unread; n.textContent = S.unread;
+}
+function send(text, doc_id) { if (text) post("/api/merchant/message", { text, shot_id: null, doc_id: doc_id || null }); }
+function push(text) {
+  if (EMBED) return;
+  $("#pushtext").textContent = text.replace(/^[^\w₹]+/u, ""); const p = $("#push"); p.classList.add("on"); clearTimeout(p._t); p._t = setTimeout(() => p.classList.remove("on"), 4200);
+  if (navigator.vibrate) navigator.vibrate([80, 60, 80]);
+}
+
+// ---------------------------------------------------------------- live
+let vt = null;
+function refresh() { clearTimeout(vt); vt = setTimeout(async () => { S.view = await fetch("/api/merchant/view").then((r) => r.json()).catch(() => S.view); render(); renderChat(); }, 180); }
 async function boot() {
   const st = await fetch("/api/state").then((r) => r.json());
-  S.chat = st.chat || []; S.drafts = st.drafts || []; S.seen = S.chat.length;
-  (st.incidents || []).forEach((i) => S.incidents[i.id] = i);
+  S.chat = st.chat || []; S.drafts = st.drafts || [];
+  const lastK = [...S.chat].reverse().find((m) => m.who === "kavach" && m.speak); S.lastSay = lastK ? lastK.speak : null;
   fetch("/api/integrations").then((r) => r.json()).then((x) => { S.sarvam = !!x.sarvam; }).catch(() => {});
-  render();
+  refresh();
   const es = new EventSource("/api/stream");
   es.onmessage = (m) => {
     const ev = JSON.parse(m.data);
-    if (ev.type === "phone") { if (ev.message.extra && ev.message.extra.doc_id) S.drafts = []; S.chat.push(ev.message); render(); if (ev.message.who === "kavach") { speak(ev.message.speak); if (navigator.vibrate) navigator.vibrate([80, 60, 80]); } }
-    else if (ev.type === "incident") { S.incidents[ev.incident.id] = ev.incident; render(); }
-    else if (ev.type === "draft") { S.drafts = [ev.draft]; renderChips(); }
-    else if (ev.type === "reset") { S.chat = []; S.incidents = {}; S.drafts = []; render(); }
+    if (ev.type === "phone") {
+      const msg = ev.message; if (msg.extra && msg.extra.doc_id) S.drafts = [];
+      S.chat.push(msg);
+      if (msg.who === "kavach") { if (msg.speak) S.lastSay = msg.speak; speak(msg.speak); if (!$("#sheet").classList.contains("on")) { S.unread++; push(msg.text); } }
+      renderChat(); refresh();
+    } else if (ev.type === "incident" || ev.type === "world" || ev.type === "step") refresh();
+    else if (ev.type === "draft") { S.drafts = [ev.draft]; refresh(); }
+    else if (ev.type === "reset") { S.chat = []; S.drafts = []; S.unread = 0; S.lastSay = null; refresh(); }
   };
 }
-$("#start").onclick = () => {
-  S.audio = true; $("#gate").remove();
-  if ("speechSynthesis" in window) { const u = new SpeechSynthesisUtterance(" "); speechSynthesis.speak(u); }   // unlock audio on this tap
-  toast("Kavach is on duty");
-};
-$("#f").onsubmit = (e) => { e.preventDefault(); const v = $("#t").value.trim(); if (!v) return; $("#t").value = ""; send(v); };
-$("#cam").onchange = async (e) => {
+$("#start").onclick = () => { S.audio = true; $("#gate").remove(); if ("speechSynthesis" in window) speechSynthesis.speak(new SpeechSynthesisUtterance(" ")); };
+if (EMBED) $("#gate").remove();
+$("#ask").onclick = () => { $("#sheet").classList.add("on"); S.unread = 0; renderChat(); };
+$("#push").onclick = () => { $("#push").classList.remove("on"); $("#ask").click(); };
+document.querySelectorAll("[data-close]").forEach((b) => b.onclick = () => b.closest(".sheet").classList.remove("on"));
+document.querySelectorAll(".sheet").forEach((s) => s.onclick = (e) => { if (e.target === s) s.classList.remove("on"); });
+$("#compose").onsubmit = (e) => { e.preventDefault(); const v = $("#t").value.trim(); if (!v) return; $("#t").value = ""; send(v); };
+document.querySelectorAll(".camin").forEach((inp) => inp.onchange = async (e) => {
   const file = e.target.files[0]; if (!file) return;
-  toast("Photo bhej rahe hain…");
   const fd = new FormData(); fd.append("kind", "notice"); fd.append("file", file);
   const r = await fetch("/api/upload", { method: "POST", body: fd }).then((x) => x.json()).catch(() => null);
-  if (r && r.doc_id) { send("Yeh notice aaya hai, dekho.", r.doc_id); toast("Notice bheja"); } else toast("Photo nahi gayi, dobara try kijiye");
+  if (r && r.doc_id) send("Yeh notice aaya hai, dekho.", r.doc_id);
   e.target.value = "";
-};
+});
 boot();
 </script>
 </body>

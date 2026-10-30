@@ -469,3 +469,36 @@ def test_paytm_nodal_upload_and_bank_desk():
             assert st["Disputed transaction identified"] == "signed" and st["CDD/EDD on the account holder"] == "bank"
             assert st["Hold scope requested by the account holder"] == "requested" and d["lien_request"]
     run(go())
+
+
+def test_merchant_view_is_a_tracker_and_respects_the_guard():
+    import json as _json
+    from app import merchant_view as mv
+    async def go():
+        w = World(); e = Engine(w)
+        assert mv.build(w, e)["mode"] == "home"
+        r = w.inject_freeze(freeze_type="total", bounce_next=True)
+        await e.tick((w.next_settlement - w.now).total_seconds() + 60)
+        v = mv.build(w, e)
+        assert v["mode"] == "case" and v["action"]["kind"] == "approve"
+        st = {s["key"]: s["state"] for s in v["steps"]}
+        assert st["detect"] == "done" and st["protect"] == "now"
+        inc = next(iter(e.incidents.values()))
+        await e.approve(inc.id, "merchant"); await e.approve(inc.id, "paytm_ops")
+        assert mv.build(w, e)["action"]["kind"] == "notice"
+        await e.merchant_message("Bank ka SMS aur police ka notice yeh hai. Account mein 3.1 lakh atak gaye.", doc_id=r["doc_id"])
+        v = mv.build(w, e)
+        assert v["ratio"] == 129 and {m["key"] for m in v["money"]} == {"locked", "disputed", "safe"}
+        assert v["action"]["kind"] == "approve" and "2,400" in v["action"]["title"]
+        await e.approve(inc.id, "merchant")
+        v = mv.build(w, e)
+        assert v["action"]["kind"] == "branch" and {d["kind"] for d in v["docs"]} == {"pack", "letter"}
+        await e.merchant_message("Bank ne complaint le li, acknowledgement mil gaya.")
+        v = mv.build(w, e)
+        assert v["action"]["kind"] == "wait" and v["action"]["days_left"] == 7
+        # guarded merchant: the whole screen is the neutral card
+        g = World(); ge = Engine(g); g.inject_freeze(freeze_type="total", bounce_next=True); g.inject_mule_signals()
+        await ge.tick((g.next_settlement - g.now).total_seconds() + 60)
+        gv = mv.build(g, ge)
+        assert gv["mode"] == "neutral" and not policy.CASE_DETAIL.search(_json.dumps(gv, ensure_ascii=False))
+    run(go())

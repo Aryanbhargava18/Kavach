@@ -212,3 +212,8 @@ body:not(.view-stage) #stage { display: none; }
 .bill-note.dim { color: #7A869E; font-size: 11px; }
 .bill details summary { cursor: pointer; color: #0D2A63; font-weight: 600; }
 .bill details ul { margin: 6px 0 0 16px; padding: 0; } .bill details li { margin: 3px 0; }
+/* Meena's phone shows the real Kavach Shield app (same page a judge opens at /m) */
+.shield-phone { padding: 0; overflow: hidden; }
+.shield-phone > :not(.shield-app) { display: none !important; }
+.shield-phone + .chips-in, .shield-phone .chips-in { display: none !important; }
+.shield-app { border: 0; width: 100%; height: 100%; display: block; background: #F3F6FA; }

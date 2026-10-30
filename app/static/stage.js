@@ -207,8 +207,8 @@
     } else if (inc && inc.kind === "freeze") {
       const guarded = inc.decisive && inc.decisive.label === "Why Kavach held back";
       top.innerHTML = guarded ? `<i class="ph-av">R</i><div><b>Paytm Risk view</b><span>Not shown to Meena · EDD queue</span></div>`
-        : `<i class="ph-av">§</i><div><b>Case file</b><span>Account hold · built by Kavach</span></div>`;
-      cap.textContent = guarded ? "Paytm Risk's screen (Meena never sees this)" : "Meena's case file";
+        : `<i class="ph-av">§</i><div><b>Paytm ops view</b><span>Risk · nodal · what the bank will see</span></div>`;
+      cap.textContent = guarded ? "Paytm Risk's screen (Meena never sees this)" : "Paytm's side of the case";
       cf.hidden = true;
       const f = inc.facts || {};
       const doc = (S.steps[inc.id] || []).find((s) => s.kind === "tool" && s.tool === "read_document");

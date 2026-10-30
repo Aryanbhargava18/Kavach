@@ -95,6 +95,14 @@ def merchant_phone():
     return FileResponse(STATIC / "m.html")
 
 
+@app.get("/api/merchant/view")
+def merchant_view():
+    """Meena's app as state: status, money map, tracker, next action, documents. Built server-side; P17 applies."""
+    from . import merchant_view as mv
+    with W().lock:
+        return mv.build(W(), E())
+
+
 @app.get("/api/state")
 def api_state():
     e = E()
