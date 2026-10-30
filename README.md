@@ -1,6 +1,6 @@
 # Kavach
 
-**A proactive, voice-first AI operations teammate for Paytm merchants. When a payment succeeds at the bank but never reaches the shop's billing app, Kavach notices first, fixes the books safely, checks the fix, tells the merchant in Hindi, and follows up until the payout lands.**
+**A proactive, voice-first AI teammate for Paytm merchants. It watches Paytm's own payment and payout signals and acts before the merchant complains. When her bank freezes her account over a cyber-fraud report and the next payout bounces, Kavach warns her in Hindi, protects new sales with a two-key hold, and builds an SOP-routed, signed case file. When a payment never reaches her billing app, it repairs the books, checks the fix, and follows up until the payout lands.**
 
 Team Second Signal · Paytm Build for India AI Hackathon · Track 3: Autonomous AI Teammates
 Everything here runs on synthetic data. No real money, messages, banks or police systems are touched, and Kavach never moves money.
@@ -30,7 +30,8 @@ One loop, the same for every incident: **understand → plan → use tools → r
 
 | What happened in Paytm's systems | What Kavach does |
 |---|---|
-| **Hero.** Rahul paid ₹4,200; switch SUCCESS; POS webhook failed ×3 (HTTP 504) | Ledger row reads **MISSING**. Policy P16 allows a repair. Kavach posts the switch record into the ledger, re-reads both systems (exactly one entry for that UTR, bill PAID), replays the Soundbox, sends Rahul a verified receipt on WhatsApp, tells Meena in Hinglish, and schedules "confirm tomorrow's 9:00 payout". Next morning the settlement callback wakes it, the payout row turns **SETTLED**, and only then does it close. |
+| **Hero.** Meena's bank freezes her account (debit and credit) over a cyber-fraud report. Nobody tells Paytm. | At the next 9:00 run the payout comes back RETURNED. The payout watcher opens a case on its own, confirms the return code, warns Meena in Hinglish and on her Soundbox before her supplier payments bounce, tells her what to ask her branch for (NCRP ack number, notice, disputed amount), and proposes a two-key payout hold. When she forwards the notice, the same case reads it, matches the one disputed payment, routes it under the SOP, signs the pack, and shows disputed vs frozen. A debit-only freeze stays invisible to Paytm, and Kavach says so. |
+| **Everyday.** Rahul paid ₹4,200; switch SUCCESS; POS webhook failed ×3 (HTTP 504) | Ledger row reads **MISSING**. Policy P16 allows a repair. Kavach posts the switch record into the ledger, re-reads both systems (exactly one entry for that UTR, bill PAID), replays the Soundbox, sends Rahul a verified receipt on WhatsApp, tells Meena in Hinglish, and schedules "confirm tomorrow's 9:00 payout". Next morning the settlement callback wakes it, the payout row turns **SETTLED**, and only then does it close. |
 | Screenshot ₹4,200, switch ₹2,400 | Claim row struck through. Bill stays PARTIAL. QR for exactly ₹1,800 still due. Nobody is called a fraud (P8). |
 | Payment still pending | "Collect again" is blocked (P1). Kavach watches the switch and receipts once when the bank confirms. |
 | No such transaction | Switch row **NOT FOUND**. No receipt, goods held, polite ask for the full UPI reference. |
@@ -43,7 +44,7 @@ Every row in that table is a scenario in the **Simulate** menu, and an eval fami
 
 ## The Live screen
 
-The default view. Meena's phone on the left; in the centre her Soundbox with Kavach in it (three.js, bundled), wired to Paytm's simulated systems, which light up and send their real values to the Soundbox only when Kavach calls them; the billing app, the customer's WhatsApp or the case file on the right; the loop (Detect → Investigate → Reconcile → Act → Verify → Follow up) along the top; Hindi voice with a waveform and word-by-word subtitles; the result and presenter controls along the bottom. Start it with **Take a ₹4,200 payment**: nobody complains, Kavach finds the missed update on its own.
+The default view. Meena's phone on the left; in the centre her Soundbox with Kavach in it (three.js, bundled), wired to Paytm's simulated systems, which light up and send their real values to the Soundbox only when Kavach calls them; the billing app, the customer's WhatsApp or the case file on the right; the loop (Detect → Investigate → Reconcile → Act → Verify → Follow up) along the top; Hindi voice with a waveform and word-by-word subtitles; the result and presenter controls along the bottom. Start it with **Meena's bank freezes her account**: nobody complains, Kavach finds the bounced payout on its own. **Take a ₹4,200 payment** shows the same watcher on an everyday incident.
 
 ## The console
 
@@ -81,7 +82,7 @@ make demo          # http://127.0.0.1:8000
 Needs Python 3.11+ and Tesseract OCR (`brew install tesseract`). Without Tesseract everything works except reading screenshots, and Kavach asks for the UPI reference instead. Chrome gives Hindi voice input and output through the browser; typing always works.
 
 ```sh
-make test          # 37 tests: proactive watcher, policy invariants, hero + every judge challenge, tamper detection, desk, clocks, both LLM paths (scripted)
+make test          # 39 tests: both proactive watchers (billing app, payouts), policy invariants, hero + every judge challenge, tamper detection, desk, clocks, both LLM paths (scripted)
 make eval          # 243 generated incidents + 800 desk merchants, Kavach vs naive baselines (≈2–3 min, offline, no credits)
 make sarvam-check  # with SARVAM_API_KEY: one live call to each Sarvam API Kavach uses
 make llm-check     # with SARVAM_API_KEY (or ANTHROPIC_API_KEY): hero scenarios on the live planner, safety + timing

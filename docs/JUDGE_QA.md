@@ -1,13 +1,32 @@
 # Judge Q&A
 
 **What is Kavach, in one sentence?**
-An autonomous operations teammate for Paytm merchants. It notices when a payment succeeded at the bank but never reached the shop's billing system, fixes the shop's books safely, checks the fix, tells the merchant in Hindi, and stays on the case until the payout lands.
+An autonomous teammate for Paytm merchants that notices trouble in Paytm's own payment and payout signals before the merchant complains. The headline case: her bank freezes her account over a cyber-fraud report, the next payout bounces, and Kavach warns her, protects new sales with two keys, and builds an SOP-routed, signed case file. Everyday incidents (a billing app that missed a payment, a pending payment, a double charge) run through the same engine.
 
-**Why is "nobody complained" the headline?**
-Because that's the difference between a support bot and a teammate. A bot waits for a ticket. Kavach watches the delivery of payment updates to the merchant's POS. When a confirmed payment fails to arrive, it opens the case itself, investigates with tools, and has fixed it before the customer is at the counter arguing. Customer disputes, refunds, duplicates and freezes run through the same engine as other incident paths.
+**Why lead with the account freeze?**
+- **Stakes.** A ₹1,000 payment froze ₹8.26 lakh for ten months in *Sri Sai Wines v. Union of India* (AP HC, WP 969/2026). I4C's own table to 30 Jun 2026 shows about ₹303 crore frozen against ₹29 crore disputed. That ratio is our sum of its rows, over contested cases only, not proof about any one account.
+- **A signal only Paytm has.** The payout return code. The merchant's bank doesn't tell her it froze credits; she finds out when a supplier payment fails.
+- **It's what we were shortlisted on.** The finals version adds the proactive watcher, the two-key hold and the signed pack.
 
-**Is the failure realistic?**
-Yes. Payment-gateway webhooks to merchant systems time out, get 5xx errors and run out of retries. When that happens the money is real but the merchant's bill says unpaid, which is the classic "customer paid, shop says not received". In the demo the failure, the retries (HTTP 503, 503, 504) and the detection are **simulated**. In production, Kavach would read Paytm's real webhook delivery logs.
+**How does Paytm know before the merchant does?**
+Every night Paytm pays out yesterday's sales. If the merchant's bank refuses the credit, the payout comes back with a return code. Kavach watches those returns. In the demo the return code (`SYN-ACCT-FROZEN`) is **synthetic**, modelled on IMPS/NEFT "account blocked/frozen" returns.
+
+**And when Paytm can't see it?**
+A **debit-only** freeze leaves credits flowing, so payouts keep landing in an account she can't withdraw from, and Paytm sees nothing. Kavach doesn't pretend: it starts from Meena's report, says on screen that Paytm can't see the freeze, and proposes the same two-key hold. A test asserts the watcher stays silent in that case.
+
+**Isn't warning the merchant "tipping off" a suspect?**
+- Kavach tells her only what Paytm itself observed: her payout came back. The bank sends her an SMS about the freeze anyway.
+- It never shares complainant or victim details (SOP 9.1(ii)), and payer handles are masked in everything merchant-facing.
+- In production, a merchant already in Paytm Risk's EDD queue (repeat reports, fan-in) would get a generic, Legal-approved message instead. We'd want Risk to own that rule.
+
+**Doesn't the payout hold help a mule account?**
+The opposite. The hold keeps money *inside* Paytm's settlement balance and needs both the merchant and a Paytm Risk human. Moving payouts to another account during a freeze is refused (rule P6), and that refusal is on screen. Suspicious patterns go to the Risk desk's EDD, not to the merchant.
+
+**Why not just fix the webhook retries for the billing-app case?**
+Paytm should, and that's the first fix. But delivery to a merchant's own POS will always fail sometimes (their server, their network). Kavach owns the gap that's left: it confirms from the switch record, repairs once, re-checks and closes only after the payout lands. It's the small, frequent sibling of the freeze case.
+
+**Is the billing-app failure realistic?**
+Yes. Payment-gateway webhooks to merchant systems time out, get 5xx errors and run out of retries. In the demo the failure, the retries (HTTP 503, 503, 504) and the detection are **simulated**. In production, Kavach would read Paytm's real webhook delivery logs.
 
 **What is real and what is simulated?**
 - **Real, running code:** the agent loop, every tool call, the deterministic policy gate, post-action verification, follow-ups that wake on callbacks, OCR, the signed evidence pack with tamper detection, and (with a key) Sarvam speech, voice and planning.
@@ -53,7 +72,7 @@ Each refusal shows on screen with the reason, and it never accuses the customer.
 Only that the PDF is byte-identical to what this Kavach instance issued. It is not a Paytm signature, not proof of innocence, and not court-admissible by itself. The verifier page says so.
 
 **How do you know it works?**
-- **Tests:** 37 automated tests cover the policy invariants, the proactive watcher, the hero and every challenge, tamper detection, and both LLM paths (scripted).
+- **Tests:** 39 automated tests cover the policy invariants, both proactive watchers (billing app and payouts), the hero and every challenge, tamper detection, and both LLM paths (scripted).
 - **Evaluation:** 243 generated incidents, using a generator that never imports Kavach's decision code.
   - A screenshot-trusting bot marked 34 bills paid with money that was short, used or being refunded. Kavach marked none.
   - Kavach re-checked every one of its 1,509 actions.
@@ -61,12 +80,14 @@ Only that the PDF is byte-identical to what this Kavach instance issued. It is n
 - This is synthetic evaluation; it isn't real-world accuracy.
 
 **Business case for Paytm?**
+- **Keeps merchants digital after a freeze:** the shop that loses ₹3 lakh to a freeze goes back to cash. Warning her early and keeping new sales safe with Paytm is retention.
+- **Keeps loan repayments flowing:** merchant loans are repaid from settlements. A held-with-Paytm payout is better than one bouncing between banks. (A hypothesis to confirm with Paytm; lending and payments sit in different entities.)
 - **Fewer tickets:** "customer paid, shop says no" tickets are deflected before they're raised.
 - **Fewer double charges:** customers aren't charged twice.
 - **Less cash fallback:** merchants who don't trust digital payments go back to cash, and that's lost GMV.
 - **Same agent everywhere:** the same agent runs inside the AI Soundbox and the Paytm for Business app Paytm already ships.
 
-Pilot metrics would be: missed-update incidents fixed before a complaint, time to fix, tickets deflected, double charges prevented, and payouts confirmed.
+Pilot metrics would be: freezes caught before the merchant reports them, time from payout return to merchant warning, missed-update incidents fixed before a complaint, time to fix, tickets deflected, double charges prevented, and payouts confirmed.
 
 **What would production need?**
 - Read access to switch status, settlement and webhook delivery logs.

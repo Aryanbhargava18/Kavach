@@ -287,7 +287,7 @@
     const handled = all.length, stopped = all.reduce((n, i) => n + (S.steps[i.id] || []).filter((s) => s.kind === "policy" && s.verdict === "DENY").length, 0);
     const money = all.filter((i) => i.kind !== "freeze").reduce((n, i) => n + ((i.money && i.money.amount) || 0), 0);
     const small = inc.status === "resolved" ? `Closed: ${inc.outcome || ""}` : fu ? `Next, on its own: ${fu.purpose.toLowerCase()} (${dayTm(fu.due)})` : "";
-    r.innerHTML = `${h}<small>${esc(small)}${small ? " · " : ""}Today: ${handled} case${handled > 1 ? "s" : ""}, ${rs(money)} kept right, ${stopped} unsafe step${stopped === 1 ? "" : "s"} stopped, 0 support tickets.</small>`;
+    r.innerHTML = `${h}<small>${esc(small)}${small ? " · " : ""}Today: ${handled} case${handled > 1 ? "s" : ""}, ${money ? rs(money) + " kept right, " : ""}${stopped} unsafe step${stopped === 1 ? "" : "s"} stopped, 0 support tickets.</small>`;
   }
   window.stageActions = (btns) => {
     const sig = btns.map((b) => b[0]).join("|");
