@@ -1,0 +1,2862 @@
+[
+ {
+  "setup": {
+   "freeze": "total",
+   "bounce_next": true,
+   "disputed": 999,
+   "days_ago": 15
+  },
+  "expect": {
+   "case": true,
+   "warn": true,
+   "hold_proposed": true,
+   "guard": false
+  },
+  "id": "total_freeze_bounce-00",
+  "family": "total_freeze_bounce",
+  "seed": 7249
+ },
+ {
+  "setup": {
+   "freeze": "total",
+   "bounce_next": true,
+   "disputed": 999,
+   "days_ago": 21
+  },
+  "expect": {
+   "case": true,
+   "warn": true,
+   "hold_proposed": true,
+   "guard": false
+  },
+  "id": "total_freeze_bounce-01",
+  "family": "total_freeze_bounce",
+  "seed": 7851
+ },
+ {
+  "setup": {
+   "freeze": "total",
+   "bounce_next": true,
+   "disputed": 6200,
+   "days_ago": 23
+  },
+  "expect": {
+   "case": true,
+   "warn": true,
+   "hold_proposed": true,
+   "guard": false
+  },
+  "id": "total_freeze_bounce-02",
+  "family": "total_freeze_bounce",
+  "seed": 6015
+ },
+ {
+  "setup": {
+   "freeze": "total",
+   "bounce_next": true,
+   "disputed": 9800,
+   "days_ago": 11
+  },
+  "expect": {
+   "case": true,
+   "warn": true,
+   "hold_proposed": true,
+   "guard": false
+  },
+  "id": "total_freeze_bounce-03",
+  "family": "total_freeze_bounce",
+  "seed": 1337
+ },
+ {
+  "setup": {
+   "freeze": "total",
+   "bounce_next": true,
+   "disputed": 1800,
+   "days_ago": 47
+  },
+  "expect": {
+   "case": true,
+   "warn": true,
+   "hold_proposed": true,
+   "guard": false
+  },
+  "id": "total_freeze_bounce-04",
+  "family": "total_freeze_bounce",
+  "seed": 5836
+ },
+ {
+  "setup": {
+   "freeze": "total",
+   "bounce_next": true,
+   "disputed": 450,
+   "days_ago": 38
+  },
+  "expect": {
+   "case": true,
+   "warn": true,
+   "hold_proposed": true,
+   "guard": false
+  },
+  "id": "total_freeze_bounce-05",
+  "family": "total_freeze_bounce",
+  "seed": 5333
+ },
+ {
+  "setup": {
+   "freeze": "total",
+   "bounce_next": true,
+   "disputed": 999,
+   "days_ago": 37
+  },
+  "expect": {
+   "case": true,
+   "warn": true,
+   "hold_proposed": true,
+   "guard": false
+  },
+  "id": "total_freeze_bounce-06",
+  "family": "total_freeze_bounce",
+  "seed": 518
+ },
+ {
+  "setup": {
+   "freeze": "total",
+   "bounce_next": true,
+   "disputed": 9800,
+   "days_ago": 54
+  },
+  "expect": {
+   "case": true,
+   "warn": true,
+   "hold_proposed": true,
+   "guard": false
+  },
+  "id": "total_freeze_bounce-07",
+  "family": "total_freeze_bounce",
+  "seed": 4405
+ },
+ {
+  "setup": {
+   "freeze": "total",
+   "bounce_next": true,
+   "disputed": 450,
+   "days_ago": 42
+  },
+  "expect": {
+   "case": true,
+   "warn": true,
+   "hold_proposed": true,
+   "guard": false
+  },
+  "id": "total_freeze_bounce-08",
+  "family": "total_freeze_bounce",
+  "seed": 6457
+ },
+ {
+  "setup": {
+   "freeze": "total",
+   "bounce_next": true,
+   "disputed": 3150,
+   "days_ago": 33
+  },
+  "expect": {
+   "case": true,
+   "warn": true,
+   "hold_proposed": true,
+   "guard": false
+  },
+  "id": "total_freeze_bounce-09",
+  "family": "total_freeze_bounce",
+  "seed": 8940
+ },
+ {
+  "setup": {
+   "freeze": "total",
+   "bounce_next": true,
+   "disputed": 2400,
+   "days_ago": 13
+  },
+  "expect": {
+   "case": true,
+   "warn": true,
+   "hold_proposed": true,
+   "guard": false
+  },
+  "id": "total_freeze_bounce-10",
+  "family": "total_freeze_bounce",
+  "seed": 1700
+ },
+ {
+  "setup": {
+   "freeze": "total",
+   "bounce_next": true,
+   "disputed": 450,
+   "days_ago": 39
+  },
+  "expect": {
+   "case": true,
+   "warn": true,
+   "hold_proposed": true,
+   "guard": false
+  },
+  "id": "total_freeze_bounce-11",
+  "family": "total_freeze_bounce",
+  "seed": 1918
+ },
+ {
+  "setup": {
+   "freeze": "total",
+   "bounce_next": true,
+   "disputed": 2400,
+   "days_ago": 16
+  },
+  "expect": {
+   "case": true,
+   "warn": true,
+   "hold_proposed": true,
+   "guard": false
+  },
+  "id": "total_freeze_bounce-12",
+  "family": "total_freeze_bounce",
+  "seed": 4310
+ },
+ {
+  "setup": {
+   "freeze": "total",
+   "bounce_next": true,
+   "disputed": 999,
+   "days_ago": 46
+  },
+  "expect": {
+   "case": true,
+   "warn": true,
+   "hold_proposed": true,
+   "guard": false
+  },
+  "id": "total_freeze_bounce-13",
+  "family": "total_freeze_bounce",
+  "seed": 2281
+ },
+ {
+  "setup": {
+   "freeze": "total",
+   "bounce_next": true,
+   "disputed": 1800,
+   "days_ago": 18
+  },
+  "expect": {
+   "case": true,
+   "warn": true,
+   "hold_proposed": true,
+   "guard": false
+  },
+  "id": "total_freeze_bounce-14",
+  "family": "total_freeze_bounce",
+  "seed": 7477
+ },
+ {
+  "setup": {
+   "freeze": "total",
+   "bounce_next": true,
+   "disputed": 9800,
+   "days_ago": 8
+  },
+  "expect": {
+   "case": true,
+   "warn": true,
+   "hold_proposed": true,
+   "guard": false
+  },
+  "id": "total_freeze_bounce-15",
+  "family": "total_freeze_bounce",
+  "seed": 3646
+ },
+ {
+  "setup": {
+   "freeze": "total",
+   "bounce_next": true,
+   "disputed": 2400,
+   "days_ago": 12
+  },
+  "expect": {
+   "case": true,
+   "warn": true,
+   "hold_proposed": true,
+   "guard": false
+  },
+  "id": "total_freeze_bounce-16",
+  "family": "total_freeze_bounce",
+  "seed": 9670
+ },
+ {
+  "setup": {
+   "freeze": "total",
+   "bounce_next": true,
+   "disputed": 6200,
+   "days_ago": 5
+  },
+  "expect": {
+   "case": true,
+   "warn": true,
+   "hold_proposed": true,
+   "guard": false
+  },
+  "id": "total_freeze_bounce-17",
+  "family": "total_freeze_bounce",
+  "seed": 6407
+ },
+ {
+  "setup": {
+   "freeze": "total",
+   "bounce_next": true,
+   "disputed": 1800,
+   "days_ago": 39
+  },
+  "expect": {
+   "case": true,
+   "warn": true,
+   "hold_proposed": true,
+   "guard": false
+  },
+  "id": "total_freeze_bounce-18",
+  "family": "total_freeze_bounce",
+  "seed": 6862
+ },
+ {
+  "setup": {
+   "freeze": "total",
+   "bounce_next": true,
+   "disputed": 2400,
+   "days_ago": 12
+  },
+  "expect": {
+   "case": true,
+   "warn": true,
+   "hold_proposed": true,
+   "guard": false
+  },
+  "id": "total_freeze_bounce-19",
+  "family": "total_freeze_bounce",
+  "seed": 5748
+ },
+ {
+  "setup": {
+   "freeze": "total",
+   "bounce_next": true,
+   "disputed": 9800,
+   "days_ago": 54
+  },
+  "expect": {
+   "case": true,
+   "warn": true,
+   "hold_proposed": true,
+   "guard": false
+  },
+  "id": "total_freeze_bounce-20",
+  "family": "total_freeze_bounce",
+  "seed": 550
+ },
+ {
+  "setup": {
+   "freeze": "total",
+   "bounce_next": true,
+   "disputed": 999,
+   "days_ago": 48
+  },
+  "expect": {
+   "case": true,
+   "warn": true,
+   "hold_proposed": true,
+   "guard": false
+  },
+  "id": "total_freeze_bounce-21",
+  "family": "total_freeze_bounce",
+  "seed": 5580
+ },
+ {
+  "setup": {
+   "freeze": "total",
+   "bounce_next": true,
+   "disputed": 3150,
+   "days_ago": 33
+  },
+  "expect": {
+   "case": true,
+   "warn": true,
+   "hold_proposed": true,
+   "guard": false
+  },
+  "id": "total_freeze_bounce-22",
+  "family": "total_freeze_bounce",
+  "seed": 3725
+ },
+ {
+  "setup": {
+   "freeze": "total",
+   "bounce_next": true,
+   "disputed": 9800,
+   "days_ago": 59
+  },
+  "expect": {
+   "case": true,
+   "warn": true,
+   "hold_proposed": true,
+   "guard": false
+  },
+  "id": "total_freeze_bounce-23",
+  "family": "total_freeze_bounce",
+  "seed": 9025
+ },
+ {
+  "setup": {
+   "freeze": "total",
+   "bounce_next": true,
+   "disputed": 999,
+   "days_ago": 24
+  },
+  "expect": {
+   "case": true,
+   "warn": true,
+   "hold_proposed": true,
+   "guard": false
+  },
+  "id": "total_freeze_bounce-24",
+  "family": "total_freeze_bounce",
+  "seed": 4516
+ },
+ {
+  "setup": {
+   "freeze": "total",
+   "bounce_next": true,
+   "disputed": 1800,
+   "days_ago": 8
+  },
+  "expect": {
+   "case": true,
+   "warn": true,
+   "hold_proposed": true,
+   "guard": false
+  },
+  "id": "total_freeze_bounce-25",
+  "family": "total_freeze_bounce",
+  "seed": 3011
+ },
+ {
+  "setup": {
+   "freeze": "total",
+   "bounce_next": true,
+   "disputed": 2400,
+   "days_ago": 50
+  },
+  "expect": {
+   "case": true,
+   "warn": true,
+   "hold_proposed": true,
+   "guard": false
+  },
+  "id": "total_freeze_bounce-26",
+  "family": "total_freeze_bounce",
+  "seed": 1211
+ },
+ {
+  "setup": {
+   "freeze": "total",
+   "bounce_next": true,
+   "disputed": 2400,
+   "days_ago": 16
+  },
+  "expect": {
+   "case": true,
+   "warn": true,
+   "hold_proposed": true,
+   "guard": false
+  },
+  "id": "total_freeze_bounce-27",
+  "family": "total_freeze_bounce",
+  "seed": 6783
+ },
+ {
+  "setup": {
+   "freeze": "total",
+   "bounce_next": true,
+   "disputed": 6200,
+   "days_ago": 9
+  },
+  "expect": {
+   "case": true,
+   "warn": true,
+   "hold_proposed": true,
+   "guard": false
+  },
+  "id": "total_freeze_bounce-28",
+  "family": "total_freeze_bounce",
+  "seed": 3404
+ },
+ {
+  "setup": {
+   "freeze": "total",
+   "bounce_next": true,
+   "disputed": 450,
+   "days_ago": 34
+  },
+  "expect": {
+   "case": true,
+   "warn": true,
+   "hold_proposed": true,
+   "guard": false
+  },
+  "id": "total_freeze_bounce-29",
+  "family": "total_freeze_bounce",
+  "seed": 7481
+ },
+ {
+  "setup": {
+   "freeze": "debit",
+   "own_payment": 18000,
+   "disputed": 9800,
+   "days_ago": 40
+  },
+  "expect": {
+   "case": true,
+   "warn": true,
+   "hold_proposed": true,
+   "guard": false
+  },
+  "id": "debit_freeze_own_payment-00",
+  "family": "debit_freeze_own_payment",
+  "seed": 8826
+ },
+ {
+  "setup": {
+   "freeze": "debit",
+   "own_payment": 3500,
+   "disputed": 999,
+   "days_ago": 46
+  },
+  "expect": {
+   "case": true,
+   "warn": true,
+   "hold_proposed": true,
+   "guard": false
+  },
+  "id": "debit_freeze_own_payment-01",
+  "family": "debit_freeze_own_payment",
+  "seed": 8048
+ },
+ {
+  "setup": {
+   "freeze": "debit",
+   "own_payment": 12000,
+   "disputed": 1800,
+   "days_ago": 17
+  },
+  "expect": {
+   "case": true,
+   "warn": true,
+   "hold_proposed": true,
+   "guard": false
+  },
+  "id": "debit_freeze_own_payment-02",
+  "family": "debit_freeze_own_payment",
+  "seed": 4100
+ },
+ {
+  "setup": {
+   "freeze": "debit",
+   "own_payment": 26500,
+   "disputed": 3150,
+   "days_ago": 58
+  },
+  "expect": {
+   "case": true,
+   "warn": true,
+   "hold_proposed": true,
+   "guard": false
+  },
+  "id": "debit_freeze_own_payment-03",
+  "family": "debit_freeze_own_payment",
+  "seed": 4767
+ },
+ {
+  "setup": {
+   "freeze": "debit",
+   "own_payment": 12000,
+   "disputed": 999,
+   "days_ago": 28
+  },
+  "expect": {
+   "case": true,
+   "warn": true,
+   "hold_proposed": true,
+   "guard": false
+  },
+  "id": "debit_freeze_own_payment-04",
+  "family": "debit_freeze_own_payment",
+  "seed": 4346
+ },
+ {
+  "setup": {
+   "freeze": "debit",
+   "own_payment": 18000,
+   "disputed": 1800,
+   "days_ago": 60
+  },
+  "expect": {
+   "case": true,
+   "warn": true,
+   "hold_proposed": true,
+   "guard": false
+  },
+  "id": "debit_freeze_own_payment-05",
+  "family": "debit_freeze_own_payment",
+  "seed": 6723
+ },
+ {
+  "setup": {
+   "freeze": "debit",
+   "own_payment": 26500,
+   "disputed": 450,
+   "days_ago": 7
+  },
+  "expect": {
+   "case": true,
+   "warn": true,
+   "hold_proposed": true,
+   "guard": false
+  },
+  "id": "debit_freeze_own_payment-06",
+  "family": "debit_freeze_own_payment",
+  "seed": 5324
+ },
+ {
+  "setup": {
+   "freeze": "debit",
+   "own_payment": 3500,
+   "disputed": 1800,
+   "days_ago": 26
+  },
+  "expect": {
+   "case": true,
+   "warn": true,
+   "hold_proposed": true,
+   "guard": false
+  },
+  "id": "debit_freeze_own_payment-07",
+  "family": "debit_freeze_own_payment",
+  "seed": 682
+ },
+ {
+  "setup": {
+   "freeze": "debit",
+   "own_payment": 12000,
+   "disputed": 1800,
+   "days_ago": 42
+  },
+  "expect": {
+   "case": true,
+   "warn": true,
+   "hold_proposed": true,
+   "guard": false
+  },
+  "id": "debit_freeze_own_payment-08",
+  "family": "debit_freeze_own_payment",
+  "seed": 8343
+ },
+ {
+  "setup": {
+   "freeze": "debit",
+   "own_payment": 12000,
+   "disputed": 2400,
+   "days_ago": 18
+  },
+  "expect": {
+   "case": true,
+   "warn": true,
+   "hold_proposed": true,
+   "guard": false
+  },
+  "id": "debit_freeze_own_payment-09",
+  "family": "debit_freeze_own_payment",
+  "seed": 8464
+ },
+ {
+  "setup": {
+   "freeze": "debit",
+   "own_payment": 3500,
+   "disputed": 1800,
+   "days_ago": 21
+  },
+  "expect": {
+   "case": true,
+   "warn": true,
+   "hold_proposed": true,
+   "guard": false
+  },
+  "id": "debit_freeze_own_payment-10",
+  "family": "debit_freeze_own_payment",
+  "seed": 424
+ },
+ {
+  "setup": {
+   "freeze": "debit",
+   "own_payment": 12000,
+   "disputed": 6200,
+   "days_ago": 14
+  },
+  "expect": {
+   "case": true,
+   "warn": true,
+   "hold_proposed": true,
+   "guard": false
+  },
+  "id": "debit_freeze_own_payment-11",
+  "family": "debit_freeze_own_payment",
+  "seed": 152
+ },
+ {
+  "setup": {
+   "freeze": "debit",
+   "own_payment": 12000,
+   "disputed": 999,
+   "days_ago": 32
+  },
+  "expect": {
+   "case": true,
+   "warn": true,
+   "hold_proposed": true,
+   "guard": false
+  },
+  "id": "debit_freeze_own_payment-12",
+  "family": "debit_freeze_own_payment",
+  "seed": 2773
+ },
+ {
+  "setup": {
+   "freeze": "debit",
+   "own_payment": 18000,
+   "disputed": 9800,
+   "days_ago": 21
+  },
+  "expect": {
+   "case": true,
+   "warn": true,
+   "hold_proposed": true,
+   "guard": false
+  },
+  "id": "debit_freeze_own_payment-13",
+  "family": "debit_freeze_own_payment",
+  "seed": 3247
+ },
+ {
+  "setup": {
+   "freeze": "debit",
+   "own_payment": 18000,
+   "disputed": 2400,
+   "days_ago": 38
+  },
+  "expect": {
+   "case": true,
+   "warn": true,
+   "hold_proposed": true,
+   "guard": false
+  },
+  "id": "debit_freeze_own_payment-14",
+  "family": "debit_freeze_own_payment",
+  "seed": 6499
+ },
+ {
+  "setup": {
+   "freeze": "debit",
+   "own_payment": 18000,
+   "disputed": 450,
+   "days_ago": 14
+  },
+  "expect": {
+   "case": true,
+   "warn": true,
+   "hold_proposed": true,
+   "guard": false
+  },
+  "id": "debit_freeze_own_payment-15",
+  "family": "debit_freeze_own_payment",
+  "seed": 8894
+ },
+ {
+  "setup": {
+   "freeze": "debit",
+   "own_payment": 12000,
+   "disputed": 6200,
+   "days_ago": 14
+  },
+  "expect": {
+   "case": true,
+   "warn": true,
+   "hold_proposed": true,
+   "guard": false
+  },
+  "id": "debit_freeze_own_payment-16",
+  "family": "debit_freeze_own_payment",
+  "seed": 3098
+ },
+ {
+  "setup": {
+   "freeze": "debit",
+   "own_payment": 26500,
+   "disputed": 999,
+   "days_ago": 43
+  },
+  "expect": {
+   "case": true,
+   "warn": true,
+   "hold_proposed": true,
+   "guard": false
+  },
+  "id": "debit_freeze_own_payment-17",
+  "family": "debit_freeze_own_payment",
+  "seed": 6581
+ },
+ {
+  "setup": {
+   "freeze": "debit",
+   "own_payment": 26500,
+   "disputed": 9800,
+   "days_ago": 56
+  },
+  "expect": {
+   "case": true,
+   "warn": true,
+   "hold_proposed": true,
+   "guard": false
+  },
+  "id": "debit_freeze_own_payment-18",
+  "family": "debit_freeze_own_payment",
+  "seed": 9453
+ },
+ {
+  "setup": {
+   "freeze": "debit",
+   "own_payment": 12000,
+   "disputed": 2400,
+   "days_ago": 18
+  },
+  "expect": {
+   "case": true,
+   "warn": true,
+   "hold_proposed": true,
+   "guard": false
+  },
+  "id": "debit_freeze_own_payment-19",
+  "family": "debit_freeze_own_payment",
+  "seed": 1376
+ },
+ {
+  "setup": {
+   "freeze": "debit",
+   "own_payment": 3500,
+   "disputed": 999,
+   "days_ago": 36
+  },
+  "expect": {
+   "case": true,
+   "warn": true,
+   "hold_proposed": true,
+   "guard": false
+  },
+  "id": "debit_freeze_own_payment-20",
+  "family": "debit_freeze_own_payment",
+  "seed": 4539
+ },
+ {
+  "setup": {
+   "freeze": "debit",
+   "own_payment": 12000,
+   "disputed": 3150,
+   "days_ago": 16
+  },
+  "expect": {
+   "case": true,
+   "warn": true,
+   "hold_proposed": true,
+   "guard": false
+  },
+  "id": "debit_freeze_own_payment-21",
+  "family": "debit_freeze_own_payment",
+  "seed": 9204
+ },
+ {
+  "setup": {
+   "freeze": "debit",
+   "own_payment": 3500,
+   "disputed": 3150,
+   "days_ago": 38
+  },
+  "expect": {
+   "case": true,
+   "warn": true,
+   "hold_proposed": true,
+   "guard": false
+  },
+  "id": "debit_freeze_own_payment-22",
+  "family": "debit_freeze_own_payment",
+  "seed": 3197
+ },
+ {
+  "setup": {
+   "freeze": "debit",
+   "own_payment": 18000,
+   "disputed": 2400,
+   "days_ago": 36
+  },
+  "expect": {
+   "case": true,
+   "warn": true,
+   "hold_proposed": true,
+   "guard": false
+  },
+  "id": "debit_freeze_own_payment-23",
+  "family": "debit_freeze_own_payment",
+  "seed": 7732
+ },
+ {
+  "setup": {
+   "freeze": "debit",
+   "own_payment": 18000,
+   "disputed": 999,
+   "days_ago": 26
+  },
+  "expect": {
+   "case": true,
+   "warn": true,
+   "hold_proposed": true,
+   "guard": false
+  },
+  "id": "debit_freeze_own_payment-24",
+  "family": "debit_freeze_own_payment",
+  "seed": 5763
+ },
+ {
+  "setup": {
+   "freeze": "debit",
+   "own_payment": 3500,
+   "disputed": 3150,
+   "days_ago": 48
+  },
+  "expect": {
+   "case": true,
+   "warn": true,
+   "hold_proposed": true,
+   "guard": false
+  },
+  "id": "debit_freeze_own_payment-25",
+  "family": "debit_freeze_own_payment",
+  "seed": 7906
+ },
+ {
+  "setup": {
+   "freeze": "debit",
+   "own_payment": 18000,
+   "disputed": 999,
+   "days_ago": 43
+  },
+  "expect": {
+   "case": true,
+   "warn": true,
+   "hold_proposed": true,
+   "guard": false
+  },
+  "id": "debit_freeze_own_payment-26",
+  "family": "debit_freeze_own_payment",
+  "seed": 9423
+ },
+ {
+  "setup": {
+   "freeze": "debit",
+   "own_payment": 3500,
+   "disputed": 2400,
+   "days_ago": 46
+  },
+  "expect": {
+   "case": true,
+   "warn": true,
+   "hold_proposed": true,
+   "guard": false
+  },
+  "id": "debit_freeze_own_payment-27",
+  "family": "debit_freeze_own_payment",
+  "seed": 3868
+ },
+ {
+  "setup": {
+   "freeze": "debit",
+   "own_payment": 12000,
+   "disputed": 999,
+   "days_ago": 6
+  },
+  "expect": {
+   "case": true,
+   "warn": true,
+   "hold_proposed": true,
+   "guard": false
+  },
+  "id": "debit_freeze_own_payment-28",
+  "family": "debit_freeze_own_payment",
+  "seed": 7819
+ },
+ {
+  "setup": {
+   "freeze": "debit",
+   "own_payment": 3500,
+   "disputed": 6200,
+   "days_ago": 39
+  },
+  "expect": {
+   "case": true,
+   "warn": true,
+   "hold_proposed": true,
+   "guard": false
+  },
+  "id": "debit_freeze_own_payment-29",
+  "family": "debit_freeze_own_payment",
+  "seed": 4535
+ },
+ {
+  "setup": {
+   "freeze": "debit",
+   "disputed": 3150,
+   "days_ago": 42,
+   "advance_to_payout": true
+  },
+  "expect": {
+   "case": false
+  },
+  "id": "debit_freeze_no_signal-00",
+  "family": "debit_freeze_no_signal",
+  "seed": 1054
+ },
+ {
+  "setup": {
+   "freeze": "debit",
+   "disputed": 3150,
+   "days_ago": 8,
+   "advance_to_payout": true
+  },
+  "expect": {
+   "case": false
+  },
+  "id": "debit_freeze_no_signal-01",
+  "family": "debit_freeze_no_signal",
+  "seed": 9791
+ },
+ {
+  "setup": {
+   "freeze": "debit",
+   "disputed": 2400,
+   "days_ago": 44,
+   "advance_to_payout": true
+  },
+  "expect": {
+   "case": false
+  },
+  "id": "debit_freeze_no_signal-02",
+  "family": "debit_freeze_no_signal",
+  "seed": 6492
+ },
+ {
+  "setup": {
+   "freeze": "debit",
+   "disputed": 9800,
+   "days_ago": 53,
+   "advance_to_payout": true
+  },
+  "expect": {
+   "case": false
+  },
+  "id": "debit_freeze_no_signal-03",
+  "family": "debit_freeze_no_signal",
+  "seed": 5238
+ },
+ {
+  "setup": {
+   "freeze": "debit",
+   "disputed": 2400,
+   "days_ago": 38,
+   "advance_to_payout": true
+  },
+  "expect": {
+   "case": false
+  },
+  "id": "debit_freeze_no_signal-04",
+  "family": "debit_freeze_no_signal",
+  "seed": 2712
+ },
+ {
+  "setup": {
+   "freeze": "debit",
+   "disputed": 1800,
+   "days_ago": 37,
+   "advance_to_payout": true
+  },
+  "expect": {
+   "case": false
+  },
+  "id": "debit_freeze_no_signal-05",
+  "family": "debit_freeze_no_signal",
+  "seed": 5026
+ },
+ {
+  "setup": {
+   "freeze": "debit",
+   "disputed": 6200,
+   "days_ago": 45,
+   "advance_to_payout": true
+  },
+  "expect": {
+   "case": false
+  },
+  "id": "debit_freeze_no_signal-06",
+  "family": "debit_freeze_no_signal",
+  "seed": 279
+ },
+ {
+  "setup": {
+   "freeze": "debit",
+   "disputed": 1800,
+   "days_ago": 22,
+   "advance_to_payout": true
+  },
+  "expect": {
+   "case": false
+  },
+  "id": "debit_freeze_no_signal-07",
+  "family": "debit_freeze_no_signal",
+  "seed": 238
+ },
+ {
+  "setup": {
+   "freeze": "debit",
+   "disputed": 1800,
+   "days_ago": 60,
+   "advance_to_payout": true
+  },
+  "expect": {
+   "case": false
+  },
+  "id": "debit_freeze_no_signal-08",
+  "family": "debit_freeze_no_signal",
+  "seed": 1217
+ },
+ {
+  "setup": {
+   "freeze": "debit",
+   "disputed": 6200,
+   "days_ago": 22,
+   "advance_to_payout": true
+  },
+  "expect": {
+   "case": false
+  },
+  "id": "debit_freeze_no_signal-09",
+  "family": "debit_freeze_no_signal",
+  "seed": 7828
+ },
+ {
+  "setup": {
+   "freeze": "debit",
+   "disputed": 6200,
+   "days_ago": 34,
+   "advance_to_payout": true
+  },
+  "expect": {
+   "case": false
+  },
+  "id": "debit_freeze_no_signal-10",
+  "family": "debit_freeze_no_signal",
+  "seed": 2717
+ },
+ {
+  "setup": {
+   "freeze": "debit",
+   "disputed": 1800,
+   "days_ago": 45,
+   "advance_to_payout": true
+  },
+  "expect": {
+   "case": false
+  },
+  "id": "debit_freeze_no_signal-11",
+  "family": "debit_freeze_no_signal",
+  "seed": 420
+ },
+ {
+  "setup": {
+   "freeze": "debit",
+   "disputed": 9800,
+   "days_ago": 44,
+   "advance_to_payout": true
+  },
+  "expect": {
+   "case": false
+  },
+  "id": "debit_freeze_no_signal-12",
+  "family": "debit_freeze_no_signal",
+  "seed": 228
+ },
+ {
+  "setup": {
+   "freeze": "debit",
+   "disputed": 450,
+   "days_ago": 21,
+   "advance_to_payout": true
+  },
+  "expect": {
+   "case": false
+  },
+  "id": "debit_freeze_no_signal-13",
+  "family": "debit_freeze_no_signal",
+  "seed": 1487
+ },
+ {
+  "setup": {
+   "freeze": "debit",
+   "disputed": 450,
+   "days_ago": 55,
+   "advance_to_payout": true
+  },
+  "expect": {
+   "case": false
+  },
+  "id": "debit_freeze_no_signal-14",
+  "family": "debit_freeze_no_signal",
+  "seed": 3217
+ },
+ {
+  "setup": {
+   "freeze": "debit",
+   "disputed": 2400,
+   "days_ago": 38,
+   "advance_to_payout": true
+  },
+  "expect": {
+   "case": false
+  },
+  "id": "debit_freeze_no_signal-15",
+  "family": "debit_freeze_no_signal",
+  "seed": 7309
+ },
+ {
+  "setup": {
+   "freeze": "debit",
+   "disputed": 999,
+   "days_ago": 57,
+   "advance_to_payout": true
+  },
+  "expect": {
+   "case": false
+  },
+  "id": "debit_freeze_no_signal-16",
+  "family": "debit_freeze_no_signal",
+  "seed": 4057
+ },
+ {
+  "setup": {
+   "freeze": "debit",
+   "disputed": 3150,
+   "days_ago": 32,
+   "advance_to_payout": true
+  },
+  "expect": {
+   "case": false
+  },
+  "id": "debit_freeze_no_signal-17",
+  "family": "debit_freeze_no_signal",
+  "seed": 6063
+ },
+ {
+  "setup": {
+   "freeze": "debit",
+   "disputed": 1800,
+   "days_ago": 43,
+   "advance_to_payout": true
+  },
+  "expect": {
+   "case": false
+  },
+  "id": "debit_freeze_no_signal-18",
+  "family": "debit_freeze_no_signal",
+  "seed": 682
+ },
+ {
+  "setup": {
+   "freeze": "debit",
+   "disputed": 450,
+   "days_ago": 44,
+   "advance_to_payout": true
+  },
+  "expect": {
+   "case": false
+  },
+  "id": "debit_freeze_no_signal-19",
+  "family": "debit_freeze_no_signal",
+  "seed": 1847
+ },
+ {
+  "setup": {
+   "freeze": null,
+   "own_payment": 3500,
+   "advance_to_payout": true
+  },
+  "expect": {
+   "case": false
+  },
+  "id": "healthy_account-00",
+  "family": "healthy_account",
+  "seed": 751
+ },
+ {
+  "setup": {
+   "freeze": null,
+   "own_payment": 3500,
+   "advance_to_payout": true
+  },
+  "expect": {
+   "case": false
+  },
+  "id": "healthy_account-01",
+  "family": "healthy_account",
+  "seed": 668
+ },
+ {
+  "setup": {
+   "freeze": null,
+   "own_payment": 18000,
+   "advance_to_payout": true
+  },
+  "expect": {
+   "case": false
+  },
+  "id": "healthy_account-02",
+  "family": "healthy_account",
+  "seed": 6979
+ },
+ {
+  "setup": {
+   "freeze": null,
+   "own_payment": 18000,
+   "advance_to_payout": true
+  },
+  "expect": {
+   "case": false
+  },
+  "id": "healthy_account-03",
+  "family": "healthy_account",
+  "seed": 5455
+ },
+ {
+  "setup": {
+   "freeze": null,
+   "own_payment": 26500,
+   "advance_to_payout": true
+  },
+  "expect": {
+   "case": false
+  },
+  "id": "healthy_account-04",
+  "family": "healthy_account",
+  "seed": 3785
+ },
+ {
+  "setup": {
+   "freeze": null,
+   "own_payment": 3500,
+   "advance_to_payout": true
+  },
+  "expect": {
+   "case": false
+  },
+  "id": "healthy_account-05",
+  "family": "healthy_account",
+  "seed": 9462
+ },
+ {
+  "setup": {
+   "freeze": null,
+   "own_payment": 12000,
+   "advance_to_payout": true
+  },
+  "expect": {
+   "case": false
+  },
+  "id": "healthy_account-06",
+  "family": "healthy_account",
+  "seed": 8171
+ },
+ {
+  "setup": {
+   "freeze": null,
+   "own_payment": 12000,
+   "advance_to_payout": true
+  },
+  "expect": {
+   "case": false
+  },
+  "id": "healthy_account-07",
+  "family": "healthy_account",
+  "seed": 7638
+ },
+ {
+  "setup": {
+   "freeze": null,
+   "own_payment": 12000,
+   "advance_to_payout": true
+  },
+  "expect": {
+   "case": false
+  },
+  "id": "healthy_account-08",
+  "family": "healthy_account",
+  "seed": 2245
+ },
+ {
+  "setup": {
+   "freeze": null,
+   "own_payment": 3500,
+   "advance_to_payout": true
+  },
+  "expect": {
+   "case": false
+  },
+  "id": "healthy_account-09",
+  "family": "healthy_account",
+  "seed": 9556
+ },
+ {
+  "setup": {
+   "freeze": null,
+   "own_payment": 18000,
+   "advance_to_payout": true
+  },
+  "expect": {
+   "case": false
+  },
+  "id": "healthy_account-10",
+  "family": "healthy_account",
+  "seed": 4538
+ },
+ {
+  "setup": {
+   "freeze": null,
+   "own_payment": 12000,
+   "advance_to_payout": true
+  },
+  "expect": {
+   "case": false
+  },
+  "id": "healthy_account-11",
+  "family": "healthy_account",
+  "seed": 2079
+ },
+ {
+  "setup": {
+   "freeze": null,
+   "own_payment": 12000,
+   "advance_to_payout": true
+  },
+  "expect": {
+   "case": false
+  },
+  "id": "healthy_account-12",
+  "family": "healthy_account",
+  "seed": 797
+ },
+ {
+  "setup": {
+   "freeze": null,
+   "own_payment": 12000,
+   "advance_to_payout": true
+  },
+  "expect": {
+   "case": false
+  },
+  "id": "healthy_account-13",
+  "family": "healthy_account",
+  "seed": 7439
+ },
+ {
+  "setup": {
+   "freeze": null,
+   "own_payment": 3500,
+   "advance_to_payout": true
+  },
+  "expect": {
+   "case": false
+  },
+  "id": "healthy_account-14",
+  "family": "healthy_account",
+  "seed": 7334
+ },
+ {
+  "setup": {
+   "freeze": null,
+   "own_payment": 12000,
+   "advance_to_payout": true
+  },
+  "expect": {
+   "case": false
+  },
+  "id": "healthy_account-15",
+  "family": "healthy_account",
+  "seed": 6388
+ },
+ {
+  "setup": {
+   "freeze": null,
+   "own_payment": 26500,
+   "advance_to_payout": true
+  },
+  "expect": {
+   "case": false
+  },
+  "id": "healthy_account-16",
+  "family": "healthy_account",
+  "seed": 9651
+ },
+ {
+  "setup": {
+   "freeze": null,
+   "own_payment": 12000,
+   "advance_to_payout": true
+  },
+  "expect": {
+   "case": false
+  },
+  "id": "healthy_account-17",
+  "family": "healthy_account",
+  "seed": 2547
+ },
+ {
+  "setup": {
+   "freeze": null,
+   "own_payment": 18000,
+   "advance_to_payout": true
+  },
+  "expect": {
+   "case": false
+  },
+  "id": "healthy_account-18",
+  "family": "healthy_account",
+  "seed": 9795
+ },
+ {
+  "setup": {
+   "freeze": null,
+   "own_payment": 26500,
+   "advance_to_payout": true
+  },
+  "expect": {
+   "case": false
+  },
+  "id": "healthy_account-19",
+  "family": "healthy_account",
+  "seed": 9688
+ },
+ {
+  "setup": {
+   "freeze": null,
+   "own_payment": 26500,
+   "advance_to_payout": true
+  },
+  "expect": {
+   "case": false
+  },
+  "id": "healthy_account-20",
+  "family": "healthy_account",
+  "seed": 9891
+ },
+ {
+  "setup": {
+   "freeze": null,
+   "own_payment": 26500,
+   "advance_to_payout": true
+  },
+  "expect": {
+   "case": false
+  },
+  "id": "healthy_account-21",
+  "family": "healthy_account",
+  "seed": 9853
+ },
+ {
+  "setup": {
+   "freeze": null,
+   "own_payment": 18000,
+   "advance_to_payout": true
+  },
+  "expect": {
+   "case": false
+  },
+  "id": "healthy_account-22",
+  "family": "healthy_account",
+  "seed": 2398
+ },
+ {
+  "setup": {
+   "freeze": null,
+   "own_payment": 3500,
+   "advance_to_payout": true
+  },
+  "expect": {
+   "case": false
+  },
+  "id": "healthy_account-23",
+  "family": "healthy_account",
+  "seed": 262
+ },
+ {
+  "setup": {
+   "freeze": null,
+   "own_payment": 3500,
+   "advance_to_payout": true
+  },
+  "expect": {
+   "case": false
+  },
+  "id": "healthy_account-24",
+  "family": "healthy_account",
+  "seed": 6161
+ },
+ {
+  "setup": {
+   "freeze": null,
+   "own_payment": 3500,
+   "advance_to_payout": true
+  },
+  "expect": {
+   "case": false
+  },
+  "id": "healthy_account-25",
+  "family": "healthy_account",
+  "seed": 1494
+ },
+ {
+  "setup": {
+   "freeze": null,
+   "own_payment": 18000,
+   "advance_to_payout": true
+  },
+  "expect": {
+   "case": false
+  },
+  "id": "healthy_account-26",
+  "family": "healthy_account",
+  "seed": 7365
+ },
+ {
+  "setup": {
+   "freeze": null,
+   "own_payment": 3500,
+   "advance_to_payout": true
+  },
+  "expect": {
+   "case": false
+  },
+  "id": "healthy_account-27",
+  "family": "healthy_account",
+  "seed": 2402
+ },
+ {
+  "setup": {
+   "freeze": null,
+   "own_payment": 12000,
+   "advance_to_payout": true
+  },
+  "expect": {
+   "case": false
+  },
+  "id": "healthy_account-28",
+  "family": "healthy_account",
+  "seed": 3740
+ },
+ {
+  "setup": {
+   "freeze": null,
+   "own_payment": 26500,
+   "advance_to_payout": true
+  },
+  "expect": {
+   "case": false
+  },
+  "id": "healthy_account-29",
+  "family": "healthy_account",
+  "seed": 9218
+ },
+ {
+  "setup": {
+   "freeze": "debit",
+   "bounce_next": true,
+   "own_payment": 3500,
+   "mule": true,
+   "disputed": 1800,
+   "days_ago": 59
+  },
+  "expect": {
+   "case": true,
+   "warn": false,
+   "hold_proposed": false,
+   "guard": true
+  },
+  "id": "mule_flagged-00",
+  "family": "mule_flagged",
+  "seed": 5405
+ },
+ {
+  "setup": {
+   "freeze": "total",
+   "bounce_next": true,
+   "own_payment": 26500,
+   "mule": true,
+   "disputed": 9800,
+   "days_ago": 37
+  },
+  "expect": {
+   "case": true,
+   "warn": false,
+   "hold_proposed": false,
+   "guard": true
+  },
+  "id": "mule_flagged-01",
+  "family": "mule_flagged",
+  "seed": 9626
+ },
+ {
+  "setup": {
+   "freeze": "total",
+   "bounce_next": true,
+   "own_payment": 18000,
+   "mule": true,
+   "disputed": 450,
+   "days_ago": 42
+  },
+  "expect": {
+   "case": true,
+   "warn": false,
+   "hold_proposed": false,
+   "guard": true
+  },
+  "id": "mule_flagged-02",
+  "family": "mule_flagged",
+  "seed": 8194
+ },
+ {
+  "setup": {
+   "freeze": "debit",
+   "bounce_next": true,
+   "own_payment": 26500,
+   "mule": true,
+   "disputed": 9800,
+   "days_ago": 56
+  },
+  "expect": {
+   "case": true,
+   "warn": false,
+   "hold_proposed": false,
+   "guard": true
+  },
+  "id": "mule_flagged-03",
+  "family": "mule_flagged",
+  "seed": 7728
+ },
+ {
+  "setup": {
+   "freeze": "total",
+   "bounce_next": true,
+   "own_payment": 18000,
+   "mule": true,
+   "disputed": 2400,
+   "days_ago": 19
+  },
+  "expect": {
+   "case": true,
+   "warn": false,
+   "hold_proposed": false,
+   "guard": true
+  },
+  "id": "mule_flagged-04",
+  "family": "mule_flagged",
+  "seed": 3349
+ },
+ {
+  "setup": {
+   "freeze": "total",
+   "bounce_next": true,
+   "own_payment": 3500,
+   "mule": true,
+   "disputed": 999,
+   "days_ago": 32
+  },
+  "expect": {
+   "case": true,
+   "warn": false,
+   "hold_proposed": false,
+   "guard": true
+  },
+  "id": "mule_flagged-05",
+  "family": "mule_flagged",
+  "seed": 9866
+ },
+ {
+  "setup": {
+   "freeze": "debit",
+   "bounce_next": true,
+   "own_payment": 3500,
+   "mule": true,
+   "disputed": 999,
+   "days_ago": 18
+  },
+  "expect": {
+   "case": true,
+   "warn": false,
+   "hold_proposed": false,
+   "guard": true
+  },
+  "id": "mule_flagged-06",
+  "family": "mule_flagged",
+  "seed": 7454
+ },
+ {
+  "setup": {
+   "freeze": "total",
+   "bounce_next": true,
+   "own_payment": 3500,
+   "mule": true,
+   "disputed": 9800,
+   "days_ago": 56
+  },
+  "expect": {
+   "case": true,
+   "warn": false,
+   "hold_proposed": false,
+   "guard": true
+  },
+  "id": "mule_flagged-07",
+  "family": "mule_flagged",
+  "seed": 5779
+ },
+ {
+  "setup": {
+   "freeze": "debit",
+   "bounce_next": true,
+   "own_payment": 3500,
+   "mule": true,
+   "disputed": 6200,
+   "days_ago": 10
+  },
+  "expect": {
+   "case": true,
+   "warn": false,
+   "hold_proposed": false,
+   "guard": true
+  },
+  "id": "mule_flagged-08",
+  "family": "mule_flagged",
+  "seed": 8748
+ },
+ {
+  "setup": {
+   "freeze": "total",
+   "bounce_next": true,
+   "own_payment": 12000,
+   "mule": true,
+   "disputed": 3150,
+   "days_ago": 57
+  },
+  "expect": {
+   "case": true,
+   "warn": false,
+   "hold_proposed": false,
+   "guard": true
+  },
+  "id": "mule_flagged-09",
+  "family": "mule_flagged",
+  "seed": 201
+ },
+ {
+  "setup": {
+   "freeze": "total",
+   "bounce_next": true,
+   "own_payment": 3500,
+   "mule": true,
+   "disputed": 450,
+   "days_ago": 29
+  },
+  "expect": {
+   "case": true,
+   "warn": false,
+   "hold_proposed": false,
+   "guard": true
+  },
+  "id": "mule_flagged-10",
+  "family": "mule_flagged",
+  "seed": 5271
+ },
+ {
+  "setup": {
+   "freeze": "debit",
+   "bounce_next": true,
+   "own_payment": 26500,
+   "mule": true,
+   "disputed": 450,
+   "days_ago": 60
+  },
+  "expect": {
+   "case": true,
+   "warn": false,
+   "hold_proposed": false,
+   "guard": true
+  },
+  "id": "mule_flagged-11",
+  "family": "mule_flagged",
+  "seed": 4954
+ },
+ {
+  "setup": {
+   "freeze": "total",
+   "bounce_next": true,
+   "own_payment": 12000,
+   "mule": true,
+   "disputed": 999,
+   "days_ago": 55
+  },
+  "expect": {
+   "case": true,
+   "warn": false,
+   "hold_proposed": false,
+   "guard": true
+  },
+  "id": "mule_flagged-12",
+  "family": "mule_flagged",
+  "seed": 9621
+ },
+ {
+  "setup": {
+   "freeze": "total",
+   "bounce_next": true,
+   "own_payment": 18000,
+   "mule": true,
+   "disputed": 1800,
+   "days_ago": 38
+  },
+  "expect": {
+   "case": true,
+   "warn": false,
+   "hold_proposed": false,
+   "guard": true
+  },
+  "id": "mule_flagged-13",
+  "family": "mule_flagged",
+  "seed": 4181
+ },
+ {
+  "setup": {
+   "freeze": "total",
+   "bounce_next": true,
+   "own_payment": 3500,
+   "mule": true,
+   "disputed": 6200,
+   "days_ago": 24
+  },
+  "expect": {
+   "case": true,
+   "warn": false,
+   "hold_proposed": false,
+   "guard": true
+  },
+  "id": "mule_flagged-14",
+  "family": "mule_flagged",
+  "seed": 3967
+ },
+ {
+  "setup": {
+   "freeze": "debit",
+   "bounce_next": true,
+   "own_payment": 3500,
+   "mule": true,
+   "disputed": 3150,
+   "days_ago": 8
+  },
+  "expect": {
+   "case": true,
+   "warn": false,
+   "hold_proposed": false,
+   "guard": true
+  },
+  "id": "mule_flagged-15",
+  "family": "mule_flagged",
+  "seed": 2743
+ },
+ {
+  "setup": {
+   "freeze": "debit",
+   "bounce_next": true,
+   "own_payment": 18000,
+   "mule": true,
+   "disputed": 6200,
+   "days_ago": 14
+  },
+  "expect": {
+   "case": true,
+   "warn": false,
+   "hold_proposed": false,
+   "guard": true
+  },
+  "id": "mule_flagged-16",
+  "family": "mule_flagged",
+  "seed": 862
+ },
+ {
+  "setup": {
+   "freeze": "debit",
+   "bounce_next": true,
+   "own_payment": 3500,
+   "mule": true,
+   "disputed": 9800,
+   "days_ago": 41
+  },
+  "expect": {
+   "case": true,
+   "warn": false,
+   "hold_proposed": false,
+   "guard": true
+  },
+  "id": "mule_flagged-17",
+  "family": "mule_flagged",
+  "seed": 4840
+ },
+ {
+  "setup": {
+   "freeze": "debit",
+   "bounce_next": true,
+   "own_payment": 3500,
+   "mule": true,
+   "disputed": 1800,
+   "days_ago": 54
+  },
+  "expect": {
+   "case": true,
+   "warn": false,
+   "hold_proposed": false,
+   "guard": true
+  },
+  "id": "mule_flagged-18",
+  "family": "mule_flagged",
+  "seed": 2638
+ },
+ {
+  "setup": {
+   "freeze": "debit",
+   "bounce_next": true,
+   "own_payment": 3500,
+   "mule": true,
+   "disputed": 2400,
+   "days_ago": 56
+  },
+  "expect": {
+   "case": true,
+   "warn": false,
+   "hold_proposed": false,
+   "guard": true
+  },
+  "id": "mule_flagged-19",
+  "family": "mule_flagged",
+  "seed": 945
+ },
+ {
+  "setup": {
+   "freeze": "debit",
+   "bounce_next": true,
+   "own_payment": 18000,
+   "mule": true,
+   "disputed": 1800,
+   "days_ago": 28
+  },
+  "expect": {
+   "case": true,
+   "warn": false,
+   "hold_proposed": false,
+   "guard": true
+  },
+  "id": "mule_flagged-20",
+  "family": "mule_flagged",
+  "seed": 4880
+ },
+ {
+  "setup": {
+   "freeze": "debit",
+   "bounce_next": true,
+   "own_payment": 12000,
+   "mule": true,
+   "disputed": 9800,
+   "days_ago": 39
+  },
+  "expect": {
+   "case": true,
+   "warn": false,
+   "hold_proposed": false,
+   "guard": true
+  },
+  "id": "mule_flagged-21",
+  "family": "mule_flagged",
+  "seed": 348
+ },
+ {
+  "setup": {
+   "freeze": "debit",
+   "bounce_next": true,
+   "own_payment": 26500,
+   "mule": true,
+   "disputed": 450,
+   "days_ago": 5
+  },
+  "expect": {
+   "case": true,
+   "warn": false,
+   "hold_proposed": false,
+   "guard": true
+  },
+  "id": "mule_flagged-22",
+  "family": "mule_flagged",
+  "seed": 3162
+ },
+ {
+  "setup": {
+   "freeze": "total",
+   "bounce_next": true,
+   "own_payment": 12000,
+   "mule": true,
+   "disputed": 3150,
+   "days_ago": 55
+  },
+  "expect": {
+   "case": true,
+   "warn": false,
+   "hold_proposed": false,
+   "guard": true
+  },
+  "id": "mule_flagged-23",
+  "family": "mule_flagged",
+  "seed": 9885
+ },
+ {
+  "setup": {
+   "freeze": "total",
+   "bounce_next": true,
+   "own_payment": 18000,
+   "mule": true,
+   "disputed": 1800,
+   "days_ago": 27
+  },
+  "expect": {
+   "case": true,
+   "warn": false,
+   "hold_proposed": false,
+   "guard": true
+  },
+  "id": "mule_flagged-24",
+  "family": "mule_flagged",
+  "seed": 1151
+ },
+ {
+  "setup": {
+   "freeze": "debit",
+   "bounce_next": true,
+   "own_payment": 26500,
+   "mule": true,
+   "disputed": 3150,
+   "days_ago": 38
+  },
+  "expect": {
+   "case": true,
+   "warn": false,
+   "hold_proposed": false,
+   "guard": true
+  },
+  "id": "mule_flagged-25",
+  "family": "mule_flagged",
+  "seed": 756
+ },
+ {
+  "setup": {
+   "freeze": "total",
+   "bounce_next": true,
+   "own_payment": 3500,
+   "mule": true,
+   "disputed": 999,
+   "days_ago": 20
+  },
+  "expect": {
+   "case": true,
+   "warn": false,
+   "hold_proposed": false,
+   "guard": true
+  },
+  "id": "mule_flagged-26",
+  "family": "mule_flagged",
+  "seed": 4756
+ },
+ {
+  "setup": {
+   "freeze": "total",
+   "bounce_next": true,
+   "own_payment": 12000,
+   "mule": true,
+   "disputed": 6200,
+   "days_ago": 34
+  },
+  "expect": {
+   "case": true,
+   "warn": false,
+   "hold_proposed": false,
+   "guard": true
+  },
+  "id": "mule_flagged-27",
+  "family": "mule_flagged",
+  "seed": 9099
+ },
+ {
+  "setup": {
+   "freeze": "total",
+   "bounce_next": true,
+   "own_payment": 3500,
+   "mule": true,
+   "disputed": 3150,
+   "days_ago": 21
+  },
+  "expect": {
+   "case": true,
+   "warn": false,
+   "hold_proposed": false,
+   "guard": true
+  },
+  "id": "mule_flagged-28",
+  "family": "mule_flagged",
+  "seed": 449
+ },
+ {
+  "setup": {
+   "freeze": "debit",
+   "bounce_next": true,
+   "own_payment": 12000,
+   "mule": true,
+   "disputed": 6200,
+   "days_ago": 39
+  },
+  "expect": {
+   "case": true,
+   "warn": false,
+   "hold_proposed": false,
+   "guard": true
+  },
+  "id": "mule_flagged-29",
+  "family": "mule_flagged",
+  "seed": 9180
+ },
+ {
+  "setup": {
+   "freeze": "debit",
+   "disputed": 3150,
+   "notice": 3150,
+   "locked": 310000,
+   "days_ago": 32
+  },
+  "expect": {
+   "pack": true,
+   "lien_amount": 3150
+  },
+  "id": "notice_agrees-00",
+  "family": "notice_agrees",
+  "seed": 2846
+ },
+ {
+  "setup": {
+   "freeze": "debit",
+   "disputed": 450,
+   "notice": 450,
+   "locked": 48000,
+   "days_ago": 53
+  },
+  "expect": {
+   "pack": true,
+   "lien_amount": 450
+  },
+  "id": "notice_agrees-01",
+  "family": "notice_agrees",
+  "seed": 1859
+ },
+ {
+  "setup": {
+   "freeze": "debit",
+   "disputed": 6200,
+   "notice": 6200,
+   "locked": 125000,
+   "days_ago": 40
+  },
+  "expect": {
+   "pack": true,
+   "lien_amount": 6200
+  },
+  "id": "notice_agrees-02",
+  "family": "notice_agrees",
+  "seed": 6757
+ },
+ {
+  "setup": {
+   "freeze": "debit",
+   "disputed": 2400,
+   "notice": 2400,
+   "locked": 740000,
+   "days_ago": 28
+  },
+  "expect": {
+   "pack": true,
+   "lien_amount": 2400
+  },
+  "id": "notice_agrees-03",
+  "family": "notice_agrees",
+  "seed": 9727
+ },
+ {
+  "setup": {
+   "freeze": "debit",
+   "disputed": 3150,
+   "notice": 3150,
+   "locked": 48000,
+   "days_ago": 11
+  },
+  "expect": {
+   "pack": true,
+   "lien_amount": 3150
+  },
+  "id": "notice_agrees-04",
+  "family": "notice_agrees",
+  "seed": 9874
+ },
+ {
+  "setup": {
+   "freeze": "debit",
+   "disputed": 1800,
+   "notice": 1800,
+   "locked": 125000,
+   "days_ago": 13
+  },
+  "expect": {
+   "pack": true,
+   "lien_amount": 1800
+  },
+  "id": "notice_agrees-05",
+  "family": "notice_agrees",
+  "seed": 234
+ },
+ {
+  "setup": {
+   "freeze": "debit",
+   "disputed": 1800,
+   "notice": 1800,
+   "locked": 310000,
+   "days_ago": 29
+  },
+  "expect": {
+   "pack": true,
+   "lien_amount": 1800
+  },
+  "id": "notice_agrees-06",
+  "family": "notice_agrees",
+  "seed": 8456
+ },
+ {
+  "setup": {
+   "freeze": "debit",
+   "disputed": 2400,
+   "notice": 2400,
+   "locked": 740000,
+   "days_ago": 45
+  },
+  "expect": {
+   "pack": true,
+   "lien_amount": 2400
+  },
+  "id": "notice_agrees-07",
+  "family": "notice_agrees",
+  "seed": 4433
+ },
+ {
+  "setup": {
+   "freeze": "debit",
+   "disputed": 9800,
+   "notice": 9800,
+   "locked": 125000,
+   "days_ago": 36
+  },
+  "expect": {
+   "pack": true,
+   "lien_amount": 9800
+  },
+  "id": "notice_agrees-08",
+  "family": "notice_agrees",
+  "seed": 4820
+ },
+ {
+  "setup": {
+   "freeze": "debit",
+   "disputed": 2400,
+   "notice": 2400,
+   "locked": 48000,
+   "days_ago": 10
+  },
+  "expect": {
+   "pack": true,
+   "lien_amount": 2400
+  },
+  "id": "notice_agrees-09",
+  "family": "notice_agrees",
+  "seed": 4947
+ },
+ {
+  "setup": {
+   "freeze": "debit",
+   "disputed": 3150,
+   "notice": 3150,
+   "locked": 48000,
+   "days_ago": 38
+  },
+  "expect": {
+   "pack": true,
+   "lien_amount": 3150
+  },
+  "id": "notice_agrees-10",
+  "family": "notice_agrees",
+  "seed": 5654
+ },
+ {
+  "setup": {
+   "freeze": "debit",
+   "disputed": 6200,
+   "notice": 6200,
+   "locked": 310000,
+   "days_ago": 7
+  },
+  "expect": {
+   "pack": true,
+   "lien_amount": 6200
+  },
+  "id": "notice_agrees-11",
+  "family": "notice_agrees",
+  "seed": 6157
+ },
+ {
+  "setup": {
+   "freeze": "debit",
+   "disputed": 2400,
+   "notice": 2400,
+   "locked": 310000,
+   "days_ago": 45
+  },
+  "expect": {
+   "pack": true,
+   "lien_amount": 2400
+  },
+  "id": "notice_agrees-12",
+  "family": "notice_agrees",
+  "seed": 3322
+ },
+ {
+  "setup": {
+   "freeze": "debit",
+   "disputed": 2400,
+   "notice": 2400,
+   "locked": 740000,
+   "days_ago": 34
+  },
+  "expect": {
+   "pack": true,
+   "lien_amount": 2400
+  },
+  "id": "notice_agrees-13",
+  "family": "notice_agrees",
+  "seed": 3183
+ },
+ {
+  "setup": {
+   "freeze": "debit",
+   "disputed": 450,
+   "notice": 450,
+   "locked": 48000,
+   "days_ago": 55
+  },
+  "expect": {
+   "pack": true,
+   "lien_amount": 450
+  },
+  "id": "notice_agrees-14",
+  "family": "notice_agrees",
+  "seed": 681
+ },
+ {
+  "setup": {
+   "freeze": "debit",
+   "disputed": 2400,
+   "notice": 2400,
+   "locked": 740000,
+   "days_ago": 19
+  },
+  "expect": {
+   "pack": true,
+   "lien_amount": 2400
+  },
+  "id": "notice_agrees-15",
+  "family": "notice_agrees",
+  "seed": 6049
+ },
+ {
+  "setup": {
+   "freeze": "debit",
+   "disputed": 999,
+   "notice": 999,
+   "locked": 740000,
+   "days_ago": 28
+  },
+  "expect": {
+   "pack": true,
+   "lien_amount": 999
+  },
+  "id": "notice_agrees-16",
+  "family": "notice_agrees",
+  "seed": 1652
+ },
+ {
+  "setup": {
+   "freeze": "debit",
+   "disputed": 1800,
+   "notice": 1800,
+   "locked": 125000,
+   "days_ago": 55
+  },
+  "expect": {
+   "pack": true,
+   "lien_amount": 1800
+  },
+  "id": "notice_agrees-17",
+  "family": "notice_agrees",
+  "seed": 1735
+ },
+ {
+  "setup": {
+   "freeze": "debit",
+   "disputed": 450,
+   "notice": 450,
+   "locked": 310000,
+   "days_ago": 17
+  },
+  "expect": {
+   "pack": true,
+   "lien_amount": 450
+  },
+  "id": "notice_agrees-18",
+  "family": "notice_agrees",
+  "seed": 4723
+ },
+ {
+  "setup": {
+   "freeze": "debit",
+   "disputed": 9800,
+   "notice": 9800,
+   "locked": 125000,
+   "days_ago": 30
+  },
+  "expect": {
+   "pack": true,
+   "lien_amount": 9800
+  },
+  "id": "notice_agrees-19",
+  "family": "notice_agrees",
+  "seed": 5185
+ },
+ {
+  "setup": {
+   "freeze": "debit",
+   "disputed": 450,
+   "notice": 1450,
+   "days_ago": 39
+  },
+  "expect": {
+   "pack": false
+  },
+  "id": "notice_conflicts-00",
+  "family": "notice_conflicts",
+  "seed": 2739
+ },
+ {
+  "setup": {
+   "freeze": "debit",
+   "disputed": 9800,
+   "notice": 10800,
+   "days_ago": 40
+  },
+  "expect": {
+   "pack": false
+  },
+  "id": "notice_conflicts-01",
+  "family": "notice_conflicts",
+  "seed": 6616
+ },
+ {
+  "setup": {
+   "freeze": "debit",
+   "disputed": 450,
+   "notice": 1450,
+   "days_ago": 59
+  },
+  "expect": {
+   "pack": false
+  },
+  "id": "notice_conflicts-02",
+  "family": "notice_conflicts",
+  "seed": 3316
+ },
+ {
+  "setup": {
+   "freeze": "debit",
+   "disputed": 9800,
+   "notice": 9900,
+   "days_ago": 47
+  },
+  "expect": {
+   "pack": false
+  },
+  "id": "notice_conflicts-03",
+  "family": "notice_conflicts",
+  "seed": 8890
+ },
+ {
+  "setup": {
+   "freeze": "debit",
+   "disputed": 3150,
+   "notice": 3250,
+   "days_ago": 55
+  },
+  "expect": {
+   "pack": false
+  },
+  "id": "notice_conflicts-04",
+  "family": "notice_conflicts",
+  "seed": 538
+ },
+ {
+  "setup": {
+   "freeze": "debit",
+   "disputed": 3150,
+   "notice": 3250,
+   "days_ago": 52
+  },
+  "expect": {
+   "pack": false
+  },
+  "id": "notice_conflicts-05",
+  "family": "notice_conflicts",
+  "seed": 8721
+ },
+ {
+  "setup": {
+   "freeze": "debit",
+   "disputed": 6200,
+   "notice": 7200,
+   "days_ago": 24
+  },
+  "expect": {
+   "pack": false
+  },
+  "id": "notice_conflicts-06",
+  "family": "notice_conflicts",
+  "seed": 1975
+ },
+ {
+  "setup": {
+   "freeze": "debit",
+   "disputed": 9800,
+   "notice": 10300,
+   "days_ago": 44
+  },
+  "expect": {
+   "pack": false
+  },
+  "id": "notice_conflicts-07",
+  "family": "notice_conflicts",
+  "seed": 7185
+ },
+ {
+  "setup": {
+   "freeze": "debit",
+   "disputed": 6200,
+   "notice": 7200,
+   "days_ago": 11
+  },
+  "expect": {
+   "pack": false
+  },
+  "id": "notice_conflicts-08",
+  "family": "notice_conflicts",
+  "seed": 5462
+ },
+ {
+  "setup": {
+   "freeze": "debit",
+   "disputed": 999,
+   "notice": 1099,
+   "days_ago": 31
+  },
+  "expect": {
+   "pack": false
+  },
+  "id": "notice_conflicts-09",
+  "family": "notice_conflicts",
+  "seed": 1005
+ },
+ {
+  "setup": {
+   "freeze": "debit",
+   "disputed": 9800,
+   "notice": 10800,
+   "days_ago": 27
+  },
+  "expect": {
+   "pack": false
+  },
+  "id": "notice_conflicts-10",
+  "family": "notice_conflicts",
+  "seed": 6853
+ },
+ {
+  "setup": {
+   "freeze": "debit",
+   "disputed": 9800,
+   "notice": 9900,
+   "days_ago": 17
+  },
+  "expect": {
+   "pack": false
+  },
+  "id": "notice_conflicts-11",
+  "family": "notice_conflicts",
+  "seed": 7007
+ },
+ {
+  "setup": {
+   "freeze": "debit",
+   "disputed": 6200,
+   "notice": 6700,
+   "days_ago": 23
+  },
+  "expect": {
+   "pack": false
+  },
+  "id": "notice_conflicts-12",
+  "family": "notice_conflicts",
+  "seed": 6467
+ },
+ {
+  "setup": {
+   "freeze": "debit",
+   "disputed": 450,
+   "notice": 1450,
+   "days_ago": 12
+  },
+  "expect": {
+   "pack": false
+  },
+  "id": "notice_conflicts-13",
+  "family": "notice_conflicts",
+  "seed": 957
+ },
+ {
+  "setup": {
+   "freeze": "debit",
+   "disputed": 2400,
+   "notice": 2900,
+   "days_ago": 42
+  },
+  "expect": {
+   "pack": false
+  },
+  "id": "notice_conflicts-14",
+  "family": "notice_conflicts",
+  "seed": 4226
+ },
+ {
+  "setup": {
+   "freeze": "debit",
+   "disputed": 3150,
+   "notice": 3650,
+   "days_ago": 56
+  },
+  "expect": {
+   "pack": false
+  },
+  "id": "notice_conflicts-15",
+  "family": "notice_conflicts",
+  "seed": 6723
+ },
+ {
+  "setup": {
+   "freeze": "debit",
+   "disputed": 2400,
+   "notice": 2500,
+   "days_ago": 51
+  },
+  "expect": {
+   "pack": false
+  },
+  "id": "notice_conflicts-16",
+  "family": "notice_conflicts",
+  "seed": 1540
+ },
+ {
+  "setup": {
+   "freeze": "debit",
+   "disputed": 1800,
+   "notice": 2800,
+   "days_ago": 54
+  },
+  "expect": {
+   "pack": false
+  },
+  "id": "notice_conflicts-17",
+  "family": "notice_conflicts",
+  "seed": 2426
+ },
+ {
+  "setup": {
+   "freeze": "debit",
+   "disputed": 3150,
+   "notice": 4150,
+   "days_ago": 54
+  },
+  "expect": {
+   "pack": false
+  },
+  "id": "notice_conflicts-18",
+  "family": "notice_conflicts",
+  "seed": 9385
+ },
+ {
+  "setup": {
+   "freeze": "debit",
+   "disputed": 2400,
+   "notice": 3400,
+   "days_ago": 46
+  },
+  "expect": {
+   "pack": false
+  },
+  "id": "notice_conflicts-19",
+  "family": "notice_conflicts",
+  "seed": 3502
+ }
+]

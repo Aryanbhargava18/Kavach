@@ -21,6 +21,7 @@ test: install
 
 eval: install
 	$(BIN)/python -m eval.generate && KAVACH_PLANNER=offline $(BIN)/python -m eval.run
+	$(BIN)/python -m eval.freeze_gen && KAVACH_PLANNER=offline $(BIN)/python -m eval.freeze_run
 
 clean:
 	rm -rf instance/packs

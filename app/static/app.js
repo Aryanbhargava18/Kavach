@@ -727,8 +727,23 @@ $("#sound").onclick = (e) => { S.sound = !S.sound; e.target.textContent = S.soun
 $("#open-eval").onclick = async () => {
   const r = await fetch("/api/eval").then((x) => x.json());
   const body = $("#eval-body");
+  const fw = r.freeze_watch;
+  const FAM = { total_freeze_bounce: "Total freeze: next payout bounces", debit_freeze_own_payment: "Debit freeze: her own payment declined (YE)",
+    debit_freeze_no_signal: "Debit freeze, no signal reaches Paytm (expect silence)", healthy_account: "Healthy account (expect silence)",
+    mule_flagged: "Risk holds 2 signals (expect details withheld)", notice_agrees: "Notice agrees with the record (expect pack + request)",
+    notice_conflicts: "Notice contradicts the record (expect refusal)" };
+  const freezeHtml = fw ? `<h2>Account freezes: ${fw.passed} of ${fw.scenarios} scenarios behave as expected.</h2>
+      <p class="sub">Separate generator (eval/freeze_gen.py), scored by checks written in the runner, not borrowed from Kavach's policy.</p>
+      <table><thead><tr><th>Family</th><th>Passed</th></tr></thead><tbody>${Object.entries(fw.by_family).map(([f, v]) => `<tr><td>${esc(FAM[f] || f)}</td><td class="k">${v.passed}/${v.n}</td></tr>`).join("")}</tbody></table>
+      <table><tbody><tr><td>Caught when Paytm has a signal</td><td class="k">${esc(fw.detected_when_paytm_has_a_signal)}</td></tr>
+      <tr><td>False alarms (healthy or blind accounts)</td><td class="k">${fw.false_alarms_on_healthy_or_blind}</td></tr>
+      <tr><td>Case details leaked to a flagged merchant</td><td class="k">${fw.tipping_off_leaks}</td></tr>
+      <tr><td>Payouts re-routed during a freeze</td><td class="k">${fw.reroutes}</td></tr></tbody></table>
+      <h3>Does this test have teeth? We broke the guard on purpose.</h3>
+      <table><thead><tr><th>Variant</th><th>Leaks</th><th>Failed</th></tr></thead><tbody>${(fw.mutation_check || []).map((m) => `<tr><td>${esc(m.variant)}</td><td class="${m.leaks ? "b" : "k"}">${m.leaks}/${m.n}</td><td class="${m.failed ? "b" : "k"}">${m.failed}/${m.n}</td></tr>`).join("")}</tbody></table>
+      <p class="caveat">${esc(fw.label)} ${esc(fw.honest_limit)}</p><hr>` : "";
   if (r.error) body.innerHTML = `<h2>No test run yet</h2><p class="sub">${esc(r.error)}</p>`;
-  else body.innerHTML = `<h2>${r.n} generated incidents. Kavach vs a bot that trusts what it's shown.</h2>
+  else body.innerHTML = freezeHtml + `<h2>Everyday incidents: ${r.n} generated. Kavach vs a bot that trusts what it's shown.</h2>
       <p class="sub">Scenarios and expected outcomes come from a separate generator (eval/generate.py) that never imports Kavach's decision code. Run ${esc(r.ran_at)}.</p>
       <table><thead><tr><th>What we measured</th><th>Kavach</th><th>Naive approach</th></tr></thead><tbody>
       ${r.metrics.map((m) => `<tr><td>${esc(m.label)}</td><td class="k">${esc(m.kavach)}</td><td class="b">${esc(m.baseline)}</td></tr>`).join("")}</tbody></table>
