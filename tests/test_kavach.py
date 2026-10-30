@@ -535,3 +535,32 @@ def test_chargeback_clock_reply_in_time_and_honest_accept():
         late = policy.evaluate(w4, "submit_dispute_response", {"dispute_id": d4["dispute_id"], "evidence": []}, {"approvals": {"merchant"}})
         assert late.verdict == "DENY"
     run(go())
+
+
+def test_merchant_view_surfaces_whatever_needs_meena():
+    from app import merchant_view as mv
+    async def go():
+        w = World(); e = Engine(w); r = w.inject_freeze()
+        inc = await e.merchant_message("Bank ka SMS aur police ka notice yeh hai. Account mein 3.1 lakh atak gaye.", doc_id=r["doc_id"])
+        await e.approve(inc.id, "merchant")                         # lien done; freeze now waits on the branch
+        assert mv.build(w, e).get("case") is None
+        w.inject_chargeback(); await e.tick(1)
+        v = mv.build(w, e)
+        assert v.get("case") == "chargeback" and v["action"]["kind"] == "approve"   # the question that needs her now
+        cb = next(i for i in e.incidents.values() if i.kind == "chargeback")
+        await e.approve(cb.id, "merchant")
+        assert mv.build(w, e).get("case") is None                    # back to the freeze case, chargeback in the clocks row
+        assert any(c["label"].startswith("Chargeback") for c in mv.build(w, e)["clocks"])
+    run(go())
+
+
+def test_chargeback_after_the_clock_moved_to_a_new_day():
+    async def go():
+        w = World(); e = Engine(w)
+        w.inject_freeze(freeze_type="total", bounce_next=True)
+        await e.tick((w.next_settlement - w.now).total_seconds() + 60)   # next morning, no sales yet today
+        d = w.inject_chargeback()
+        assert d["amount"] > 0 and w.txn_by_id(d["txn_id"])["bill_id"]
+        await e.tick(1)
+        assert any(i.kind == "chargeback" for i in e.incidents.values())
+    run(go())

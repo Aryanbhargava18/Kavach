@@ -113,8 +113,16 @@ def _neutral(inc) -> dict[str, Any]:
             "shield": {"tone": "wait", "title": "Payout mein rukawat", "sub": "Paytm ki team jald aapse baat karegi. Tab tak aapka paisa Paytm ke paas surakshit hai."}}
 
 
+def _needs_meena(i) -> bool:
+    return "merchant" in ((i.pending or {}).get("approvers") or [])
+
+
 def build(world, engine) -> dict[str, Any]:
+    # Whatever is waiting on Meena comes first; otherwise the most serious open case (a freeze), then a chargeback.
+    waiting = [i for i in engine.incidents.values() if i.kind == "chargeback" and i.status not in LIVE and _needs_meena(i)]
     live = [i for i in engine.incidents.values() if i.kind in ("freeze", "settlement") and i.status not in LIVE]
+    if waiting and not (live and _needs_meena(live[-1])):
+        return _chargeback(world, engine, waiting[-1])
     inc = live[-1] if live else None
     if inc is None:
         cb = [i for i in engine.incidents.values() if i.kind == "chargeback" and (i.status not in LIVE or i.updated_at >= world.now.isoformat()[:13])]

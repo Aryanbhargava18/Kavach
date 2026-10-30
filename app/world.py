@@ -494,9 +494,18 @@ class World:
         """A payer's bank raises a chargeback on one of today's counter sales. If the merchant does not reply by
         respond_by, the dispute is deemed valid and the amount is netted from her next payout (synthetic TAT)."""
         with self.lock:
-            today = [t for t in self.transactions if t["status"] == "SUCCESS" and t.get("bill_id") and t["created_at"].date() == self.now.date()
-                     and not any(d["txn_id"] == t["txn_id"] for d in self.disputes)]
-            t = max(today, key=lambda x: x["amount"])
+            recent = [t for t in self.transactions if t["status"] == "SUCCESS" and t.get("bill_id") and t["payee_vpa"] == MERCHANT["vpa"]
+                      and self.now - t["created_at"] <= timedelta(days=3) and not any(d["txn_id"] == t["txn_id"] for d in self.disputes)]
+            if not recent:      # no billed sale to dispute yet: a counter sale happens first
+                ts = self.now - timedelta(hours=2)
+                bill = self._new_bill(1450, ts - timedelta(seconds=40), customer=None)
+                t0 = self._make_txn(1450, ts, "SUCCESS", announced=True)
+                t0["bill_id"] = bill["bill_id"]
+                self.transactions.append(t0)
+                self._deliver_webhook(t0, at=ts + timedelta(seconds=1))
+                self.soundbox_log.append({"device": MERCHANT["soundbox_id"], "txn_id": t0["txn_id"], "amount": 1450, "at": ts.isoformat(), "phrase": "Paytm par ₹1,450 prapt hue"})
+                recent = [t0]
+            t = max(sorted(recent, key=lambda x: x["created_at"])[-8:], key=lambda x: x["amount"])
             d = {"dispute_id": f"CB-{77101 + len(self.disputes)}", "txn_id": t["txn_id"], "utr": t["utr"], "amount": t["amount"], "reason": reason,
                  "raised_at": self.now.isoformat(), "respond_by": (self.now + timedelta(hours=hours)).isoformat(), "status": "OPEN",
                  "watched": True, "response": None, "decided_at": None, "source": "Paytm dispute desk (synthetic)"}
