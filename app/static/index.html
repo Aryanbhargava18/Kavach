@@ -1,0 +1,222 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Kavach · Payment Resolution Agent</title>
+<link rel="stylesheet" href="/static/app.css">
+<link rel="stylesheet" href="/static/stage.css">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cpath d='M16 2 4 6v9c0 7 5 12.5 12 15 7-2.5 12-8 12-15V6z' fill='%230E1E3A'/%3E%3Cpath d='m10 16 4.5 4.5L23 12' stroke='%23F2B03D' stroke-width='3' fill='none'/%3E%3C/svg%3E">
+<script src="/static/app.js" defer></script>
+<script src="/static/stage.js" defer></script>
+<script type="importmap">{"imports":{"three":"/static/vendor/three.module.min.js","three/addons/":"/static/vendor/jsm/"}}</script>
+<script type="module" src="/static/scene3d.js"></script>
+</head>
+<body class="view-stage">
+<header class="top">
+  <div class="brand">
+    <svg viewBox="0 0 32 32" aria-hidden="true"><path d="M16 2 4 6v9c0 7 5 12.5 12 15 7-2.5 12-8 12-15V6z"/><path class="tick" d="m10 16 4.5 4.5L23 12"/></svg>
+    <div><b>Kavach</b><span>Payment Resolution Agent</span></div>
+  </div>
+  <div class="shopchip" title="The merchant Kavach works for (synthetic)"><i>M</i><div><b>Meena Kirana Store</b><span>Lucknow · meenakirana@paytm</span></div></div>
+  <div class="soundbox" id="soundbox" aria-live="polite" title="Meena's Soundbox (simulated)">
+    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 9h4l5-4v14l-5-4H5zM17 9a4 4 0 0 1 0 6M19.5 6.5a8 8 0 0 1 0 11"/></svg>
+    <span id="sb-line">Soundbox</span>
+  </div>
+  <div class="spacer"></div>
+  <div class="seg" role="tablist" aria-label="View"><button data-view="stage" class="on" role="tab">Live</button><button data-view="work" role="tab">Console</button><button data-view="desk" role="tab">Paytm Risk desk</button></div>
+  <span class="intg" id="intg"></span>
+  <span class="clock"><time id="clock">--:--</time></span>
+  <button class="tbtn" id="open-sys">Systems</button>
+  <button class="tbtn" id="open-eval">Results</button>
+  <button class="tbtn icon" id="sound" aria-pressed="true" aria-label="Sound">🔊</button>
+  <button class="tbtn" id="reset">Reset</button>
+</header>
+
+<section class="stage" id="stage" aria-label="Kavach live">
+  <div class="dev dev-meena">
+    <div class="phone">
+      <header class="ph-top"><i class="ph-av">K</i><div><b>Kavach</b><span>in Paytm for Business · Meena Kirana Store</span></div></header>
+      <ol class="ph-msgs" id="m-msgs"><li class="ph-hint">Kavach writes here when something needs Meena. She can talk to it in Hindi or Hinglish.</li></ol>
+      <form class="ph-in" id="m-form" autocomplete="off">
+        <input id="m-text" placeholder="Meena ji, likhiye ya boliye…" aria-label="Message from Meena">
+        <button type="button" class="ph-mic" id="m-mic" aria-label="Speak as Meena"><svg viewBox="0 0 24 24"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg></button>
+      </form>
+    </div>
+    <p class="dev-cap">Meena's phone</p>
+  </div>
+
+  <div class="core">
+    <ol class="phases" id="phases" aria-label="What Kavach is doing">
+      <li data-p="detect"><span>Detect</span></li><li data-p="investigate"><span>Investigate</span></li><li data-p="reconcile"><span>Reconcile</span></li>
+      <li data-p="act"><span>Act</span></li><li data-p="verify"><span>Verify</span></li><li data-p="follow"><span>Follow up</span></li>
+    </ol>
+    <div class="map" id="map">
+      <div class="fly" id="fly" aria-hidden="true"></div>
+      <svg class="wires" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true" id="wires"></svg>
+      <div class="box" id="box" data-state="idle">
+        <span class="ripple"></span><span class="ripple r2"></span>
+        <div class="grille"></div>
+        <div class="lcd" id="lcd">ON DUTY</div>
+        <p class="box-name">Meena's Soundbox<br><b>with Kavach</b></p>
+      </div>
+      <p class="box-name b3" id="box3-label">Meena's Soundbox <b>with Kavach inside</b></p>
+    </div>
+    <div class="say" id="say" aria-live="polite">
+      <p class="line" id="line">Kavach is on duty for Meena Kirana Store.</p>
+      <div class="voice" id="voice" hidden><canvas id="wave" width="560" height="44" aria-hidden="true"></canvas><p class="hindi" id="hindi" lang="hi"></p></div>
+      <p class="sub" id="sub">It watches every payment, refund and payout, fixes what it safely can, and tells Meena out loud.</p>
+      <div class="go-row" id="go-row">
+        <button class="go" data-scn="live_payment">Take a ₹4,200 payment</button>
+        <button class="ghost" id="st-menu-open2">Judge challenges</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="dev dev-right">
+    <div class="phone" id="r-phone">
+      <header class="ph-top" id="r-top"><i class="ph-av bill">₹</i><div><b>Billing app</b><span>Meena Kirana Store · today's bills</span></div></header>
+      <div class="ph-body" id="r-body"></div>
+      <form class="ph-in" id="c-form" autocomplete="off" hidden><input id="c-text" placeholder="Type as the customer…" aria-label="Message from the customer"></form>
+    </div>
+    <p class="dev-cap" id="r-cap">The shop's billing app</p>
+  </div>
+
+  <footer class="band" id="band">
+    <p class="result" id="result">Nothing to fix yet.</p>
+    <div class="band-acts">
+      <span id="next-acts"></span>
+      <button class="menu-btn" id="st-menu-open" aria-haspopup="true">Run a scenario</button>
+    </div>
+    <div class="st-menu" id="st-menu" hidden>
+      <p>Each one changes what really happened in Paytm's systems (simulated). Kavach has to find out on its own.</p>
+      <button data-scn="live_payment" class="hero"><b>A payment comes in; the billing app misses it</b><small>Nobody complains. Kavach catches it.</small></button>
+      <button data-scn="customer_claim" data-mode="success_missed"><b>Customer says paid; shop says no</b><small>Rahul writes in on WhatsApp</small></button>
+      <button data-scn="customer_claim" data-mode="fake_amount"><b>Screenshot ₹4,200, bank says ₹2,400</b><small>Priya</small></button>
+      <button data-scn="customer_claim" data-mode="pending"><b>Payment still pending</b><small>Imran</small></button>
+      <button data-scn="customer_claim" data-mode="refund_initiated"><b>Refund already on its way back</b><small>Farah</small></button>
+      <button data-scn="customer_claim" data-mode="replay"><b>Same payment shown for a second bill</b><small>Vikas</small></button>
+      <button data-scn="customer_claim" data-mode="fake_utr"><b>Reference that doesn't exist</b><small>Deepak</small></button>
+      <button data-scn="duplicate"><b>Charged twice</b><small>Sunita · ₹2,450</small></button>
+      <button data-scn="freeze"><b>Bank froze Meena's account</b><small>cyber-fraud hold notice</small></button>
+    </div>
+  </footer>
+</section>
+
+<main class="app" id="app">
+  <!-- LEFT · incident inbox -->
+  <aside class="inbox" aria-label="Incident inbox">
+    <div class="inbox-head"><h2>Incidents</h2><span id="inbox-count"></span></div>
+    <nav class="filters" id="filters">
+      <button data-f="all" class="on">All</button><button data-f="needs">Needs you</button><button data-f="working">Working</button><button data-f="closed">Closed</button>
+    </nav>
+    <ol class="inc-list" id="inc-list"></ol>
+    <div class="sim">
+      <button class="sim-btn" id="sim-open" aria-haspopup="true"><span>+</span> Simulate an incoming problem</button>
+      <div class="sim-menu" id="sim-menu" hidden>
+        <p class="sim-note">These change what really happened in the (simulated) Paytm systems. Kavach has to find out on its own.</p>
+        <h4>The hero case</h4>
+        <button data-scn="customer_claim" data-mode="success_missed" class="hero"><b>Customer paid, shop's ledger missed it</b><small>Rahul · ₹4,200 · webhook to the billing app failed</small></button>
+        <h4>Judge challenges</h4>
+        <button data-scn="customer_claim" data-mode="fake_amount"><b>Screenshot ₹4,200, bank says ₹2,400</b><small>Priya</small></button>
+        <button data-scn="customer_claim" data-mode="pending"><b>Payment still pending</b><small>Imran · bank hasn't confirmed</small></button>
+        <button data-scn="customer_claim" data-mode="fake_utr"><b>No such transaction</b><small>Deepak · reference doesn't exist</small></button>
+        <button data-scn="customer_claim" data-mode="refund_initiated"><b>Refund already initiated</b><small>Farah · paid after the QR expired</small></button>
+        <button data-scn="customer_claim" data-mode="replay"><b>Same UTR presented twice</b><small>Vikas · reuses an earlier screenshot</small></button>
+        <button data-scn="customer_claim" data-mode="failed_debited"><b>Real-looking screenshot, bank says FAILED</b><small>Kavita</small></button>
+        <button data-scn="freeze"><b>Cyber-fraud account hold notice</b><small>Meena · bank froze her account</small></button>
+        <h4>More</h4>
+        <button data-scn="customer_claim" data-mode="wrong_merchant"><b>Paid a different shop</b><small>Sanjay</small></button>
+        <button data-scn="duplicate"><b>Charged twice</b><small>Sunita · ₹2,450, 37 s apart</small></button>
+        <button data-scn="duplicate" data-genuine="false"><b>Two customers, same amount</b><small>not a duplicate</small></button>
+        <button data-scn="freeze" data-ftype="total"><b>Total freeze</b><small>bank bounces Paytm's payouts</small></button>
+        <button data-scn="freeze" data-notice="2900"><b>Police notice gets the amount wrong</b><small>notice ₹2,900 vs record ₹2,400</small></button>
+        <button data-scn="freeze" data-record="false"><b>Freeze over a non-Paytm payment</b><small>no record to build on</small></button>
+        <h4>Your own screenshot</h4>
+        <div class="own"><span>Customer's screenshot shows ₹</span><input id="own-amt" type="number" min="1" value="9000" aria-label="Screenshot amount"><button id="own-go">Send</button></div>
+        <p class="sim-note">Or attach any real image with 📎 in the composer.</p>
+      </div>
+    </div>
+  </aside>
+
+  <!-- CENTER · agent workspace -->
+  <section class="work" aria-label="Agent workspace">
+    <div class="empty" id="empty">
+      <p class="eyebrow">Kavach · for Meena Kirana Store</p>
+      <h1>When a customer says “I paid”, Kavach owns it until it's actually fixed.</h1>
+      <p>It reads the claim, checks the UPI switch, the shop's own ledger, refunds and payouts, repairs what's wrong through tools, re-checks that the fix worked, tells both sides, and follows up. It stops itself whenever the evidence says an action would be unsafe.</p>
+      <div class="empty-cta">
+        <button class="cta" data-scn="customer_claim" data-mode="success_missed">▶ A customer says they paid</button>
+        <button class="ghost" id="empty-sim">Judge challenges</button>
+      </div>
+      <ol class="loop" aria-label="How Kavach works">
+        <li>Understand</li><li>Plan</li><li>Investigate</li><li>Reconcile</li><li>Policy</li><li>Act</li><li>Verify</li><li>Follow up</li>
+      </ol>
+    </div>
+
+    <div class="ws" id="ws" hidden>
+      <header class="ws-head">
+        <div class="who"><i id="who-av">R</i><div><b id="who-name"></b><span id="who-meta"></span></div></div>
+        <div class="ws-status"><span class="pill" id="ws-pill"></span><span class="owner" id="ws-owner">Owner · Kavach</span></div>
+      </header>
+      <ol class="rail" id="rail" aria-label="Agent loop stage">
+        <li data-stage="understand">Understand</li><li data-stage="plan">Plan</li><li data-stage="investigate">Investigate</li><li data-stage="reconcile">Reconcile</li>
+        <li data-stage="policy">Policy</li><li data-stage="act">Act</li><li data-stage="verify">Verify</li><li data-stage="follow">Follow up</li>
+      </ol>
+      <div class="thread" id="thread" aria-live="polite"></div>
+      <div class="suggest" id="suggest"></div>
+      <form class="composer" id="composer">
+        <div class="as" role="radiogroup" aria-label="Write as">
+          <button type="button" data-as="customer" class="on">Customer · WhatsApp</button><button type="button" data-as="merchant">Meena · to Kavach</button>
+        </div>
+        <div class="attach" id="attach" hidden></div>
+        <div class="row">
+          <button type="button" class="clip" id="clip" aria-label="Attach an image" aria-haspopup="true"><svg viewBox="0 0 24 24"><path d="M21 11l-8.5 8.5a5 5 0 0 1-7-7L14 4a3.5 3.5 0 0 1 5 5l-8.5 8.5a2 2 0 0 1-3-3L15 7"/></svg></button>
+          <div class="clip-menu" id="clip-menu" hidden><button type="button" data-up="screenshot">Payment screenshot</button><button type="button" data-up="notice">Bank SMS or police notice</button></div>
+          <input type="file" id="file" accept="image/*" hidden>
+          <input id="text" autocomplete="off" placeholder="Type as the customer…" aria-label="Message">
+          <button type="button" class="mic" id="mic" aria-label="Speak (Hindi / Hinglish)"><svg viewBox="0 0 24 24"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg></button>
+          <button class="send" type="submit" aria-label="Send"><svg viewBox="0 0 24 24"><path d="M4 12h14M13 6l6 6-6 6"/></svg></button>
+        </div>
+      </form>
+    </div>
+  </section>
+
+  <!-- RIGHT · payment intelligence -->
+  <aside class="intel" aria-label="Payment intelligence">
+    <header class="intel-head"><h2>Payment intelligence</h2><span id="intel-case"></span></header>
+    <div class="verdict" id="verdict"><span class="vstamp" hidden></span><p class="vtext">Waiting for an incident.</p><p class="vsub"></p></div>
+    <section class="recon">
+      <h3>Reconciliation <small>every value comes from a tool call</small></h3>
+      <ol class="rows" id="rows"></ol>
+    </section>
+    <div class="money" id="money" hidden><b></b><span></span></div>
+    <section class="next" id="next"></section>
+    <section class="clocks" id="clocks" hidden></section>
+    <section class="checks" id="checks-wrap" hidden><h3>What Kavach changed, and how it checked</h3><ol id="checks"></ol></section>
+    <footer class="simbar" id="simbar" hidden></footer>
+  </aside>
+
+  <!-- Paytm Risk desk (second view) -->
+  <section class="desk" id="desk" hidden aria-label="Paytm Risk desk">
+    <header class="desk-head">
+      <div><p class="eyebrow">Paytm Risk · PA desk · simulated CFCFRMS feed</p>
+        <h2>Frozen merchants named in cyber-fraud reports</h2>
+        <p class="desk-sub">SOP 9.5(iv): the same UPI ID in several reports calls for enhanced due diligence. Kavach escalates only on two or more independent signals. A review queue for a human, never a guilt finding.</p></div>
+      <div class="desk-actions"><div class="desk-sum" id="desk-sum"></div><button class="cta" id="desk-run">Let Kavach work the queue</button></div>
+    </header>
+    <div class="desk-grid" id="desk-grid"></div>
+  </section>
+</main>
+
+<aside class="drawer" id="drawer" aria-label="Paytm systems" hidden>
+  <header><nav class="dtabs"><button data-tab="systems" class="on">Paytm systems</button><button data-tab="automation">Automations (n8n)</button></nav>
+    <button class="dclose" id="close-drawer" aria-label="Close">✕</button></header>
+  <div class="dpane" data-pane="systems"><div id="sys"></div></div>
+  <div class="dpane" data-pane="automation" hidden><p class="dnote" id="auto-note"></p><ol class="autolog" id="autolog"></ol></div>
+</aside>
+
+<dialog id="img-dialog"><img alt=""><form method="dialog"><button>Close</button></form></dialog>
+<dialog id="eval-dialog" class="eval"><div id="eval-body"></div><form method="dialog"><button>Close</button></form></dialog>
+</body>
+</html>

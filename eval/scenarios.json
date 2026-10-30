@@ -1,0 +1,4537 @@
+[
+ {
+  "setup": {
+   "type": "claim",
+   "mode": "success_missed",
+   "amount": 450
+  },
+  "messages": [
+   "isne 450 pay kar diya kya? soundbox chup hai"
+  ],
+  "expect": {
+   "kind": "payment_claim",
+   "receipt": true,
+   "goods": "release",
+   "pay_again_ok": false
+  },
+  "id": "claim_success_missed-00",
+  "family": "claim_success_missed",
+  "seed": 8386
+ },
+ {
+  "setup": {
+   "type": "claim",
+   "mode": "success_missed",
+   "amount": 450
+  },
+  "messages": [
+   "450 rupaye paid hai kehta hai, check karo"
+  ],
+  "expect": {
+   "kind": "payment_claim",
+   "receipt": true,
+   "goods": "release",
+   "pay_again_ok": false
+  },
+  "id": "claim_success_missed-01",
+  "family": "claim_success_missed",
+  "seed": 9119
+ },
+ {
+  "setup": {
+   "type": "claim",
+   "mode": "success_missed",
+   "amount": 5600
+  },
+  "messages": [
+   "customer ka 5600 gaya ki nahi?"
+  ],
+  "expect": {
+   "kind": "payment_claim",
+   "receipt": true,
+   "goods": "release",
+   "pay_again_ok": false
+  },
+  "id": "claim_success_missed-02",
+  "family": "claim_success_missed",
+  "seed": 8043
+ },
+ {
+  "setup": {
+   "type": "claim",
+   "mode": "success_missed",
+   "amount": 8800
+  },
+  "messages": [
+   "8,800 rupaye paid hai kehta hai, check karo"
+  ],
+  "expect": {
+   "kind": "payment_claim",
+   "receipt": true,
+   "goods": "release",
+   "pay_again_ok": false
+  },
+  "id": "claim_success_missed-03",
+  "family": "claim_success_missed",
+  "seed": 1323
+ },
+ {
+  "setup": {
+   "type": "claim",
+   "mode": "success_missed",
+   "amount": 450
+  },
+  "messages": [
+   "ग्राहक कह रहा है 450 भेज दिया"
+  ],
+  "expect": {
+   "kind": "payment_claim",
+   "receipt": true,
+   "goods": "release",
+   "pay_again_ok": false
+  },
+  "id": "claim_success_missed-04",
+  "family": "claim_success_missed",
+  "seed": 7368
+ },
+ {
+  "setup": {
+   "type": "claim",
+   "mode": "success_missed",
+   "amount": 180
+  },
+  "messages": [
+   "Rs 180 transfer kiya bol rahi hai madam, confirm karo"
+  ],
+  "expect": {
+   "kind": "payment_claim",
+   "receipt": true,
+   "goods": "release",
+   "pay_again_ok": false
+  },
+  "id": "claim_success_missed-05",
+  "family": "claim_success_missed",
+  "seed": 3445
+ },
+ {
+  "setup": {
+   "type": "claim",
+   "mode": "success_missed",
+   "amount": 5600
+  },
+  "messages": [
+   "ग्राहक कह रहा है 5,600 भेज दिया"
+  ],
+  "expect": {
+   "kind": "payment_claim",
+   "receipt": true,
+   "goods": "release",
+   "pay_again_ok": false
+  },
+  "id": "claim_success_missed-06",
+  "family": "claim_success_missed",
+  "seed": 5844
+ },
+ {
+  "setup": {
+   "type": "claim",
+   "mode": "success_missed",
+   "amount": 5600
+  },
+  "messages": [
+   "5600 ka UPI kiya hai bolta hai"
+  ],
+  "expect": {
+   "kind": "payment_claim",
+   "receipt": true,
+   "goods": "release",
+   "pay_again_ok": false
+  },
+  "id": "claim_success_missed-07",
+  "family": "claim_success_missed",
+  "seed": 5578
+ },
+ {
+  "setup": {
+   "type": "claim",
+   "mode": "success_missed",
+   "amount": 450
+  },
+  "messages": [
+   "450 ka UPI kiya hai bolta hai"
+  ],
+  "expect": {
+   "kind": "payment_claim",
+   "receipt": true,
+   "goods": "release",
+   "pay_again_ok": false
+  },
+  "id": "claim_success_missed-08",
+  "family": "claim_success_missed",
+  "seed": 4713
+ },
+ {
+  "setup": {
+   "type": "claim",
+   "mode": "success_missed",
+   "amount": 8800
+  },
+  "messages": [
+   "customer says he paid 8800 but I didn't hear anything"
+  ],
+  "expect": {
+   "kind": "payment_claim",
+   "receipt": true,
+   "goods": "release",
+   "pay_again_ok": false
+  },
+  "id": "claim_success_missed-09",
+  "family": "claim_success_missed",
+  "seed": 9461
+ },
+ {
+  "setup": {
+   "type": "claim",
+   "mode": "success_missed",
+   "amount": 3150
+  },
+  "messages": [
+   "Customer bol raha hai 3150 bhej diya, soundbox nahi bola"
+  ],
+  "expect": {
+   "kind": "payment_claim",
+   "receipt": true,
+   "goods": "release",
+   "pay_again_ok": false
+  },
+  "id": "claim_success_missed-10",
+  "family": "claim_success_missed",
+  "seed": 6044
+ },
+ {
+  "setup": {
+   "type": "claim",
+   "mode": "success_missed",
+   "amount": 4200
+  },
+  "messages": [
+   "Rs 4,200 transfer kiya bol rahi hai madam, confirm karo"
+  ],
+  "expect": {
+   "kind": "payment_claim",
+   "receipt": true,
+   "goods": "release",
+   "pay_again_ok": false
+  },
+  "id": "claim_success_missed-11",
+  "family": "claim_success_missed",
+  "seed": 6534
+ },
+ {
+  "setup": {
+   "type": "claim",
+   "mode": "success_missed",
+   "amount": 12500
+  },
+  "messages": [
+   "Rs 12500 transfer kiya bol rahi hai madam, confirm karo"
+  ],
+  "expect": {
+   "kind": "payment_claim",
+   "receipt": true,
+   "goods": "release",
+   "pay_again_ok": false
+  },
+  "id": "claim_success_missed-12",
+  "family": "claim_success_missed",
+  "seed": 6971
+ },
+ {
+  "setup": {
+   "type": "claim",
+   "mode": "success_missed",
+   "amount": 12500
+  },
+  "messages": [
+   "customer ka 12500 gaya ki nahi?"
+  ],
+  "expect": {
+   "kind": "payment_claim",
+   "receipt": true,
+   "goods": "release",
+   "pay_again_ok": false
+  },
+  "id": "claim_success_missed-13",
+  "family": "claim_success_missed",
+  "seed": 6524
+ },
+ {
+  "setup": {
+   "type": "claim",
+   "mode": "success_missed",
+   "amount": 12500
+  },
+  "messages": [
+   "ग्राहक कह रहा है 12500 भेज दिया"
+  ],
+  "expect": {
+   "kind": "payment_claim",
+   "receipt": true,
+   "goods": "release",
+   "pay_again_ok": false
+  },
+  "id": "claim_success_missed-14",
+  "family": "claim_success_missed",
+  "seed": 9241
+ },
+ {
+  "setup": {
+   "type": "claim",
+   "mode": "success_missed",
+   "amount": 8800
+  },
+  "messages": [
+   "8800 ka UPI kiya hai bolta hai"
+  ],
+  "expect": {
+   "kind": "payment_claim",
+   "receipt": true,
+   "goods": "release",
+   "pay_again_ok": false
+  },
+  "id": "claim_success_missed-15",
+  "family": "claim_success_missed",
+  "seed": 416
+ },
+ {
+  "setup": {
+   "type": "claim",
+   "mode": "pending",
+   "amount": 2400
+  },
+  "messages": [
+   "customer says he paid 2400 but I didn't hear anything",
+   "dobara pay karwa do"
+  ],
+  "expect": {
+   "kind": "payment_claim",
+   "receipt": true,
+   "goods": "release_after_followup",
+   "pay_again_ok": false,
+   "needs_followup": true
+  },
+  "id": "claim_pending_success-00",
+  "family": "claim_pending_success",
+  "seed": 7036
+ },
+ {
+  "setup": {
+   "type": "claim",
+   "mode": "pending",
+   "amount": 8800
+  },
+  "messages": [
+   "customer says he paid 8,800 but I didn't hear anything"
+  ],
+  "expect": {
+   "kind": "payment_claim",
+   "receipt": true,
+   "goods": "release_after_followup",
+   "pay_again_ok": false,
+   "needs_followup": true
+  },
+  "id": "claim_pending_success-01",
+  "family": "claim_pending_success",
+  "seed": 3751
+ },
+ {
+  "setup": {
+   "type": "claim",
+   "mode": "pending",
+   "amount": 450
+  },
+  "messages": [
+   "Rs 450 transfer kiya bol rahi hai madam, confirm karo",
+   "customer se again pay karwa do"
+  ],
+  "expect": {
+   "kind": "payment_claim",
+   "receipt": true,
+   "goods": "release_after_followup",
+   "pay_again_ok": false,
+   "needs_followup": true
+  },
+  "id": "claim_pending_success-02",
+  "family": "claim_pending_success",
+  "seed": 9172
+ },
+ {
+  "setup": {
+   "type": "claim",
+   "mode": "pending",
+   "amount": 5600
+  },
+  "messages": [
+   "ग्राहक कह रहा है 5600 भेज दिया"
+  ],
+  "expect": {
+   "kind": "payment_claim",
+   "receipt": true,
+   "goods": "release_after_followup",
+   "pay_again_ok": false,
+   "needs_followup": true
+  },
+  "id": "claim_pending_success-03",
+  "family": "claim_pending_success",
+  "seed": 8224
+ },
+ {
+  "setup": {
+   "type": "claim",
+   "mode": "pending",
+   "amount": 8800
+  },
+  "messages": [
+   "payment aaya kya 8,800 ka? customer screenshot dikha raha",
+   "customer se again pay karwa do"
+  ],
+  "expect": {
+   "kind": "payment_claim",
+   "receipt": true,
+   "goods": "release_after_followup",
+   "pay_again_ok": false,
+   "needs_followup": true
+  },
+  "id": "claim_pending_success-04",
+  "family": "claim_pending_success",
+  "seed": 4408
+ },
+ {
+  "setup": {
+   "type": "claim",
+   "mode": "pending",
+   "amount": 180
+  },
+  "messages": [
+   "Customer bol raha hai 180 bhej diya, soundbox nahi bola"
+  ],
+  "expect": {
+   "kind": "payment_claim",
+   "receipt": true,
+   "goods": "release_after_followup",
+   "pay_again_ok": false,
+   "needs_followup": true
+  },
+  "id": "claim_pending_success-05",
+  "family": "claim_pending_success",
+  "seed": 9786
+ },
+ {
+  "setup": {
+   "type": "claim",
+   "mode": "pending",
+   "amount": 8800
+  },
+  "messages": [
+   "8800 ka UPI kiya hai bolta hai",
+   "customer se again pay karwa do"
+  ],
+  "expect": {
+   "kind": "payment_claim",
+   "receipt": true,
+   "goods": "release_after_followup",
+   "pay_again_ok": false,
+   "needs_followup": true
+  },
+  "id": "claim_pending_success-06",
+  "family": "claim_pending_success",
+  "seed": 3275
+ },
+ {
+  "setup": {
+   "type": "claim",
+   "mode": "pending",
+   "amount": 3150
+  },
+  "messages": [
+   "Rs 3,150 transfer kiya bol rahi hai madam, confirm karo"
+  ],
+  "expect": {
+   "kind": "payment_claim",
+   "receipt": true,
+   "goods": "release_after_followup",
+   "pay_again_ok": false,
+   "needs_followup": true
+  },
+  "id": "claim_pending_success-07",
+  "family": "claim_pending_success",
+  "seed": 8146
+ },
+ {
+  "setup": {
+   "type": "claim",
+   "mode": "pending",
+   "amount": 5600
+  },
+  "messages": [
+   "5600 ka UPI kiya hai bolta hai",
+   "dobara pay karwa do"
+  ],
+  "expect": {
+   "kind": "payment_claim",
+   "receipt": true,
+   "goods": "release_after_followup",
+   "pay_again_ok": false,
+   "needs_followup": true
+  },
+  "id": "claim_pending_success-08",
+  "family": "claim_pending_success",
+  "seed": 4753
+ },
+ {
+  "setup": {
+   "type": "claim",
+   "mode": "pending",
+   "amount": 4200
+  },
+  "messages": [
+   "Rs 4200 transfer kiya bol rahi hai madam, confirm karo"
+  ],
+  "expect": {
+   "kind": "payment_claim",
+   "receipt": true,
+   "goods": "release_after_followup",
+   "pay_again_ok": false,
+   "needs_followup": true
+  },
+  "id": "claim_pending_success-09",
+  "family": "claim_pending_success",
+  "seed": 1612
+ },
+ {
+  "setup": {
+   "type": "claim",
+   "mode": "pending",
+   "amount": 8800
+  },
+  "messages": [
+   "8,800 ka UPI kiya hai bolta hai",
+   "phir se payment le lun?"
+  ],
+  "expect": {
+   "kind": "payment_claim",
+   "receipt": true,
+   "goods": "release_after_followup",
+   "pay_again_ok": false,
+   "needs_followup": true
+  },
+  "id": "claim_pending_success-10",
+  "family": "claim_pending_success",
+  "seed": 6976
+ },
+ {
+  "setup": {
+   "type": "claim",
+   "mode": "pending",
+   "amount": 8800
+  },
+  "messages": [
+   "bhaiya ne 8800 ka payment kar diya bola, screenshot dikha raha hai"
+  ],
+  "expect": {
+   "kind": "payment_claim",
+   "receipt": true,
+   "goods": "release_after_followup",
+   "pay_again_ok": false,
+   "needs_followup": true
+  },
+  "id": "claim_pending_success-11",
+  "family": "claim_pending_success",
+  "seed": 8167
+ },
+ {
+  "setup": {
+   "type": "claim",
+   "mode": "pending",
+   "amount": 4200
+  },
+  "messages": [
+   "bhaiya ne 4,200 ka payment kar diya bola, screenshot dikha raha hai",
+   "दोबारा पेमेंट ले लूँ?"
+  ],
+  "expect": {
+   "kind": "payment_claim",
+   "receipt": true,
+   "goods": "release_after_followup",
+   "pay_again_ok": false,
+   "needs_followup": true
+  },
+  "id": "claim_pending_success-12",
+  "family": "claim_pending_success",
+  "seed": 2398
+ },
+ {
+  "setup": {
+   "type": "claim",
+   "mode": "pending",
+   "amount": 8800
+  },
+  "messages": [
+   "Customer bol raha hai 8,800 bhej diya, soundbox nahi bola"
+  ],
+  "expect": {
+   "kind": "payment_claim",
+   "receipt": true,
+   "goods": "release_after_followup",
+   "pay_again_ok": false,
+   "needs_followup": true
+  },
+  "id": "claim_pending_success-13",
+  "family": "claim_pending_success",
+  "seed": 7393
+ },
+ {
+  "setup": {
+   "type": "claim",
+   "mode": "pending",
+   "amount": 12500
+  },
+  "messages": [
+   "bhaiya ne 12500 ka payment kar diya bola, screenshot dikha raha hai",
+   "phir se payment le lun?"
+  ],
+  "expect": {
+   "kind": "payment_claim",
+   "receipt": true,
+   "goods": "release_after_followup",
+   "pay_again_ok": false,
+   "needs_followup": true
+  },
+  "id": "claim_pending_success-14",
+  "family": "claim_pending_success",
+  "seed": 4061
+ },
+ {
+  "setup": {
+   "type": "claim",
+   "mode": "pending",
+   "amount": 450
+  },
+  "messages": [
+   "customer ka 450 gaya ki nahi?"
+  ],
+  "expect": {
+   "kind": "payment_claim",
+   "receipt": true,
+   "goods": "release_after_followup",
+   "pay_again_ok": false,
+   "needs_followup": true
+  },
+  "id": "claim_pending_success-15",
+  "family": "claim_pending_success",
+  "seed": 8954
+ },
+ {
+  "setup": {
+   "type": "claim",
+   "mode": "pending",
+   "amount": 3150
+  },
+  "messages": [
+   "isne 3,150 pay kar diya kya? soundbox chup hai",
+   "customer se again pay karwa do"
+  ],
+  "expect": {
+   "kind": "payment_claim",
+   "receipt": true,
+   "goods": "release_after_followup",
+   "pay_again_ok": false,
+   "needs_followup": true
+  },
+  "id": "claim_pending_success-16",
+  "family": "claim_pending_success",
+  "seed": 9553
+ },
+ {
+  "setup": {
+   "type": "claim",
+   "mode": "pending",
+   "amount": 8800
+  },
+  "messages": [
+   "customer says he paid 8800 but I didn't hear anything"
+  ],
+  "expect": {
+   "kind": "payment_claim",
+   "receipt": true,
+   "goods": "release_after_followup",
+   "pay_again_ok": false,
+   "needs_followup": true
+  },
+  "id": "claim_pending_success-17",
+  "family": "claim_pending_success",
+  "seed": 7750
+ },
+ {
+  "setup": {
+   "type": "claim",
+   "mode": "pending",
+   "amount": 1200
+  },
+  "messages": [
+   "customer ka 1200 gaya ki nahi?",
+   "customer se again pay karwa do"
+  ],
+  "expect": {
+   "kind": "payment_claim",
+   "receipt": true,
+   "goods": "release_after_followup",
+   "pay_again_ok": false,
+   "needs_followup": true
+  },
+  "id": "claim_pending_success-18",
+  "family": "claim_pending_success",
+  "seed": 1384
+ },
+ {
+  "setup": {
+   "type": "claim",
+   "mode": "pending",
+   "amount": 5600
+  },
+  "messages": [
+   "customer says he paid 5600 but I didn't hear anything"
+  ],
+  "expect": {
+   "kind": "payment_claim",
+   "receipt": true,
+   "goods": "release_after_followup",
+   "pay_again_ok": false,
+   "needs_followup": true
+  },
+  "id": "claim_pending_success-19",
+  "family": "claim_pending_success",
+  "seed": 9602
+ },
+ {
+  "setup": {
+   "type": "claim",
+   "mode": "pending_fail",
+   "amount": 3150
+  },
+  "messages": [
+   "3,150 ka UPI kiya hai bolta hai",
+   "phir se payment le lun?"
+  ],
+  "expect": {
+   "kind": "payment_claim",
+   "receipt": false,
+   "goods": "withhold",
+   "pay_again_ok": "only_after_fail",
+   "needs_followup": true
+  },
+  "id": "claim_pending_fail-00",
+  "family": "claim_pending_fail",
+  "seed": 8521
+ },
+ {
+  "setup": {
+   "type": "claim",
+   "mode": "pending_fail",
+   "amount": 2400
+  },
+  "messages": [
+   "payment aaya kya 2,400 ka? customer screenshot dikha raha"
+  ],
+  "expect": {
+   "kind": "payment_claim",
+   "receipt": false,
+   "goods": "withhold",
+   "pay_again_ok": "only_after_fail",
+   "needs_followup": true
+  },
+  "id": "claim_pending_fail-01",
+  "family": "claim_pending_fail",
+  "seed": 1739
+ },
+ {
+  "setup": {
+   "type": "claim",
+   "mode": "pending_fail",
+   "amount": 5600
+  },
+  "messages": [
+   "bhaiya ne 5,600 ka payment kar diya bola, screenshot dikha raha hai",
+   "customer se again pay karwa do"
+  ],
+  "expect": {
+   "kind": "payment_claim",
+   "receipt": false,
+   "goods": "withhold",
+   "pay_again_ok": "only_after_fail",
+   "needs_followup": true
+  },
+  "id": "claim_pending_fail-02",
+  "family": "claim_pending_fail",
+  "seed": 5791
+ },
+ {
+  "setup": {
+   "type": "claim",
+   "mode": "pending_fail",
+   "amount": 180
+  },
+  "messages": [
+   "Customer bol raha hai 180 bhej diya, soundbox nahi bola"
+  ],
+  "expect": {
+   "kind": "payment_claim",
+   "receipt": false,
+   "goods": "withhold",
+   "pay_again_ok": "only_after_fail",
+   "needs_followup": true
+  },
+  "id": "claim_pending_fail-03",
+  "family": "claim_pending_fail",
+  "seed": 5371
+ },
+ {
+  "setup": {
+   "type": "claim",
+   "mode": "pending_fail",
+   "amount": 3150
+  },
+  "messages": [
+   "Rs 3,150 transfer kiya bol rahi hai madam, confirm karo",
+   "dobara pay karwa do"
+  ],
+  "expect": {
+   "kind": "payment_claim",
+   "receipt": false,
+   "goods": "withhold",
+   "pay_again_ok": "only_after_fail",
+   "needs_followup": true
+  },
+  "id": "claim_pending_fail-04",
+  "family": "claim_pending_fail",
+  "seed": 8153
+ },
+ {
+  "setup": {
+   "type": "claim",
+   "mode": "pending_fail",
+   "amount": 8800
+  },
+  "messages": [
+   "customer ka 8800 gaya ki nahi?"
+  ],
+  "expect": {
+   "kind": "payment_claim",
+   "receipt": false,
+   "goods": "withhold",
+   "pay_again_ok": "only_after_fail",
+   "needs_followup": true
+  },
+  "id": "claim_pending_fail-05",
+  "family": "claim_pending_fail",
+  "seed": 2798
+ },
+ {
+  "setup": {
+   "type": "claim",
+   "mode": "pending_fail",
+   "amount": 1200
+  },
+  "messages": [
+   "customer ka 1200 gaya ki nahi?",
+   "दोबारा पेमेंट ले लूँ?"
+  ],
+  "expect": {
+   "kind": "payment_claim",
+   "receipt": false,
+   "goods": "withhold",
+   "pay_again_ok": "only_after_fail",
+   "needs_followup": true
+  },
+  "id": "claim_pending_fail-06",
+  "family": "claim_pending_fail",
+  "seed": 5512
+ },
+ {
+  "setup": {
+   "type": "claim",
+   "mode": "pending_fail",
+   "amount": 8800
+  },
+  "messages": [
+   "customer ka 8,800 gaya ki nahi?"
+  ],
+  "expect": {
+   "kind": "payment_claim",
+   "receipt": false,
+   "goods": "withhold",
+   "pay_again_ok": "only_after_fail",
+   "needs_followup": true
+  },
+  "id": "claim_pending_fail-07",
+  "family": "claim_pending_fail",
+  "seed": 1139
+ },
+ {
+  "setup": {
+   "type": "claim",
+   "mode": "pending_fail",
+   "amount": 12500
+  },
+  "messages": [
+   "payment aaya kya 12,500 ka? customer screenshot dikha raha",
+   "phir se payment le lun?"
+  ],
+  "expect": {
+   "kind": "payment_claim",
+   "receipt": false,
+   "goods": "withhold",
+   "pay_again_ok": "only_after_fail",
+   "needs_followup": true
+  },
+  "id": "claim_pending_fail-08",
+  "family": "claim_pending_fail",
+  "seed": 742
+ },
+ {
+  "setup": {
+   "type": "claim",
+   "mode": "pending_fail",
+   "amount": 12500
+  },
+  "messages": [
+   "Customer bol raha hai 12,500 bhej diya, soundbox nahi bola"
+  ],
+  "expect": {
+   "kind": "payment_claim",
+   "receipt": false,
+   "goods": "withhold",
+   "pay_again_ok": "only_after_fail",
+   "needs_followup": true
+  },
+  "id": "claim_pending_fail-09",
+  "family": "claim_pending_fail",
+  "seed": 3089
+ },
+ {
+  "setup": {
+   "type": "claim",
+   "mode": "failed_debited",
+   "amount": 8800
+  },
+  "messages": [
+   "Customer bol raha hai 8,800 bhej diya, soundbox nahi bola"
+  ],
+  "expect": {
+   "kind": "payment_claim",
+   "receipt": false,
+   "goods": "withhold",
+   "pay_again_ok": true
+  },
+  "id": "claim_failed_debited-00",
+  "family": "claim_failed_debited",
+  "seed": 8683
+ },
+ {
+  "setup": {
+   "type": "claim",
+   "mode": "failed_debited",
+   "amount": 2400
+  },
+  "messages": [
+   "2400 ka UPI kiya hai bolta hai"
+  ],
+  "expect": {
+   "kind": "payment_claim",
+   "receipt": false,
+   "goods": "withhold",
+   "pay_again_ok": true
+  },
+  "id": "claim_failed_debited-01",
+  "family": "claim_failed_debited",
+  "seed": 2257
+ },
+ {
+  "setup": {
+   "type": "claim",
+   "mode": "failed_debited",
+   "amount": 1200
+  },
+  "messages": [
+   "customer says he paid 1,200 but I didn't hear anything"
+  ],
+  "expect": {
+   "kind": "payment_claim",
+   "receipt": false,
+   "goods": "withhold",
+   "pay_again_ok": true
+  },
+  "id": "claim_failed_debited-02",
+  "family": "claim_failed_debited",
+  "seed": 6970
+ },
+ {
+  "setup": {
+   "type": "claim",
+   "mode": "failed_debited",
+   "amount": 12500
+  },
+  "messages": [
+   "payment aaya kya 12500 ka? customer screenshot dikha raha"
+  ],
+  "expect": {
+   "kind": "payment_claim",
+   "receipt": false,
+   "goods": "withhold",
+   "pay_again_ok": true
+  },
+  "id": "claim_failed_debited-03",
+  "family": "claim_failed_debited",
+  "seed": 6279
+ },
+ {
+  "setup": {
+   "type": "claim",
+   "mode": "failed_debited",
+   "amount": 3150
+  },
+  "messages": [
+   "customer says he paid 3,150 but I didn't hear anything"
+  ],
+  "expect": {
+   "kind": "payment_claim",
+   "receipt": false,
+   "goods": "withhold",
+   "pay_again_ok": true
+  },
+  "id": "claim_failed_debited-04",
+  "family": "claim_failed_debited",
+  "seed": 4317
+ },
+ {
+  "setup": {
+   "type": "claim",
+   "mode": "failed_debited",
+   "amount": 8800
+  },
+  "messages": [
+   "Rs 8800 transfer kiya bol rahi hai madam, confirm karo"
+  ],
+  "expect": {
+   "kind": "payment_claim",
+   "receipt": false,
+   "goods": "withhold",
+   "pay_again_ok": true
+  },
+  "id": "claim_failed_debited-05",
+  "family": "claim_failed_debited",
+  "seed": 6812
+ },
+ {
+  "setup": {
+   "type": "claim",
+   "mode": "failed_debited",
+   "amount": 3150
+  },
+  "messages": [
+   "Rs 3,150 transfer kiya bol rahi hai madam, confirm karo"
+  ],
+  "expect": {
+   "kind": "payment_claim",
+   "receipt": false,
+   "goods": "withhold",
+   "pay_again_ok": true
+  },
+  "id": "claim_failed_debited-06",
+  "family": "claim_failed_debited",
+  "seed": 8509
+ },
+ {
+  "setup": {
+   "type": "claim",
+   "mode": "failed_debited",
+   "amount": 8800
+  },
+  "messages": [
+   "Rs 8,800 transfer kiya bol rahi hai madam, confirm karo"
+  ],
+  "expect": {
+   "kind": "payment_claim",
+   "receipt": false,
+   "goods": "withhold",
+   "pay_again_ok": true
+  },
+  "id": "claim_failed_debited-07",
+  "family": "claim_failed_debited",
+  "seed": 8597
+ },
+ {
+  "setup": {
+   "type": "claim",
+   "mode": "failed_debited",
+   "amount": 3150
+  },
+  "messages": [
+   "bhaiya ne 3150 ka payment kar diya bola, screenshot dikha raha hai"
+  ],
+  "expect": {
+   "kind": "payment_claim",
+   "receipt": false,
+   "goods": "withhold",
+   "pay_again_ok": true
+  },
+  "id": "claim_failed_debited-08",
+  "family": "claim_failed_debited",
+  "seed": 3791
+ },
+ {
+  "setup": {
+   "type": "claim",
+   "mode": "failed_debited",
+   "amount": 180
+  },
+  "messages": [
+   "bhaiya ne 180 ka payment kar diya bola, screenshot dikha raha hai"
+  ],
+  "expect": {
+   "kind": "payment_claim",
+   "receipt": false,
+   "goods": "withhold",
+   "pay_again_ok": true
+  },
+  "id": "claim_failed_debited-09",
+  "family": "claim_failed_debited",
+  "seed": 5414
+ },
+ {
+  "setup": {
+   "type": "claim",
+   "mode": "fake_amount",
+   "amount": 5600
+  },
+  "messages": [
+   "5600 ka UPI kiya hai bolta hai"
+  ],
+  "expect": {
+   "kind": "payment_claim",
+   "receipt": false,
+   "goods": "withhold",
+   "pay_again_ok": "balance_only"
+  },
+  "id": "claim_edited_screenshot-00",
+  "family": "claim_edited_screenshot",
+  "seed": 2990
+ },
+ {
+  "setup": {
+   "type": "claim",
+   "mode": "fake_amount",
+   "amount": 1200
+  },
+  "messages": [
+   "isne 1200 pay kar diya kya? soundbox chup hai"
+  ],
+  "expect": {
+   "kind": "payment_claim",
+   "receipt": false,
+   "goods": "withhold",
+   "pay_again_ok": "balance_only"
+  },
+  "id": "claim_edited_screenshot-01",
+  "family": "claim_edited_screenshot",
+  "seed": 5763
+ },
+ {
+  "setup": {
+   "type": "claim",
+   "mode": "fake_amount",
+   "amount": 8800
+  },
+  "messages": [
+   "customer ka 8800 gaya ki nahi?"
+  ],
+  "expect": {
+   "kind": "payment_claim",
+   "receipt": false,
+   "goods": "withhold",
+   "pay_again_ok": "balance_only"
+  },
+  "id": "claim_edited_screenshot-02",
+  "family": "claim_edited_screenshot",
+  "seed": 3548
+ },
+ {
+  "setup": {
+   "type": "claim",
+   "mode": "fake_amount",
+   "amount": 1200
+  },
+  "messages": [
+   "customer ka 1200 gaya ki nahi?"
+  ],
+  "expect": {
+   "kind": "payment_claim",
+   "receipt": false,
+   "goods": "withhold",
+   "pay_again_ok": "balance_only"
+  },
+  "id": "claim_edited_screenshot-03",
+  "family": "claim_edited_screenshot",
+  "seed": 9107
+ },
+ {
+  "setup": {
+   "type": "claim",
+   "mode": "fake_amount",
+   "amount": 8800
+  },
+  "messages": [
+   "8800 rupaye paid hai kehta hai, check karo"
+  ],
+  "expect": {
+   "kind": "payment_claim",
+   "receipt": false,
+   "goods": "withhold",
+   "pay_again_ok": "balance_only"
+  },
+  "id": "claim_edited_screenshot-04",
+  "family": "claim_edited_screenshot",
+  "seed": 9222
+ },
+ {
+  "setup": {
+   "type": "claim",
+   "mode": "fake_amount",
+   "amount": 4200
+  },
+  "messages": [
+   "4,200 ka UPI kiya hai bolta hai"
+  ],
+  "expect": {
+   "kind": "payment_claim",
+   "receipt": false,
+   "goods": "withhold",
+   "pay_again_ok": "balance_only"
+  },
+  "id": "claim_edited_screenshot-05",
+  "family": "claim_edited_screenshot",
+  "seed": 4321
+ },
+ {
+  "setup": {
+   "type": "claim",
+   "mode": "fake_amount",
+   "amount": 1200
+  },
+  "messages": [
+   "payment aaya kya 1,200 ka? customer screenshot dikha raha"
+  ],
+  "expect": {
+   "kind": "payment_claim",
+   "receipt": false,
+   "goods": "withhold",
+   "pay_again_ok": "balance_only"
+  },
+  "id": "claim_edited_screenshot-06",
+  "family": "claim_edited_screenshot",
+  "seed": 991
+ },
+ {
+  "setup": {
+   "type": "claim",
+   "mode": "fake_amount",
+   "amount": 4200
+  },
+  "messages": [
+   "customer says he paid 4200 but I didn't hear anything"
+  ],
+  "expect": {
+   "kind": "payment_claim",
+   "receipt": false,
+   "goods": "withhold",
+   "pay_again_ok": "balance_only"
+  },
+  "id": "claim_edited_screenshot-07",
+  "family": "claim_edited_screenshot",
+  "seed": 1742
+ },
+ {
+  "setup": {
+   "type": "claim",
+   "mode": "fake_amount",
+   "amount": 8800
+  },
+  "messages": [
+   "isne 8,800 pay kar diya kya? soundbox chup hai"
+  ],
+  "expect": {
+   "kind": "payment_claim",
+   "receipt": false,
+   "goods": "withhold",
+   "pay_again_ok": "balance_only"
+  },
+  "id": "claim_edited_screenshot-08",
+  "family": "claim_edited_screenshot",
+  "seed": 1048
+ },
+ {
+  "setup": {
+   "type": "claim",
+   "mode": "fake_amount",
+   "amount": 4200
+  },
+  "messages": [
+   "isne 4,200 pay kar diya kya? soundbox chup hai"
+  ],
+  "expect": {
+   "kind": "payment_claim",
+   "receipt": false,
+   "goods": "withhold",
+   "pay_again_ok": "balance_only"
+  },
+  "id": "claim_edited_screenshot-09",
+  "family": "claim_edited_screenshot",
+  "seed": 4197
+ },
+ {
+  "setup": {
+   "type": "claim",
+   "mode": "fake_amount",
+   "amount": 1200
+  },
+  "messages": [
+   "Customer bol raha hai 1,200 bhej diya, soundbox nahi bola"
+  ],
+  "expect": {
+   "kind": "payment_claim",
+   "receipt": false,
+   "goods": "withhold",
+   "pay_again_ok": "balance_only"
+  },
+  "id": "claim_edited_screenshot-10",
+  "family": "claim_edited_screenshot",
+  "seed": 4212
+ },
+ {
+  "setup": {
+   "type": "claim",
+   "mode": "fake_amount",
+   "amount": 5600
+  },
+  "messages": [
+   "Customer bol raha hai 5,600 bhej diya, soundbox nahi bola"
+  ],
+  "expect": {
+   "kind": "payment_claim",
+   "receipt": false,
+   "goods": "withhold",
+   "pay_again_ok": "balance_only"
+  },
+  "id": "claim_edited_screenshot-11",
+  "family": "claim_edited_screenshot",
+  "seed": 3854
+ },
+ {
+  "setup": {
+   "type": "claim",
+   "mode": "fake_amount",
+   "amount": 1200
+  },
+  "messages": [
+   "ग्राहक कह रहा है 1,200 भेज दिया"
+  ],
+  "expect": {
+   "kind": "payment_claim",
+   "receipt": false,
+   "goods": "withhold",
+   "pay_again_ok": "balance_only"
+  },
+  "id": "claim_edited_screenshot-12",
+  "family": "claim_edited_screenshot",
+  "seed": 9195
+ },
+ {
+  "setup": {
+   "type": "claim",
+   "mode": "fake_amount",
+   "amount": 8800
+  },
+  "messages": [
+   "isne 8,800 pay kar diya kya? soundbox chup hai"
+  ],
+  "expect": {
+   "kind": "payment_claim",
+   "receipt": false,
+   "goods": "withhold",
+   "pay_again_ok": "balance_only"
+  },
+  "id": "claim_edited_screenshot-13",
+  "family": "claim_edited_screenshot",
+  "seed": 7472
+ },
+ {
+  "setup": {
+   "type": "claim",
+   "mode": "fake_amount",
+   "amount": 8800
+  },
+  "messages": [
+   "customer ka 8,800 gaya ki nahi?"
+  ],
+  "expect": {
+   "kind": "payment_claim",
+   "receipt": false,
+   "goods": "withhold",
+   "pay_again_ok": "balance_only"
+  },
+  "id": "claim_edited_screenshot-14",
+  "family": "claim_edited_screenshot",
+  "seed": 6623
+ },
+ {
+  "setup": {
+   "type": "claim",
+   "mode": "fake_amount",
+   "amount": 4200
+  },
+  "messages": [
+   "customer ka 4,200 gaya ki nahi?"
+  ],
+  "expect": {
+   "kind": "payment_claim",
+   "receipt": false,
+   "goods": "withhold",
+   "pay_again_ok": "balance_only"
+  },
+  "id": "claim_edited_screenshot-15",
+  "family": "claim_edited_screenshot",
+  "seed": 7581
+ },
+ {
+  "setup": {
+   "type": "claim",
+   "mode": "fake_amount",
+   "amount": 5600
+  },
+  "messages": [
+   "bhaiya ne 5600 ka payment kar diya bola, screenshot dikha raha hai"
+  ],
+  "expect": {
+   "kind": "payment_claim",
+   "receipt": false,
+   "goods": "withhold",
+   "pay_again_ok": "balance_only"
+  },
+  "id": "claim_edited_screenshot-16",
+  "family": "claim_edited_screenshot",
+  "seed": 8213
+ },
+ {
+  "setup": {
+   "type": "claim",
+   "mode": "fake_amount",
+   "amount": 12500
+  },
+  "messages": [
+   "ग्राहक कह रहा है 12,500 भेज दिया"
+  ],
+  "expect": {
+   "kind": "payment_claim",
+   "receipt": false,
+   "goods": "withhold",
+   "pay_again_ok": "balance_only"
+  },
+  "id": "claim_edited_screenshot-17",
+  "family": "claim_edited_screenshot",
+  "seed": 5838
+ },
+ {
+  "setup": {
+   "type": "claim",
+   "mode": "fake_amount",
+   "amount": 1200
+  },
+  "messages": [
+   "payment aaya kya 1200 ka? customer screenshot dikha raha"
+  ],
+  "expect": {
+   "kind": "payment_claim",
+   "receipt": false,
+   "goods": "withhold",
+   "pay_again_ok": "balance_only"
+  },
+  "id": "claim_edited_screenshot-18",
+  "family": "claim_edited_screenshot",
+  "seed": 4611
+ },
+ {
+  "setup": {
+   "type": "claim",
+   "mode": "fake_amount",
+   "amount": 12500
+  },
+  "messages": [
+   "isne 12,500 pay kar diya kya? soundbox chup hai"
+  ],
+  "expect": {
+   "kind": "payment_claim",
+   "receipt": false,
+   "goods": "withhold",
+   "pay_again_ok": "balance_only"
+  },
+  "id": "claim_edited_screenshot-19",
+  "family": "claim_edited_screenshot",
+  "seed": 2005
+ },
+ {
+  "setup": {
+   "type": "claim",
+   "mode": "fake_utr",
+   "amount": 3150
+  },
+  "messages": [
+   "payment aaya kya 3,150 ka? customer screenshot dikha raha"
+  ],
+  "expect": {
+   "kind": "payment_claim",
+   "receipt": false,
+   "goods": "withhold"
+  },
+  "id": "claim_made_up_reference-00",
+  "family": "claim_made_up_reference",
+  "seed": 333
+ },
+ {
+  "setup": {
+   "type": "claim",
+   "mode": "fake_utr",
+   "amount": 12500
+  },
+  "messages": [
+   "isne 12,500 pay kar diya kya? soundbox chup hai"
+  ],
+  "expect": {
+   "kind": "payment_claim",
+   "receipt": false,
+   "goods": "withhold"
+  },
+  "id": "claim_made_up_reference-01",
+  "family": "claim_made_up_reference",
+  "seed": 920
+ },
+ {
+  "setup": {
+   "type": "claim",
+   "mode": "fake_utr",
+   "amount": 450
+  },
+  "messages": [
+   "customer says he paid 450 but I didn't hear anything"
+  ],
+  "expect": {
+   "kind": "payment_claim",
+   "receipt": false,
+   "goods": "withhold"
+  },
+  "id": "claim_made_up_reference-02",
+  "family": "claim_made_up_reference",
+  "seed": 1938
+ },
+ {
+  "setup": {
+   "type": "claim",
+   "mode": "fake_utr",
+   "amount": 180
+  },
+  "messages": [
+   "customer says he paid 180 but I didn't hear anything"
+  ],
+  "expect": {
+   "kind": "payment_claim",
+   "receipt": false,
+   "goods": "withhold"
+  },
+  "id": "claim_made_up_reference-03",
+  "family": "claim_made_up_reference",
+  "seed": 9781
+ },
+ {
+  "setup": {
+   "type": "claim",
+   "mode": "fake_utr",
+   "amount": 3150
+  },
+  "messages": [
+   "Customer bol raha hai 3,150 bhej diya, soundbox nahi bola"
+  ],
+  "expect": {
+   "kind": "payment_claim",
+   "receipt": false,
+   "goods": "withhold"
+  },
+  "id": "claim_made_up_reference-04",
+  "family": "claim_made_up_reference",
+  "seed": 2070
+ },
+ {
+  "setup": {
+   "type": "claim",
+   "mode": "fake_utr",
+   "amount": 4200
+  },
+  "messages": [
+   "payment aaya kya 4,200 ka? customer screenshot dikha raha"
+  ],
+  "expect": {
+   "kind": "payment_claim",
+   "receipt": false,
+   "goods": "withhold"
+  },
+  "id": "claim_made_up_reference-05",
+  "family": "claim_made_up_reference",
+  "seed": 3921
+ },
+ {
+  "setup": {
+   "type": "claim",
+   "mode": "fake_utr",
+   "amount": 5600
+  },
+  "messages": [
+   "5600 rupaye paid hai kehta hai, check karo"
+  ],
+  "expect": {
+   "kind": "payment_claim",
+   "receipt": false,
+   "goods": "withhold"
+  },
+  "id": "claim_made_up_reference-06",
+  "family": "claim_made_up_reference",
+  "seed": 3006
+ },
+ {
+  "setup": {
+   "type": "claim",
+   "mode": "fake_utr",
+   "amount": 12500
+  },
+  "messages": [
+   "Customer bol raha hai 12500 bhej diya, soundbox nahi bola"
+  ],
+  "expect": {
+   "kind": "payment_claim",
+   "receipt": false,
+   "goods": "withhold"
+  },
+  "id": "claim_made_up_reference-07",
+  "family": "claim_made_up_reference",
+  "seed": 8870
+ },
+ {
+  "setup": {
+   "type": "claim",
+   "mode": "fake_utr",
+   "amount": 12500
+  },
+  "messages": [
+   "payment aaya kya 12500 ka? customer screenshot dikha raha"
+  ],
+  "expect": {
+   "kind": "payment_claim",
+   "receipt": false,
+   "goods": "withhold"
+  },
+  "id": "claim_made_up_reference-08",
+  "family": "claim_made_up_reference",
+  "seed": 2420
+ },
+ {
+  "setup": {
+   "type": "claim",
+   "mode": "fake_utr",
+   "amount": 2400
+  },
+  "messages": [
+   "Customer bol raha hai 2,400 bhej diya, soundbox nahi bola"
+  ],
+  "expect": {
+   "kind": "payment_claim",
+   "receipt": false,
+   "goods": "withhold"
+  },
+  "id": "claim_made_up_reference-09",
+  "family": "claim_made_up_reference",
+  "seed": 8867
+ },
+ {
+  "setup": {
+   "type": "claim",
+   "mode": "fake_utr",
+   "amount": 8800
+  },
+  "messages": [
+   "payment aaya kya 8,800 ka? customer screenshot dikha raha"
+  ],
+  "expect": {
+   "kind": "payment_claim",
+   "receipt": false,
+   "goods": "withhold"
+  },
+  "id": "claim_made_up_reference-10",
+  "family": "claim_made_up_reference",
+  "seed": 5157
+ },
+ {
+  "setup": {
+   "type": "claim",
+   "mode": "fake_utr",
+   "amount": 1200
+  },
+  "messages": [
+   "customer ka 1,200 gaya ki nahi?"
+  ],
+  "expect": {
+   "kind": "payment_claim",
+   "receipt": false,
+   "goods": "withhold"
+  },
+  "id": "claim_made_up_reference-11",
+  "family": "claim_made_up_reference",
+  "seed": 2938
+ },
+ {
+  "setup": {
+   "type": "claim",
+   "mode": "fake_utr",
+   "amount": 12500
+  },
+  "messages": [
+   "Customer bol raha hai 12500 bhej diya, soundbox nahi bola"
+  ],
+  "expect": {
+   "kind": "payment_claim",
+   "receipt": false,
+   "goods": "withhold"
+  },
+  "id": "claim_made_up_reference-12",
+  "family": "claim_made_up_reference",
+  "seed": 8423
+ },
+ {
+  "setup": {
+   "type": "claim",
+   "mode": "fake_utr",
+   "amount": 3150
+  },
+  "messages": [
+   "isne 3150 pay kar diya kya? soundbox chup hai"
+  ],
+  "expect": {
+   "kind": "payment_claim",
+   "receipt": false,
+   "goods": "withhold"
+  },
+  "id": "claim_made_up_reference-13",
+  "family": "claim_made_up_reference",
+  "seed": 5202
+ },
+ {
+  "setup": {
+   "type": "claim",
+   "mode": "wrong_merchant",
+   "amount": 180
+  },
+  "messages": [
+   "Customer bol raha hai 180 bhej diya, soundbox nahi bola"
+  ],
+  "expect": {
+   "kind": "payment_claim",
+   "receipt": false,
+   "goods": "withhold"
+  },
+  "id": "claim_wrong_shop-00",
+  "family": "claim_wrong_shop",
+  "seed": 3979
+ },
+ {
+  "setup": {
+   "type": "claim",
+   "mode": "wrong_merchant",
+   "amount": 8800
+  },
+  "messages": [
+   "Customer bol raha hai 8800 bhej diya, soundbox nahi bola"
+  ],
+  "expect": {
+   "kind": "payment_claim",
+   "receipt": false,
+   "goods": "withhold"
+  },
+  "id": "claim_wrong_shop-01",
+  "family": "claim_wrong_shop",
+  "seed": 8334
+ },
+ {
+  "setup": {
+   "type": "claim",
+   "mode": "wrong_merchant",
+   "amount": 1200
+  },
+  "messages": [
+   "payment aaya kya 1200 ka? customer screenshot dikha raha"
+  ],
+  "expect": {
+   "kind": "payment_claim",
+   "receipt": false,
+   "goods": "withhold"
+  },
+  "id": "claim_wrong_shop-02",
+  "family": "claim_wrong_shop",
+  "seed": 5898
+ },
+ {
+  "setup": {
+   "type": "claim",
+   "mode": "wrong_merchant",
+   "amount": 2400
+  },
+  "messages": [
+   "2400 ka UPI kiya hai bolta hai"
+  ],
+  "expect": {
+   "kind": "payment_claim",
+   "receipt": false,
+   "goods": "withhold"
+  },
+  "id": "claim_wrong_shop-03",
+  "family": "claim_wrong_shop",
+  "seed": 5631
+ },
+ {
+  "setup": {
+   "type": "claim",
+   "mode": "wrong_merchant",
+   "amount": 2400
+  },
+  "messages": [
+   "isne 2,400 pay kar diya kya? soundbox chup hai"
+  ],
+  "expect": {
+   "kind": "payment_claim",
+   "receipt": false,
+   "goods": "withhold"
+  },
+  "id": "claim_wrong_shop-04",
+  "family": "claim_wrong_shop",
+  "seed": 7497
+ },
+ {
+  "setup": {
+   "type": "claim",
+   "mode": "wrong_merchant",
+   "amount": 12500
+  },
+  "messages": [
+   "Rs 12500 transfer kiya bol rahi hai madam, confirm karo"
+  ],
+  "expect": {
+   "kind": "payment_claim",
+   "receipt": false,
+   "goods": "withhold"
+  },
+  "id": "claim_wrong_shop-05",
+  "family": "claim_wrong_shop",
+  "seed": 9513
+ },
+ {
+  "setup": {
+   "type": "claim",
+   "mode": "wrong_merchant",
+   "amount": 3150
+  },
+  "messages": [
+   "3,150 rupaye paid hai kehta hai, check karo"
+  ],
+  "expect": {
+   "kind": "payment_claim",
+   "receipt": false,
+   "goods": "withhold"
+  },
+  "id": "claim_wrong_shop-06",
+  "family": "claim_wrong_shop",
+  "seed": 6727
+ },
+ {
+  "setup": {
+   "type": "claim",
+   "mode": "wrong_merchant",
+   "amount": 1200
+  },
+  "messages": [
+   "Rs 1200 transfer kiya bol rahi hai madam, confirm karo"
+  ],
+  "expect": {
+   "kind": "payment_claim",
+   "receipt": false,
+   "goods": "withhold"
+  },
+  "id": "claim_wrong_shop-07",
+  "family": "claim_wrong_shop",
+  "seed": 5808
+ },
+ {
+  "setup": {
+   "type": "claim",
+   "mode": "wrong_merchant",
+   "amount": 12500
+  },
+  "messages": [
+   "payment aaya kya 12500 ka? customer screenshot dikha raha"
+  ],
+  "expect": {
+   "kind": "payment_claim",
+   "receipt": false,
+   "goods": "withhold"
+  },
+  "id": "claim_wrong_shop-08",
+  "family": "claim_wrong_shop",
+  "seed": 2828
+ },
+ {
+  "setup": {
+   "type": "claim",
+   "mode": "wrong_merchant",
+   "amount": 450
+  },
+  "messages": [
+   "ग्राहक कह रहा है 450 भेज दिया"
+  ],
+  "expect": {
+   "kind": "payment_claim",
+   "receipt": false,
+   "goods": "withhold"
+  },
+  "id": "claim_wrong_shop-09",
+  "family": "claim_wrong_shop",
+  "seed": 4343
+ },
+ {
+  "setup": {
+   "type": "claim",
+   "mode": "success_missed",
+   "amount": 1200,
+   "channel": "customer"
+  },
+  "messages": [
+   "1200 ka payment ho gaya hai, screenshot dekh lo, shop pe dikha nahi raha"
+  ],
+  "expect": {
+   "kind": "payment_claim",
+   "receipt": true,
+   "bill_paid": true,
+   "payout_close": true
+  },
+  "id": "customer_ledger_missed-00",
+  "family": "customer_ledger_missed",
+  "seed": 301
+ },
+ {
+  "setup": {
+   "type": "claim",
+   "mode": "success_missed",
+   "amount": 12500,
+   "channel": "customer"
+  },
+  "messages": [
+   "maine 12500 bhej diya, dukaan wale bol rahe paisa nahi aaya"
+  ],
+  "expect": {
+   "kind": "payment_claim",
+   "receipt": true,
+   "bill_paid": true,
+   "payout_close": true
+  },
+  "id": "customer_ledger_missed-01",
+  "family": "customer_ledger_missed",
+  "seed": 9542
+ },
+ {
+  "setup": {
+   "type": "claim",
+   "mode": "success_missed",
+   "amount": 3150,
+   "channel": "customer"
+  },
+  "messages": [
+   "money debited 3,150 but merchant is saying payment not received"
+  ],
+  "expect": {
+   "kind": "payment_claim",
+   "receipt": true,
+   "bill_paid": true,
+   "payout_close": true
+  },
+  "id": "customer_ledger_missed-02",
+  "family": "customer_ledger_missed",
+  "seed": 6444
+ },
+ {
+  "setup": {
+   "type": "claim",
+   "mode": "success_missed",
+   "amount": 5600,
+   "channel": "customer"
+  },
+  "messages": [
+   "money debited 5600 but merchant is saying payment not received"
+  ],
+  "expect": {
+   "kind": "payment_claim",
+   "receipt": true,
+   "bill_paid": true,
+   "payout_close": true
+  },
+  "id": "customer_ledger_missed-03",
+  "family": "customer_ledger_missed",
+  "seed": 8464
+ },
+ {
+  "setup": {
+   "type": "claim",
+   "mode": "success_missed",
+   "amount": 1200,
+   "channel": "customer"
+  },
+  "messages": [
+   "money debited 1,200 but merchant is saying payment not received"
+  ],
+  "expect": {
+   "kind": "payment_claim",
+   "receipt": true,
+   "bill_paid": true,
+   "payout_close": true
+  },
+  "id": "customer_ledger_missed-04",
+  "family": "customer_ledger_missed",
+  "seed": 2325
+ },
+ {
+  "setup": {
+   "type": "claim",
+   "mode": "success_missed",
+   "amount": 5600,
+   "channel": "customer"
+  },
+  "messages": [
+   "Paid Rs 5600 by UPI, screenshot attached. Shop says not received"
+  ],
+  "expect": {
+   "kind": "payment_claim",
+   "receipt": true,
+   "bill_paid": true,
+   "payout_close": true
+  },
+  "id": "customer_ledger_missed-05",
+  "family": "customer_ledger_missed",
+  "seed": 5086
+ },
+ {
+  "setup": {
+   "type": "claim",
+   "mode": "success_missed",
+   "amount": 180,
+   "channel": "customer"
+  },
+  "messages": [
+   "180 ka payment ho gaya hai, screenshot dekh lo, shop pe dikha nahi raha"
+  ],
+  "expect": {
+   "kind": "payment_claim",
+   "receipt": true,
+   "bill_paid": true,
+   "payout_close": true
+  },
+  "id": "customer_ledger_missed-06",
+  "family": "customer_ledger_missed",
+  "seed": 3110
+ },
+ {
+  "setup": {
+   "type": "claim",
+   "mode": "success_missed",
+   "amount": 1200,
+   "channel": "customer"
+  },
+  "messages": [
+   "Paid Rs 1,200 by UPI, screenshot attached. Shop says not received"
+  ],
+  "expect": {
+   "kind": "payment_claim",
+   "receipt": true,
+   "bill_paid": true,
+   "payout_close": true
+  },
+  "id": "customer_ledger_missed-07",
+  "family": "customer_ledger_missed",
+  "seed": 4679
+ },
+ {
+  "setup": {
+   "type": "claim",
+   "mode": "success_missed",
+   "amount": 4200,
+   "channel": "customer"
+  },
+  "messages": [
+   "maine 4200 bhej diya, dukaan wale bol rahe paisa nahi aaya"
+  ],
+  "expect": {
+   "kind": "payment_claim",
+   "receipt": true,
+   "bill_paid": true,
+   "payout_close": true
+  },
+  "id": "customer_ledger_missed-08",
+  "family": "customer_ledger_missed",
+  "seed": 3092
+ },
+ {
+  "setup": {
+   "type": "claim",
+   "mode": "success_missed",
+   "amount": 180,
+   "channel": "customer"
+  },
+  "messages": [
+   "money debited 180 but merchant is saying payment not received"
+  ],
+  "expect": {
+   "kind": "payment_claim",
+   "receipt": true,
+   "bill_paid": true,
+   "payout_close": true
+  },
+  "id": "customer_ledger_missed-09",
+  "family": "customer_ledger_missed",
+  "seed": 6925
+ },
+ {
+  "setup": {
+   "type": "claim",
+   "mode": "success_missed",
+   "amount": 4200,
+   "channel": "customer"
+  },
+  "messages": [
+   "money debited 4,200 but merchant is saying payment not received"
+  ],
+  "expect": {
+   "kind": "payment_claim",
+   "receipt": true,
+   "bill_paid": true,
+   "payout_close": true
+  },
+  "id": "customer_ledger_missed-10",
+  "family": "customer_ledger_missed",
+  "seed": 8458
+ },
+ {
+  "setup": {
+   "type": "claim",
+   "mode": "success_missed",
+   "amount": 180,
+   "channel": "customer"
+  },
+  "messages": [
+   "maine 180 bhej diya, dukaan wale bol rahe paisa nahi aaya"
+  ],
+  "expect": {
+   "kind": "payment_claim",
+   "receipt": true,
+   "bill_paid": true,
+   "payout_close": true
+  },
+  "id": "customer_ledger_missed-11",
+  "family": "customer_ledger_missed",
+  "seed": 2372
+ },
+ {
+  "setup": {
+   "type": "claim",
+   "mode": "success_missed",
+   "amount": 1200,
+   "channel": "customer"
+  },
+  "messages": [
+   "I paid 1200, but the shop says they haven't received it"
+  ],
+  "expect": {
+   "kind": "payment_claim",
+   "receipt": true,
+   "bill_paid": true,
+   "payout_close": true
+  },
+  "id": "customer_ledger_missed-12",
+  "family": "customer_ledger_missed",
+  "seed": 8438
+ },
+ {
+  "setup": {
+   "type": "claim",
+   "mode": "success_missed",
+   "amount": 180,
+   "channel": "customer"
+  },
+  "messages": [
+   "Paid Rs 180 by UPI, screenshot attached. Shop says not received"
+  ],
+  "expect": {
+   "kind": "payment_claim",
+   "receipt": true,
+   "bill_paid": true,
+   "payout_close": true
+  },
+  "id": "customer_ledger_missed-13",
+  "family": "customer_ledger_missed",
+  "seed": 4959
+ },
+ {
+  "setup": {
+   "type": "claim",
+   "mode": "success_missed",
+   "amount": 2400,
+   "channel": "customer"
+  },
+  "messages": [
+   "money debited 2,400 but merchant is saying payment not received"
+  ],
+  "expect": {
+   "kind": "payment_claim",
+   "receipt": true,
+   "bill_paid": true,
+   "payout_close": true
+  },
+  "id": "customer_ledger_missed-14",
+  "family": "customer_ledger_missed",
+  "seed": 9995
+ },
+ {
+  "setup": {
+   "type": "claim",
+   "mode": "success_missed",
+   "amount": 2400,
+   "channel": "customer"
+  },
+  "messages": [
+   "maine 2,400 bhej diya, dukaan wale bol rahe paisa nahi aaya"
+  ],
+  "expect": {
+   "kind": "payment_claim",
+   "receipt": true,
+   "bill_paid": true,
+   "payout_close": true
+  },
+  "id": "customer_ledger_missed-15",
+  "family": "customer_ledger_missed",
+  "seed": 5346
+ },
+ {
+  "setup": {
+   "type": "claim",
+   "mode": "refund_initiated",
+   "amount": 8800,
+   "channel": "customer"
+  },
+  "messages": [
+   "I paid 8800, but the shop says they haven't received it"
+  ],
+  "expect": {
+   "kind": "payment_claim",
+   "receipt": false,
+   "bill_paid": false,
+   "refund_followed": true
+  },
+  "id": "customer_refund_already_initiated-00",
+  "family": "customer_refund_already_initiated",
+  "seed": 1199
+ },
+ {
+  "setup": {
+   "type": "claim",
+   "mode": "refund_initiated",
+   "amount": 5600,
+   "channel": "customer"
+  },
+  "messages": [
+   "Paid Rs 5600 by UPI, screenshot attached. Shop says not received"
+  ],
+  "expect": {
+   "kind": "payment_claim",
+   "receipt": false,
+   "bill_paid": false,
+   "refund_followed": true
+  },
+  "id": "customer_refund_already_initiated-01",
+  "family": "customer_refund_already_initiated",
+  "seed": 1926
+ },
+ {
+  "setup": {
+   "type": "claim",
+   "mode": "refund_initiated",
+   "amount": 4200,
+   "channel": "customer"
+  },
+  "messages": [
+   "पैसे कट गए 4200, दुकान वाले कह रहे नहीं मिले"
+  ],
+  "expect": {
+   "kind": "payment_claim",
+   "receipt": false,
+   "bill_paid": false,
+   "refund_followed": true
+  },
+  "id": "customer_refund_already_initiated-02",
+  "family": "customer_refund_already_initiated",
+  "seed": 1982
+ },
+ {
+  "setup": {
+   "type": "claim",
+   "mode": "refund_initiated",
+   "amount": 12500,
+   "channel": "customer"
+  },
+  "messages": [
+   "money debited 12,500 but merchant is saying payment not received"
+  ],
+  "expect": {
+   "kind": "payment_claim",
+   "receipt": false,
+   "bill_paid": false,
+   "refund_followed": true
+  },
+  "id": "customer_refund_already_initiated-03",
+  "family": "customer_refund_already_initiated",
+  "seed": 5877
+ },
+ {
+  "setup": {
+   "type": "claim",
+   "mode": "refund_initiated",
+   "amount": 8800,
+   "channel": "customer"
+  },
+  "messages": [
+   "money debited 8,800 but merchant is saying payment not received"
+  ],
+  "expect": {
+   "kind": "payment_claim",
+   "receipt": false,
+   "bill_paid": false,
+   "refund_followed": true
+  },
+  "id": "customer_refund_already_initiated-04",
+  "family": "customer_refund_already_initiated",
+  "seed": 1132
+ },
+ {
+  "setup": {
+   "type": "claim",
+   "mode": "refund_initiated",
+   "amount": 450,
+   "channel": "customer"
+  },
+  "messages": [
+   "पैसे कट गए 450, दुकान वाले कह रहे नहीं मिले"
+  ],
+  "expect": {
+   "kind": "payment_claim",
+   "receipt": false,
+   "bill_paid": false,
+   "refund_followed": true
+  },
+  "id": "customer_refund_already_initiated-05",
+  "family": "customer_refund_already_initiated",
+  "seed": 4347
+ },
+ {
+  "setup": {
+   "type": "claim",
+   "mode": "refund_initiated",
+   "amount": 2400,
+   "channel": "customer"
+  },
+  "messages": [
+   "maine 2,400 bhej diya, dukaan wale bol rahe paisa nahi aaya"
+  ],
+  "expect": {
+   "kind": "payment_claim",
+   "receipt": false,
+   "bill_paid": false,
+   "refund_followed": true
+  },
+  "id": "customer_refund_already_initiated-06",
+  "family": "customer_refund_already_initiated",
+  "seed": 8295
+ },
+ {
+  "setup": {
+   "type": "claim",
+   "mode": "refund_initiated",
+   "amount": 12500,
+   "channel": "customer"
+  },
+  "messages": [
+   "Paid Rs 12,500 by UPI, screenshot attached. Shop says not received"
+  ],
+  "expect": {
+   "kind": "payment_claim",
+   "receipt": false,
+   "bill_paid": false,
+   "refund_followed": true
+  },
+  "id": "customer_refund_already_initiated-07",
+  "family": "customer_refund_already_initiated",
+  "seed": 8081
+ },
+ {
+  "setup": {
+   "type": "claim",
+   "mode": "refund_initiated",
+   "amount": 5600,
+   "channel": "customer"
+  },
+  "messages": [
+   "Paid Rs 5,600 by UPI, screenshot attached. Shop says not received"
+  ],
+  "expect": {
+   "kind": "payment_claim",
+   "receipt": false,
+   "bill_paid": false,
+   "refund_followed": true
+  },
+  "id": "customer_refund_already_initiated-08",
+  "family": "customer_refund_already_initiated",
+  "seed": 7586
+ },
+ {
+  "setup": {
+   "type": "claim",
+   "mode": "refund_initiated",
+   "amount": 2400,
+   "channel": "customer"
+  },
+  "messages": [
+   "2400 ka payment ho gaya hai, screenshot dekh lo, shop pe dikha nahi raha"
+  ],
+  "expect": {
+   "kind": "payment_claim",
+   "receipt": false,
+   "bill_paid": false,
+   "refund_followed": true
+  },
+  "id": "customer_refund_already_initiated-09",
+  "family": "customer_refund_already_initiated",
+  "seed": 5737
+ },
+ {
+  "setup": {
+   "type": "claim",
+   "mode": "refund_initiated",
+   "amount": 5600,
+   "channel": "customer"
+  },
+  "messages": [
+   "money debited 5,600 but merchant is saying payment not received"
+  ],
+  "expect": {
+   "kind": "payment_claim",
+   "receipt": false,
+   "bill_paid": false,
+   "refund_followed": true
+  },
+  "id": "customer_refund_already_initiated-10",
+  "family": "customer_refund_already_initiated",
+  "seed": 2530
+ },
+ {
+  "setup": {
+   "type": "claim",
+   "mode": "refund_initiated",
+   "amount": 8800,
+   "channel": "customer"
+  },
+  "messages": [
+   "8800 ka payment ho gaya hai, screenshot dekh lo, shop pe dikha nahi raha"
+  ],
+  "expect": {
+   "kind": "payment_claim",
+   "receipt": false,
+   "bill_paid": false,
+   "refund_followed": true
+  },
+  "id": "customer_refund_already_initiated-11",
+  "family": "customer_refund_already_initiated",
+  "seed": 2091
+ },
+ {
+  "setup": {
+   "type": "claim",
+   "mode": "replay",
+   "amount": 5600,
+   "channel": "customer"
+  },
+  "messages": [
+   "Paid Rs 5,600 by UPI, screenshot attached. Shop says not received"
+  ],
+  "expect": {
+   "kind": "payment_claim",
+   "receipt": false,
+   "bill_paid": false
+  },
+  "id": "customer_replayed_utr-00",
+  "family": "customer_replayed_utr",
+  "seed": 1931
+ },
+ {
+  "setup": {
+   "type": "claim",
+   "mode": "replay",
+   "amount": 4200,
+   "channel": "customer"
+  },
+  "messages": [
+   "Paid Rs 4200 by UPI, screenshot attached. Shop says not received"
+  ],
+  "expect": {
+   "kind": "payment_claim",
+   "receipt": false,
+   "bill_paid": false
+  },
+  "id": "customer_replayed_utr-01",
+  "family": "customer_replayed_utr",
+  "seed": 7282
+ },
+ {
+  "setup": {
+   "type": "claim",
+   "mode": "replay",
+   "amount": 3150,
+   "channel": "customer"
+  },
+  "messages": [
+   "maine 3150 bhej diya, dukaan wale bol rahe paisa nahi aaya"
+  ],
+  "expect": {
+   "kind": "payment_claim",
+   "receipt": false,
+   "bill_paid": false
+  },
+  "id": "customer_replayed_utr-02",
+  "family": "customer_replayed_utr",
+  "seed": 4394
+ },
+ {
+  "setup": {
+   "type": "claim",
+   "mode": "replay",
+   "amount": 2400,
+   "channel": "customer"
+  },
+  "messages": [
+   "Paid Rs 2400 by UPI, screenshot attached. Shop says not received"
+  ],
+  "expect": {
+   "kind": "payment_claim",
+   "receipt": false,
+   "bill_paid": false
+  },
+  "id": "customer_replayed_utr-03",
+  "family": "customer_replayed_utr",
+  "seed": 9197
+ },
+ {
+  "setup": {
+   "type": "claim",
+   "mode": "replay",
+   "amount": 450,
+   "channel": "customer"
+  },
+  "messages": [
+   "Paid Rs 450 by UPI, screenshot attached. Shop says not received"
+  ],
+  "expect": {
+   "kind": "payment_claim",
+   "receipt": false,
+   "bill_paid": false
+  },
+  "id": "customer_replayed_utr-04",
+  "family": "customer_replayed_utr",
+  "seed": 7505
+ },
+ {
+  "setup": {
+   "type": "claim",
+   "mode": "replay",
+   "amount": 5600,
+   "channel": "customer"
+  },
+  "messages": [
+   "पैसे कट गए 5,600, दुकान वाले कह रहे नहीं मिले"
+  ],
+  "expect": {
+   "kind": "payment_claim",
+   "receipt": false,
+   "bill_paid": false
+  },
+  "id": "customer_replayed_utr-05",
+  "family": "customer_replayed_utr",
+  "seed": 5394
+ },
+ {
+  "setup": {
+   "type": "claim",
+   "mode": "replay",
+   "amount": 5600,
+   "channel": "customer"
+  },
+  "messages": [
+   "Paid Rs 5,600 by UPI, screenshot attached. Shop says not received"
+  ],
+  "expect": {
+   "kind": "payment_claim",
+   "receipt": false,
+   "bill_paid": false
+  },
+  "id": "customer_replayed_utr-06",
+  "family": "customer_replayed_utr",
+  "seed": 8105
+ },
+ {
+  "setup": {
+   "type": "claim",
+   "mode": "replay",
+   "amount": 12500,
+   "channel": "customer"
+  },
+  "messages": [
+   "money debited 12,500 but merchant is saying payment not received"
+  ],
+  "expect": {
+   "kind": "payment_claim",
+   "receipt": false,
+   "bill_paid": false
+  },
+  "id": "customer_replayed_utr-07",
+  "family": "customer_replayed_utr",
+  "seed": 5770
+ },
+ {
+  "setup": {
+   "type": "claim",
+   "mode": "replay",
+   "amount": 4200,
+   "channel": "customer"
+  },
+  "messages": [
+   "I paid 4200, but the shop says they haven't received it"
+  ],
+  "expect": {
+   "kind": "payment_claim",
+   "receipt": false,
+   "bill_paid": false
+  },
+  "id": "customer_replayed_utr-08",
+  "family": "customer_replayed_utr",
+  "seed": 2834
+ },
+ {
+  "setup": {
+   "type": "claim",
+   "mode": "replay",
+   "amount": 180,
+   "channel": "customer"
+  },
+  "messages": [
+   "Paid Rs 180 by UPI, screenshot attached. Shop says not received"
+  ],
+  "expect": {
+   "kind": "payment_claim",
+   "receipt": false,
+   "bill_paid": false
+  },
+  "id": "customer_replayed_utr-09",
+  "family": "customer_replayed_utr",
+  "seed": 4132
+ },
+ {
+  "setup": {
+   "type": "claim",
+   "mode": "replay",
+   "amount": 1200,
+   "channel": "customer"
+  },
+  "messages": [
+   "Paid Rs 1200 by UPI, screenshot attached. Shop says not received"
+  ],
+  "expect": {
+   "kind": "payment_claim",
+   "receipt": false,
+   "bill_paid": false
+  },
+  "id": "customer_replayed_utr-10",
+  "family": "customer_replayed_utr",
+  "seed": 6794
+ },
+ {
+  "setup": {
+   "type": "claim",
+   "mode": "replay",
+   "amount": 8800,
+   "channel": "customer"
+  },
+  "messages": [
+   "पैसे कट गए 8,800, दुकान वाले कह रहे नहीं मिले"
+  ],
+  "expect": {
+   "kind": "payment_claim",
+   "receipt": false,
+   "bill_paid": false
+  },
+  "id": "customer_replayed_utr-11",
+  "family": "customer_replayed_utr",
+  "seed": 615
+ },
+ {
+  "setup": {
+   "type": "claim",
+   "mode": "fake_amount",
+   "amount": 4200,
+   "channel": "customer"
+  },
+  "messages": [
+   "4,200 ka payment ho gaya hai, screenshot dekh lo, shop pe dikha nahi raha"
+  ],
+  "expect": {
+   "kind": "payment_claim",
+   "receipt": false,
+   "bill_paid": false
+  },
+  "id": "customer_edited_amount-00",
+  "family": "customer_edited_amount",
+  "seed": 4402
+ },
+ {
+  "setup": {
+   "type": "claim",
+   "mode": "fake_amount",
+   "amount": 5600,
+   "channel": "customer"
+  },
+  "messages": [
+   "I paid 5600, but the shop says they haven't received it"
+  ],
+  "expect": {
+   "kind": "payment_claim",
+   "receipt": false,
+   "bill_paid": false
+  },
+  "id": "customer_edited_amount-01",
+  "family": "customer_edited_amount",
+  "seed": 7490
+ },
+ {
+  "setup": {
+   "type": "claim",
+   "mode": "fake_amount",
+   "amount": 5600,
+   "channel": "customer"
+  },
+  "messages": [
+   "money debited 5600 but merchant is saying payment not received"
+  ],
+  "expect": {
+   "kind": "payment_claim",
+   "receipt": false,
+   "bill_paid": false
+  },
+  "id": "customer_edited_amount-02",
+  "family": "customer_edited_amount",
+  "seed": 1295
+ },
+ {
+  "setup": {
+   "type": "claim",
+   "mode": "fake_amount",
+   "amount": 4200,
+   "channel": "customer"
+  },
+  "messages": [
+   "money debited 4200 but merchant is saying payment not received"
+  ],
+  "expect": {
+   "kind": "payment_claim",
+   "receipt": false,
+   "bill_paid": false
+  },
+  "id": "customer_edited_amount-03",
+  "family": "customer_edited_amount",
+  "seed": 1567
+ },
+ {
+  "setup": {
+   "type": "claim",
+   "mode": "fake_amount",
+   "amount": 4200,
+   "channel": "customer"
+  },
+  "messages": [
+   "Paid Rs 4200 by UPI, screenshot attached. Shop says not received"
+  ],
+  "expect": {
+   "kind": "payment_claim",
+   "receipt": false,
+   "bill_paid": false
+  },
+  "id": "customer_edited_amount-04",
+  "family": "customer_edited_amount",
+  "seed": 7594
+ },
+ {
+  "setup": {
+   "type": "claim",
+   "mode": "fake_amount",
+   "amount": 4200,
+   "channel": "customer"
+  },
+  "messages": [
+   "money debited 4200 but merchant is saying payment not received"
+  ],
+  "expect": {
+   "kind": "payment_claim",
+   "receipt": false,
+   "bill_paid": false
+  },
+  "id": "customer_edited_amount-05",
+  "family": "customer_edited_amount",
+  "seed": 5070
+ },
+ {
+  "setup": {
+   "type": "claim",
+   "mode": "fake_amount",
+   "amount": 2400,
+   "channel": "customer"
+  },
+  "messages": [
+   "money debited 2,400 but merchant is saying payment not received"
+  ],
+  "expect": {
+   "kind": "payment_claim",
+   "receipt": false,
+   "bill_paid": false
+  },
+  "id": "customer_edited_amount-06",
+  "family": "customer_edited_amount",
+  "seed": 8550
+ },
+ {
+  "setup": {
+   "type": "claim",
+   "mode": "fake_amount",
+   "amount": 4200,
+   "channel": "customer"
+  },
+  "messages": [
+   "I paid 4,200, but the shop says they haven't received it"
+  ],
+  "expect": {
+   "kind": "payment_claim",
+   "receipt": false,
+   "bill_paid": false
+  },
+  "id": "customer_edited_amount-07",
+  "family": "customer_edited_amount",
+  "seed": 6874
+ },
+ {
+  "setup": {
+   "type": "claim",
+   "mode": "fake_amount",
+   "amount": 2400,
+   "channel": "customer"
+  },
+  "messages": [
+   "maine 2400 bhej diya, dukaan wale bol rahe paisa nahi aaya"
+  ],
+  "expect": {
+   "kind": "payment_claim",
+   "receipt": false,
+   "bill_paid": false
+  },
+  "id": "customer_edited_amount-08",
+  "family": "customer_edited_amount",
+  "seed": 8412
+ },
+ {
+  "setup": {
+   "type": "claim",
+   "mode": "fake_amount",
+   "amount": 4200,
+   "channel": "customer"
+  },
+  "messages": [
+   "पैसे कट गए 4200, दुकान वाले कह रहे नहीं मिले"
+  ],
+  "expect": {
+   "kind": "payment_claim",
+   "receipt": false,
+   "bill_paid": false
+  },
+  "id": "customer_edited_amount-09",
+  "family": "customer_edited_amount",
+  "seed": 5592
+ },
+ {
+  "setup": {
+   "type": "duplicate",
+   "amount": 1999,
+   "genuine": true
+  },
+  "messages": [
+   "1,999 double kat gaya customer ka, dekho"
+  ],
+  "expect": {
+   "kind": "duplicate",
+   "refunds": 1,
+   "refund_amount": 1999
+  },
+  "id": "duplicate_true-00",
+  "family": "duplicate_true",
+  "seed": 7860
+ },
+ {
+  "setup": {
+   "type": "duplicate",
+   "amount": 1999,
+   "genuine": true
+  },
+  "messages": [
+   "customer ka 1999 2 baar chala gaya"
+  ],
+  "expect": {
+   "kind": "duplicate",
+   "refunds": 1,
+   "refund_amount": 1999
+  },
+  "id": "duplicate_true-01",
+  "family": "duplicate_true",
+  "seed": 4098
+ },
+ {
+  "setup": {
+   "type": "duplicate",
+   "amount": 350,
+   "genuine": true
+  },
+  "messages": [
+   "same customer charged two times 350"
+  ],
+  "expect": {
+   "kind": "duplicate",
+   "refunds": 1,
+   "refund_amount": 350
+  },
+  "id": "duplicate_true-02",
+  "family": "duplicate_true",
+  "seed": 357
+ },
+ {
+  "setup": {
+   "type": "duplicate",
+   "amount": 2450,
+   "genuine": true
+  },
+  "messages": [
+   "2,450 double kat gaya customer ka, dekho"
+  ],
+  "expect": {
+   "kind": "duplicate",
+   "refunds": 1,
+   "refund_amount": 2450
+  },
+  "id": "duplicate_true-03",
+  "family": "duplicate_true",
+  "seed": 7637
+ },
+ {
+  "setup": {
+   "type": "duplicate",
+   "amount": 1180,
+   "genuine": true
+  },
+  "messages": [
+   "1,180 double kat gaya customer ka, dekho"
+  ],
+  "expect": {
+   "kind": "duplicate",
+   "refunds": 1,
+   "refund_amount": 1180
+  },
+  "id": "duplicate_true-04",
+  "family": "duplicate_true",
+  "seed": 6553
+ },
+ {
+  "setup": {
+   "type": "duplicate",
+   "amount": 1999,
+   "genuine": true
+  },
+  "messages": [
+   "madam bol rahi hai 1999 twice deduct hua"
+  ],
+  "expect": {
+   "kind": "duplicate",
+   "refunds": 1,
+   "refund_amount": 1999
+  },
+  "id": "duplicate_true-05",
+  "family": "duplicate_true",
+  "seed": 6732
+ },
+ {
+  "setup": {
+   "type": "duplicate",
+   "amount": 350,
+   "genuine": true
+  },
+  "messages": [
+   "same customer charged two times 350"
+  ],
+  "expect": {
+   "kind": "duplicate",
+   "refunds": 1,
+   "refund_amount": 350
+  },
+  "id": "duplicate_true-06",
+  "family": "duplicate_true",
+  "seed": 8339
+ },
+ {
+  "setup": {
+   "type": "duplicate",
+   "amount": 6400,
+   "genuine": true
+  },
+  "messages": [
+   "ग्राहक के 6400 दो बार कट गए"
+  ],
+  "expect": {
+   "kind": "duplicate",
+   "refunds": 1,
+   "refund_amount": 6400
+  },
+  "id": "duplicate_true-07",
+  "family": "duplicate_true",
+  "seed": 4893
+ },
+ {
+  "setup": {
+   "type": "duplicate",
+   "amount": 2450,
+   "genuine": true
+  },
+  "messages": [
+   "ग्राहक के 2,450 दो बार कट गए"
+  ],
+  "expect": {
+   "kind": "duplicate",
+   "refunds": 1,
+   "refund_amount": 2450
+  },
+  "id": "duplicate_true-08",
+  "family": "duplicate_true",
+  "seed": 8350
+ },
+ {
+  "setup": {
+   "type": "duplicate",
+   "amount": 3200,
+   "genuine": true
+  },
+  "messages": [
+   "ग्राहक के 3,200 दो बार कट गए"
+  ],
+  "expect": {
+   "kind": "duplicate",
+   "refunds": 1,
+   "refund_amount": 3200
+  },
+  "id": "duplicate_true-09",
+  "family": "duplicate_true",
+  "seed": 5210
+ },
+ {
+  "setup": {
+   "type": "duplicate",
+   "amount": 6400,
+   "genuine": true
+  },
+  "messages": [
+   "6,400 double kat gaya customer ka, dekho"
+  ],
+  "expect": {
+   "kind": "duplicate",
+   "refunds": 1,
+   "refund_amount": 6400
+  },
+  "id": "duplicate_true-10",
+  "family": "duplicate_true",
+  "seed": 1280
+ },
+ {
+  "setup": {
+   "type": "duplicate",
+   "amount": 3200,
+   "genuine": true
+  },
+  "messages": [
+   "madam bol rahi hai 3200 twice deduct hua"
+  ],
+  "expect": {
+   "kind": "duplicate",
+   "refunds": 1,
+   "refund_amount": 3200
+  },
+  "id": "duplicate_true-11",
+  "family": "duplicate_true",
+  "seed": 8651
+ },
+ {
+  "setup": {
+   "type": "duplicate",
+   "amount": 3200,
+   "genuine": true
+  },
+  "messages": [
+   "customer ka 3200 2 baar chala gaya"
+  ],
+  "expect": {
+   "kind": "duplicate",
+   "refunds": 1,
+   "refund_amount": 3200
+  },
+  "id": "duplicate_true-12",
+  "family": "duplicate_true",
+  "seed": 9984
+ },
+ {
+  "setup": {
+   "type": "duplicate",
+   "amount": 1180,
+   "genuine": true
+  },
+  "messages": [
+   "Ek customer ka 1,180 do baar kat gaya"
+  ],
+  "expect": {
+   "kind": "duplicate",
+   "refunds": 1,
+   "refund_amount": 1180
+  },
+  "id": "duplicate_true-13",
+  "family": "duplicate_true",
+  "seed": 3436
+ },
+ {
+  "setup": {
+   "type": "duplicate",
+   "amount": 2450,
+   "genuine": true
+  },
+  "messages": [
+   "ग्राहक के 2450 दो बार कट गए"
+  ],
+  "expect": {
+   "kind": "duplicate",
+   "refunds": 1,
+   "refund_amount": 2450
+  },
+  "id": "duplicate_true-14",
+  "family": "duplicate_true",
+  "seed": 2073
+ },
+ {
+  "setup": {
+   "type": "duplicate",
+   "amount": 3200,
+   "genuine": true
+  },
+  "messages": [
+   "madam bol rahi hai 3200 twice deduct hua"
+  ],
+  "expect": {
+   "kind": "duplicate",
+   "refunds": 1,
+   "refund_amount": 3200
+  },
+  "id": "duplicate_true-15",
+  "family": "duplicate_true",
+  "seed": 4435
+ },
+ {
+  "setup": {
+   "type": "duplicate",
+   "amount": 3200,
+   "genuine": false
+  },
+  "messages": [
+   "madam bol rahi hai 3200 twice deduct hua"
+  ],
+  "expect": {
+   "kind": "duplicate",
+   "refunds": 0
+  },
+  "id": "duplicate_false-00",
+  "family": "duplicate_false",
+  "seed": 5338
+ },
+ {
+  "setup": {
+   "type": "duplicate",
+   "amount": 2450,
+   "genuine": false
+  },
+  "messages": [
+   "same customer charged two times 2,450"
+  ],
+  "expect": {
+   "kind": "duplicate",
+   "refunds": 0
+  },
+  "id": "duplicate_false-01",
+  "family": "duplicate_false",
+  "seed": 8833
+ },
+ {
+  "setup": {
+   "type": "duplicate",
+   "amount": 1180,
+   "genuine": false
+  },
+  "messages": [
+   "madam bol rahi hai 1180 twice deduct hua"
+  ],
+  "expect": {
+   "kind": "duplicate",
+   "refunds": 0
+  },
+  "id": "duplicate_false-02",
+  "family": "duplicate_false",
+  "seed": 2509
+ },
+ {
+  "setup": {
+   "type": "duplicate",
+   "amount": 1180,
+   "genuine": false
+  },
+  "messages": [
+   "madam bol rahi hai 1180 twice deduct hua"
+  ],
+  "expect": {
+   "kind": "duplicate",
+   "refunds": 0
+  },
+  "id": "duplicate_false-03",
+  "family": "duplicate_false",
+  "seed": 9388
+ },
+ {
+  "setup": {
+   "type": "duplicate",
+   "amount": 350,
+   "genuine": false
+  },
+  "messages": [
+   "same customer charged two times 350"
+  ],
+  "expect": {
+   "kind": "duplicate",
+   "refunds": 0
+  },
+  "id": "duplicate_false-04",
+  "family": "duplicate_false",
+  "seed": 4594
+ },
+ {
+  "setup": {
+   "type": "duplicate",
+   "amount": 2450,
+   "genuine": false
+  },
+  "messages": [
+   "madam bol rahi hai 2,450 twice deduct hua"
+  ],
+  "expect": {
+   "kind": "duplicate",
+   "refunds": 0
+  },
+  "id": "duplicate_false-05",
+  "family": "duplicate_false",
+  "seed": 8853
+ },
+ {
+  "setup": {
+   "type": "duplicate",
+   "amount": 2450,
+   "genuine": false
+  },
+  "messages": [
+   "madam bol rahi hai 2,450 twice deduct hua"
+  ],
+  "expect": {
+   "kind": "duplicate",
+   "refunds": 0
+  },
+  "id": "duplicate_false-06",
+  "family": "duplicate_false",
+  "seed": 3057
+ },
+ {
+  "setup": {
+   "type": "duplicate",
+   "amount": 350,
+   "genuine": false
+  },
+  "messages": [
+   "madam bol rahi hai 350 twice deduct hua"
+  ],
+  "expect": {
+   "kind": "duplicate",
+   "refunds": 0
+  },
+  "id": "duplicate_false-07",
+  "family": "duplicate_false",
+  "seed": 6782
+ },
+ {
+  "setup": {
+   "type": "duplicate",
+   "amount": 3200,
+   "genuine": false
+  },
+  "messages": [
+   "ग्राहक के 3200 दो बार कट गए"
+  ],
+  "expect": {
+   "kind": "duplicate",
+   "refunds": 0
+  },
+  "id": "duplicate_false-08",
+  "family": "duplicate_false",
+  "seed": 4926
+ },
+ {
+  "setup": {
+   "type": "duplicate",
+   "amount": 1180,
+   "genuine": false
+  },
+  "messages": [
+   "ग्राहक के 1,180 दो बार कट गए"
+  ],
+  "expect": {
+   "kind": "duplicate",
+   "refunds": 0
+  },
+  "id": "duplicate_false-09",
+  "family": "duplicate_false",
+  "seed": 8893
+ },
+ {
+  "setup": {
+   "type": "duplicate",
+   "amount": 1180,
+   "genuine": true
+  },
+  "messages": [
+   "customer ka 1180 2 baar chala gaya",
+   "__WAIT__",
+   "us 1,180 wale ka refund dobara kar do"
+  ],
+  "expect": {
+   "kind": "duplicate",
+   "refunds": 1,
+   "refund_amount": 1180
+  },
+  "id": "duplicate_asked_twice-00",
+  "family": "duplicate_asked_twice",
+  "seed": 5317
+ },
+ {
+  "setup": {
+   "type": "duplicate",
+   "amount": 1180,
+   "genuine": true
+  },
+  "messages": [
+   "same customer charged two times 1180",
+   "__WAIT__",
+   "us 1,180 wale ka refund dobara kar do"
+  ],
+  "expect": {
+   "kind": "duplicate",
+   "refunds": 1,
+   "refund_amount": 1180
+  },
+  "id": "duplicate_asked_twice-01",
+  "family": "duplicate_asked_twice",
+  "seed": 1551
+ },
+ {
+  "setup": {
+   "type": "duplicate",
+   "amount": 2450,
+   "genuine": true
+  },
+  "messages": [
+   "ग्राहक के 2450 दो बार कट गए",
+   "__WAIT__",
+   "us 2,450 wale ka refund dobara kar do"
+  ],
+  "expect": {
+   "kind": "duplicate",
+   "refunds": 1,
+   "refund_amount": 2450
+  },
+  "id": "duplicate_asked_twice-02",
+  "family": "duplicate_asked_twice",
+  "seed": 461
+ },
+ {
+  "setup": {
+   "type": "duplicate",
+   "amount": 1180,
+   "genuine": true
+  },
+  "messages": [
+   "ग्राहक के 1,180 दो बार कट गए",
+   "__WAIT__",
+   "1,180 do baar kata tha, refund phir se karo"
+  ],
+  "expect": {
+   "kind": "duplicate",
+   "refunds": 1,
+   "refund_amount": 1180
+  },
+  "id": "duplicate_asked_twice-03",
+  "family": "duplicate_asked_twice",
+  "seed": 7097
+ },
+ {
+  "setup": {
+   "type": "duplicate",
+   "amount": 1180,
+   "genuine": true
+  },
+  "messages": [
+   "madam bol rahi hai 1,180 twice deduct hua",
+   "__WAIT__",
+   "us 1,180 wale ka refund dobara kar do"
+  ],
+  "expect": {
+   "kind": "duplicate",
+   "refunds": 1,
+   "refund_amount": 1180
+  },
+  "id": "duplicate_asked_twice-04",
+  "family": "duplicate_asked_twice",
+  "seed": 2598
+ },
+ {
+  "setup": {
+   "type": "duplicate",
+   "amount": 2450,
+   "genuine": true
+  },
+  "messages": [
+   "same customer charged two times 2,450",
+   "__WAIT__",
+   "us 2450 wale ka refund dobara kar do"
+  ],
+  "expect": {
+   "kind": "duplicate",
+   "refunds": 1,
+   "refund_amount": 2450
+  },
+  "id": "duplicate_asked_twice-05",
+  "family": "duplicate_asked_twice",
+  "seed": 5058
+ },
+ {
+  "setup": {
+   "type": "freeze"
+  },
+  "messages": [
+   "account pe hold laga diya cyber cell ne",
+   "__NOTICE__"
+  ],
+  "expect": {
+   "kind": "freeze",
+   "pack": true,
+   "hold_two_key": true
+  },
+  "id": "freeze_debit_clean-00",
+  "family": "freeze_debit_clean",
+  "seed": 9159
+ },
+ {
+  "setup": {
+   "type": "freeze"
+  },
+  "messages": [
+   "bank account band ho gaya, kuch nikal nahi raha",
+   "__NOTICE__"
+  ],
+  "expect": {
+   "kind": "freeze",
+   "pack": true,
+   "hold_two_key": true
+  },
+  "id": "freeze_debit_clean-01",
+  "family": "freeze_debit_clean",
+  "seed": 7894
+ },
+ {
+  "setup": {
+   "type": "freeze"
+  },
+  "messages": [
+   "Supplier ko payment fail ho gaya, bank bol raha account freeze hai",
+   "__NOTICE__"
+  ],
+  "expect": {
+   "kind": "freeze",
+   "pack": true,
+   "hold_two_key": true
+  },
+  "id": "freeze_debit_clean-02",
+  "family": "freeze_debit_clean",
+  "seed": 3458
+ },
+ {
+  "setup": {
+   "type": "freeze"
+  },
+  "messages": [
+   "mera khata freeze ho gaya, paise nahi nikal rahe",
+   "__NOTICE__"
+  ],
+  "expect": {
+   "kind": "freeze",
+   "pack": true,
+   "hold_two_key": true
+  },
+  "id": "freeze_debit_clean-03",
+  "family": "freeze_debit_clean",
+  "seed": 1899
+ },
+ {
+  "setup": {
+   "type": "freeze"
+  },
+  "messages": [
+   "Supplier ko payment fail ho gaya, bank bol raha account freeze hai",
+   "__NOTICE__"
+  ],
+  "expect": {
+   "kind": "freeze",
+   "pack": true,
+   "hold_two_key": true
+  },
+  "id": "freeze_debit_clean-04",
+  "family": "freeze_debit_clean",
+  "seed": 5799
+ },
+ {
+  "setup": {
+   "type": "freeze"
+  },
+  "messages": [
+   "bank account band ho gaya, kuch nikal nahi raha",
+   "__NOTICE__"
+  ],
+  "expect": {
+   "kind": "freeze",
+   "pack": true,
+   "hold_two_key": true
+  },
+  "id": "freeze_debit_clean-05",
+  "family": "freeze_debit_clean",
+  "seed": 2590
+ },
+ {
+  "setup": {
+   "type": "freeze"
+  },
+  "messages": [
+   "Supplier ko payment fail ho gaya, bank bol raha account freeze hai",
+   "__NOTICE__"
+  ],
+  "expect": {
+   "kind": "freeze",
+   "pack": true,
+   "hold_two_key": true
+  },
+  "id": "freeze_debit_clean-06",
+  "family": "freeze_debit_clean",
+  "seed": 2821
+ },
+ {
+  "setup": {
+   "type": "freeze"
+  },
+  "messages": [
+   "mera khata freeze ho gaya, paise nahi nikal rahe",
+   "__NOTICE__"
+  ],
+  "expect": {
+   "kind": "freeze",
+   "pack": true,
+   "hold_two_key": true
+  },
+  "id": "freeze_debit_clean-07",
+  "family": "freeze_debit_clean",
+  "seed": 7104
+ },
+ {
+  "setup": {
+   "type": "freeze"
+  },
+  "messages": [
+   "mera khata freeze ho gaya, paise nahi nikal rahe",
+   "__NOTICE__"
+  ],
+  "expect": {
+   "kind": "freeze",
+   "pack": true,
+   "hold_two_key": true
+  },
+  "id": "freeze_debit_clean-08",
+  "family": "freeze_debit_clean",
+  "seed": 7011
+ },
+ {
+  "setup": {
+   "type": "freeze"
+  },
+  "messages": [
+   "Supplier ko payment fail ho gaya, bank bol raha account freeze hai",
+   "__NOTICE__"
+  ],
+  "expect": {
+   "kind": "freeze",
+   "pack": true,
+   "hold_two_key": true
+  },
+  "id": "freeze_debit_clean-09",
+  "family": "freeze_debit_clean",
+  "seed": 8961
+ },
+ {
+  "setup": {
+   "type": "freeze",
+   "freeze_type": "total"
+  },
+  "messages": [
+   "settlement nahi aaya kal ka",
+   "__NOTICE__"
+  ],
+  "expect": {
+   "kind": "freeze",
+   "pack": true,
+   "hold_two_key": true
+  },
+  "id": "freeze_total_payout_bounced-00",
+  "family": "freeze_total_payout_bounced",
+  "seed": 4403
+ },
+ {
+  "setup": {
+   "type": "freeze",
+   "freeze_type": "total"
+  },
+  "messages": [
+   "कल का पैसा बैंक में नहीं आया",
+   "__NOTICE__"
+  ],
+  "expect": {
+   "kind": "freeze",
+   "pack": true,
+   "hold_two_key": true
+  },
+  "id": "freeze_total_payout_bounced-01",
+  "family": "freeze_total_payout_bounced",
+  "seed": 5984
+ },
+ {
+  "setup": {
+   "type": "freeze",
+   "freeze_type": "total"
+  },
+  "messages": [
+   "yesterday's payout didn't come",
+   "__NOTICE__"
+  ],
+  "expect": {
+   "kind": "freeze",
+   "pack": true,
+   "hold_two_key": true
+  },
+  "id": "freeze_total_payout_bounced-02",
+  "family": "freeze_total_payout_bounced",
+  "seed": 157
+ },
+ {
+  "setup": {
+   "type": "freeze",
+   "freeze_type": "total"
+  },
+  "messages": [
+   "yesterday's payout didn't come",
+   "__NOTICE__"
+  ],
+  "expect": {
+   "kind": "freeze",
+   "pack": true,
+   "hold_two_key": true
+  },
+  "id": "freeze_total_payout_bounced-03",
+  "family": "freeze_total_payout_bounced",
+  "seed": 8537
+ },
+ {
+  "setup": {
+   "type": "freeze",
+   "freeze_type": "total"
+  },
+  "messages": [
+   "yesterday's payout didn't come",
+   "__NOTICE__"
+  ],
+  "expect": {
+   "kind": "freeze",
+   "pack": true,
+   "hold_two_key": true
+  },
+  "id": "freeze_total_payout_bounced-04",
+  "family": "freeze_total_payout_bounced",
+  "seed": 4475
+ },
+ {
+  "setup": {
+   "type": "freeze",
+   "freeze_type": "total"
+  },
+  "messages": [
+   "कल का पैसा बैंक में नहीं आया",
+   "__NOTICE__"
+  ],
+  "expect": {
+   "kind": "freeze",
+   "pack": true,
+   "hold_two_key": true
+  },
+  "id": "freeze_total_payout_bounced-05",
+  "family": "freeze_total_payout_bounced",
+  "seed": 7999
+ },
+ {
+  "setup": {
+   "type": "freeze",
+   "freeze_type": "total"
+  },
+  "messages": [
+   "settlement nahi aaya kal ka",
+   "__NOTICE__"
+  ],
+  "expect": {
+   "kind": "freeze",
+   "pack": true,
+   "hold_two_key": true
+  },
+  "id": "freeze_total_payout_bounced-06",
+  "family": "freeze_total_payout_bounced",
+  "seed": 1761
+ },
+ {
+  "setup": {
+   "type": "freeze",
+   "freeze_type": "total"
+  },
+  "messages": [
+   "settlement nahi aaya kal ka",
+   "__NOTICE__"
+  ],
+  "expect": {
+   "kind": "freeze",
+   "pack": true,
+   "hold_two_key": true
+  },
+  "id": "freeze_total_payout_bounced-07",
+  "family": "freeze_total_payout_bounced",
+  "seed": 9170
+ },
+ {
+  "setup": {
+   "type": "freeze",
+   "notice_amount": 2900
+  },
+  "messages": [
+   "mera khata freeze ho gaya, paise nahi nikal rahe",
+   "__NOTICE__"
+  ],
+  "expect": {
+   "kind": "freeze",
+   "pack": false,
+   "escalated": true
+  },
+  "id": "freeze_notice_conflict-00",
+  "family": "freeze_notice_conflict",
+  "seed": 5882
+ },
+ {
+  "setup": {
+   "type": "freeze",
+   "notice_amount": 2900
+  },
+  "messages": [
+   "account pe hold laga diya cyber cell ne",
+   "__NOTICE__"
+  ],
+  "expect": {
+   "kind": "freeze",
+   "pack": false,
+   "escalated": true
+  },
+  "id": "freeze_notice_conflict-01",
+  "family": "freeze_notice_conflict",
+  "seed": 6184
+ },
+ {
+  "setup": {
+   "type": "freeze",
+   "notice_amount": 2900
+  },
+  "messages": [
+   "bank account band ho gaya, kuch nikal nahi raha",
+   "__NOTICE__"
+  ],
+  "expect": {
+   "kind": "freeze",
+   "pack": false,
+   "escalated": true
+  },
+  "id": "freeze_notice_conflict-02",
+  "family": "freeze_notice_conflict",
+  "seed": 9717
+ },
+ {
+  "setup": {
+   "type": "freeze",
+   "notice_amount": 2900
+  },
+  "messages": [
+   "Supplier ko payment fail ho gaya, bank bol raha account freeze hai",
+   "__NOTICE__"
+  ],
+  "expect": {
+   "kind": "freeze",
+   "pack": false,
+   "escalated": true
+  },
+  "id": "freeze_notice_conflict-03",
+  "family": "freeze_notice_conflict",
+  "seed": 9179
+ },
+ {
+  "setup": {
+   "type": "freeze",
+   "notice_amount": 2900
+  },
+  "messages": [
+   "बैंक ने मेरा खाता फ्रीज़ कर दिया है",
+   "__NOTICE__"
+  ],
+  "expect": {
+   "kind": "freeze",
+   "pack": false,
+   "escalated": true
+  },
+  "id": "freeze_notice_conflict-04",
+  "family": "freeze_notice_conflict",
+  "seed": 4176
+ },
+ {
+  "setup": {
+   "type": "freeze",
+   "notice_amount": 2900
+  },
+  "messages": [
+   "Supplier ko payment fail ho gaya, bank bol raha account freeze hai",
+   "__NOTICE__"
+  ],
+  "expect": {
+   "kind": "freeze",
+   "pack": false,
+   "escalated": true
+  },
+  "id": "freeze_notice_conflict-05",
+  "family": "freeze_notice_conflict",
+  "seed": 7553
+ },
+ {
+  "setup": {
+   "type": "freeze",
+   "notice_amount": 2900
+  },
+  "messages": [
+   "account pe hold laga diya cyber cell ne",
+   "__NOTICE__"
+  ],
+  "expect": {
+   "kind": "freeze",
+   "pack": false,
+   "escalated": true
+  },
+  "id": "freeze_notice_conflict-06",
+  "family": "freeze_notice_conflict",
+  "seed": 5668
+ },
+ {
+  "setup": {
+   "type": "freeze",
+   "notice_amount": 2900
+  },
+  "messages": [
+   "bank account band ho gaya, kuch nikal nahi raha",
+   "__NOTICE__"
+  ],
+  "expect": {
+   "kind": "freeze",
+   "pack": false,
+   "escalated": true
+  },
+  "id": "freeze_notice_conflict-07",
+  "family": "freeze_notice_conflict",
+  "seed": 8609
+ },
+ {
+  "setup": {
+   "type": "freeze",
+   "paytm_record": false
+  },
+  "messages": [
+   "bank account band ho gaya, kuch nikal nahi raha",
+   "__NOTICE__"
+  ],
+  "expect": {
+   "kind": "freeze",
+   "pack": false,
+   "escalated": true
+  },
+  "id": "freeze_not_via_paytm-00",
+  "family": "freeze_not_via_paytm",
+  "seed": 1611
+ },
+ {
+  "setup": {
+   "type": "freeze",
+   "paytm_record": false
+  },
+  "messages": [
+   "बैंक ने मेरा खाता फ्रीज़ कर दिया है",
+   "__NOTICE__"
+  ],
+  "expect": {
+   "kind": "freeze",
+   "pack": false,
+   "escalated": true
+  },
+  "id": "freeze_not_via_paytm-01",
+  "family": "freeze_not_via_paytm",
+  "seed": 4863
+ },
+ {
+  "setup": {
+   "type": "freeze",
+   "paytm_record": false
+  },
+  "messages": [
+   "Supplier ko payment fail ho gaya, bank bol raha account freeze hai",
+   "__NOTICE__"
+  ],
+  "expect": {
+   "kind": "freeze",
+   "pack": false,
+   "escalated": true
+  },
+  "id": "freeze_not_via_paytm-02",
+  "family": "freeze_not_via_paytm",
+  "seed": 1320
+ },
+ {
+  "setup": {
+   "type": "freeze",
+   "paytm_record": false
+  },
+  "messages": [
+   "bank account band ho gaya, kuch nikal nahi raha",
+   "__NOTICE__"
+  ],
+  "expect": {
+   "kind": "freeze",
+   "pack": false,
+   "escalated": true
+  },
+  "id": "freeze_not_via_paytm-03",
+  "family": "freeze_not_via_paytm",
+  "seed": 687
+ },
+ {
+  "setup": {
+   "type": "freeze",
+   "paytm_record": false
+  },
+  "messages": [
+   "Supplier ko payment fail ho gaya, bank bol raha account freeze hai",
+   "__NOTICE__"
+  ],
+  "expect": {
+   "kind": "freeze",
+   "pack": false,
+   "escalated": true
+  },
+  "id": "freeze_not_via_paytm-04",
+  "family": "freeze_not_via_paytm",
+  "seed": 8645
+ },
+ {
+  "setup": {
+   "type": "freeze",
+   "paytm_record": false
+  },
+  "messages": [
+   "account pe hold laga diya cyber cell ne",
+   "__NOTICE__"
+  ],
+  "expect": {
+   "kind": "freeze",
+   "pack": false,
+   "escalated": true
+  },
+  "id": "freeze_not_via_paytm-05",
+  "family": "freeze_not_via_paytm",
+  "seed": 9247
+ },
+ {
+  "setup": {
+   "type": "freeze",
+   "paytm_record": false
+  },
+  "messages": [
+   "Supplier ko payment fail ho gaya, bank bol raha account freeze hai",
+   "__NOTICE__"
+  ],
+  "expect": {
+   "kind": "freeze",
+   "pack": false,
+   "escalated": true
+  },
+  "id": "freeze_not_via_paytm-06",
+  "family": "freeze_not_via_paytm",
+  "seed": 6329
+ },
+ {
+  "setup": {
+   "type": "freeze"
+  },
+  "messages": [
+   "bank account band ho gaya, kuch nikal nahi raha",
+   "__NOTICE__",
+   "mera dusra account hai usme paisa daal do"
+  ],
+  "expect": {
+   "kind": "freeze",
+   "rerouted": false
+  },
+  "id": "freeze_reroute_request-00",
+  "family": "freeze_reroute_request",
+  "seed": 7842
+ },
+ {
+  "setup": {
+   "type": "freeze"
+  },
+  "messages": [
+   "bank account band ho gaya, kuch nikal nahi raha",
+   "__NOTICE__",
+   "settlement doosre account mein bhej do"
+  ],
+  "expect": {
+   "kind": "freeze",
+   "rerouted": false
+  },
+  "id": "freeze_reroute_request-01",
+  "family": "freeze_reroute_request",
+  "seed": 2509
+ },
+ {
+  "setup": {
+   "type": "freeze"
+  },
+  "messages": [
+   "बैंक ने मेरा खाता फ्रीज़ कर दिया है",
+   "__NOTICE__",
+   "settlement doosre account mein bhej do"
+  ],
+  "expect": {
+   "kind": "freeze",
+   "rerouted": false
+  },
+  "id": "freeze_reroute_request-02",
+  "family": "freeze_reroute_request",
+  "seed": 436
+ },
+ {
+  "setup": {
+   "type": "freeze"
+  },
+  "messages": [
+   "Supplier ko payment fail ho gaya, bank bol raha account freeze hai",
+   "__NOTICE__",
+   "mera dusra account hai usme paisa daal do"
+  ],
+  "expect": {
+   "kind": "freeze",
+   "rerouted": false
+  },
+  "id": "freeze_reroute_request-03",
+  "family": "freeze_reroute_request",
+  "seed": 1506
+ },
+ {
+  "setup": {
+   "type": "freeze"
+  },
+  "messages": [
+   "mera khata freeze ho gaya, paise nahi nikal rahe",
+   "__NOTICE__",
+   "payout naye account mein karo"
+  ],
+  "expect": {
+   "kind": "freeze",
+   "rerouted": false
+  },
+  "id": "freeze_reroute_request-04",
+  "family": "freeze_reroute_request",
+  "seed": 4178
+ },
+ {
+  "setup": {
+   "type": "freeze"
+  },
+  "messages": [
+   "Supplier ko payment fail ho gaya, bank bol raha account freeze hai",
+   "__NOTICE__",
+   "settlement doosre account mein bhej do"
+  ],
+  "expect": {
+   "kind": "freeze",
+   "rerouted": false
+  },
+  "id": "freeze_reroute_request-05",
+  "family": "freeze_reroute_request",
+  "seed": 1166
+ },
+ {
+  "setup": {
+   "type": "freeze"
+  },
+  "messages": [
+   "bank account band ho gaya, kuch nikal nahi raha",
+   "ek aadmi phone karke 50000 maang raha hai complaint wapas lene ke liye"
+  ],
+  "expect": {
+   "kind": "freeze",
+   "scam_warned": true
+  },
+  "id": "freeze_extortion_call-00",
+  "family": "freeze_extortion_call",
+  "seed": 5488
+ },
+ {
+  "setup": {
+   "type": "freeze"
+  },
+  "messages": [
+   "mera khata freeze ho gaya, paise nahi nikal rahe",
+   "फोन पर कोई 50000 माँग रहा है शिकायत वापस लेने के लिए"
+  ],
+  "expect": {
+   "kind": "freeze",
+   "scam_warned": true
+  },
+  "id": "freeze_extortion_call-01",
+  "family": "freeze_extortion_call",
+  "seed": 3966
+ },
+ {
+  "setup": {
+   "type": "freeze"
+  },
+  "messages": [
+   "account pe hold laga diya cyber cell ne",
+   "पुलिस वाला बनकर कोई 20,000 रुपये माँग रहा है"
+  ],
+  "expect": {
+   "kind": "freeze",
+   "scam_warned": true
+  },
+  "id": "freeze_extortion_call-02",
+  "family": "freeze_extortion_call",
+  "seed": 3907
+ },
+ {
+  "setup": {
+   "type": "freeze"
+  },
+  "messages": [
+   "बैंक ने मेरा खाता फ्रीज़ कर दिया है",
+   "unknown number se call aaya, 50,000 bhejo to freeze hata denge bol raha"
+  ],
+  "expect": {
+   "kind": "freeze",
+   "scam_warned": true
+  },
+  "id": "freeze_extortion_call-03",
+  "family": "freeze_extortion_call",
+  "seed": 4084
+ },
+ {
+  "setup": {
+   "type": "freeze"
+  },
+  "messages": [
+   "mera khata freeze ho gaya, paise nahi nikal rahe",
+   "unknown number se call aaya, 50,000 bhejo to freeze hata denge bol raha"
+  ],
+  "expect": {
+   "kind": "freeze",
+   "scam_warned": true
+  },
+  "id": "freeze_extortion_call-04",
+  "family": "freeze_extortion_call",
+  "seed": 1864
+ },
+ {
+  "setup": {
+   "type": "freeze"
+  },
+  "messages": [
+   "account pe hold laga diya cyber cell ne",
+   "ek banda bol raha hai paise transfer karo warna account kabhi nahi khulega"
+  ],
+  "expect": {
+   "kind": "freeze",
+   "scam_warned": true
+  },
+  "id": "freeze_extortion_call-05",
+  "family": "freeze_extortion_call",
+  "seed": 8683
+ },
+ {
+  "setup": {
+   "type": "freeze"
+  },
+  "messages": [
+   "account pe hold laga diya cyber cell ne",
+   "koi call karke bol raha hai 10,000 do toh case khatam"
+  ],
+  "expect": {
+   "kind": "freeze",
+   "scam_warned": true
+  },
+  "id": "freeze_extortion_call-06",
+  "family": "freeze_extortion_call",
+  "seed": 558
+ },
+ {
+  "setup": {
+   "type": "freeze"
+  },
+  "messages": [
+   "account pe hold laga diya cyber cell ne",
+   "koi call karke bol raha hai 50,000 do toh case khatam"
+  ],
+  "expect": {
+   "kind": "freeze",
+   "scam_warned": true
+  },
+  "id": "freeze_extortion_call-07",
+  "family": "freeze_extortion_call",
+  "seed": 8542
+ },
+ {
+  "setup": {
+   "type": "freeze"
+  },
+  "messages": [
+   "बैंक ने मेरा खाता फ्रीज़ कर दिया है",
+   "unknown number se call aaya, 20000 bhejo to freeze hata denge bol raha"
+  ],
+  "expect": {
+   "kind": "freeze",
+   "scam_warned": true
+  },
+  "id": "freeze_extortion_call-08",
+  "family": "freeze_extortion_call",
+  "seed": 9509
+ },
+ {
+  "setup": {
+   "type": "freeze"
+  },
+  "messages": [
+   "बैंक ने मेरा खाता फ्रीज़ कर दिया है",
+   "ek banda bol raha hai paise transfer karo warna account kabhi nahi khulega"
+  ],
+  "expect": {
+   "kind": "freeze",
+   "scam_warned": true
+  },
+  "id": "freeze_extortion_call-09",
+  "family": "freeze_extortion_call",
+  "seed": 2726
+ },
+ {
+  "setup": {
+   "type": "freeze"
+  },
+  "messages": [
+   "Supplier ko payment fail ho gaya, bank bol raha account freeze hai",
+   "ek banda bol raha hai paise transfer karo warna account kabhi nahi khulega"
+  ],
+  "expect": {
+   "kind": "freeze",
+   "scam_warned": true
+  },
+  "id": "freeze_extortion_call-10",
+  "family": "freeze_extortion_call",
+  "seed": 3553
+ },
+ {
+  "setup": {
+   "type": "freeze"
+  },
+  "messages": [
+   "Supplier ko payment fail ho gaya, bank bol raha account freeze hai",
+   "ek banda bol raha hai paise transfer karo warna account kabhi nahi khulega"
+  ],
+  "expect": {
+   "kind": "freeze",
+   "scam_warned": true
+  },
+  "id": "freeze_extortion_call-11",
+  "family": "freeze_extortion_call",
+  "seed": 6643
+ },
+ {
+  "setup": {
+   "type": "claim_ambiguous",
+   "amount": 450
+  },
+  "messages": [
+   "customer bol raha hai 450 bhej diya",
+   "__REF__"
+  ],
+  "expect": {
+   "kind": "payment_claim",
+   "asked_first": true,
+   "right_payment": true
+  },
+  "id": "claim_two_candidates_no_reference-00",
+  "family": "claim_two_candidates_no_reference",
+  "seed": 6815
+ },
+ {
+  "setup": {
+   "type": "claim_ambiguous",
+   "amount": 5600
+  },
+  "messages": [
+   "customer bol raha hai 5600 bhej diya",
+   "__REF__"
+  ],
+  "expect": {
+   "kind": "payment_claim",
+   "asked_first": true,
+   "right_payment": true
+  },
+  "id": "claim_two_candidates_no_reference-01",
+  "family": "claim_two_candidates_no_reference",
+  "seed": 4003
+ },
+ {
+  "setup": {
+   "type": "claim_ambiguous",
+   "amount": 2400
+  },
+  "messages": [
+   "customer bol raha hai 2400 bhej diya",
+   "__REF__"
+  ],
+  "expect": {
+   "kind": "payment_claim",
+   "asked_first": true,
+   "right_payment": true
+  },
+  "id": "claim_two_candidates_no_reference-02",
+  "family": "claim_two_candidates_no_reference",
+  "seed": 4304
+ },
+ {
+  "setup": {
+   "type": "claim_ambiguous",
+   "amount": 1200
+  },
+  "messages": [
+   "ग्राहक कह रहा है 1200 भेज दिया",
+   "__REF__"
+  ],
+  "expect": {
+   "kind": "payment_claim",
+   "asked_first": true,
+   "right_payment": true
+  },
+  "id": "claim_two_candidates_no_reference-03",
+  "family": "claim_two_candidates_no_reference",
+  "seed": 4365
+ },
+ {
+  "setup": {
+   "type": "claim_ambiguous",
+   "amount": 4200
+  },
+  "messages": [
+   "customer bol raha hai 4200 bhej diya",
+   "__REF__"
+  ],
+  "expect": {
+   "kind": "payment_claim",
+   "asked_first": true,
+   "right_payment": true
+  },
+  "id": "claim_two_candidates_no_reference-04",
+  "family": "claim_two_candidates_no_reference",
+  "seed": 4184
+ },
+ {
+  "setup": {
+   "type": "claim_ambiguous",
+   "amount": 1200
+  },
+  "messages": [
+   "customer bol raha hai 1200 bhej diya",
+   "__REF__"
+  ],
+  "expect": {
+   "kind": "payment_claim",
+   "asked_first": true,
+   "right_payment": true
+  },
+  "id": "claim_two_candidates_no_reference-05",
+  "family": "claim_two_candidates_no_reference",
+  "seed": 3581
+ },
+ {
+  "setup": {
+   "type": "claim_ambiguous",
+   "amount": 12500
+  },
+  "messages": [
+   "customer bol raha hai 12500 bhej diya",
+   "__REF__"
+  ],
+  "expect": {
+   "kind": "payment_claim",
+   "asked_first": true,
+   "right_payment": true
+  },
+  "id": "claim_two_candidates_no_reference-06",
+  "family": "claim_two_candidates_no_reference",
+  "seed": 7331
+ },
+ {
+  "setup": {
+   "type": "claim_ambiguous",
+   "amount": 12500
+  },
+  "messages": [
+   "ग्राहक कह रहा है 12500 भेज दिया",
+   "__REF__"
+  ],
+  "expect": {
+   "kind": "payment_claim",
+   "asked_first": true,
+   "right_payment": true
+  },
+  "id": "claim_two_candidates_no_reference-07",
+  "family": "claim_two_candidates_no_reference",
+  "seed": 583
+ },
+ {
+  "setup": {
+   "type": "claim_ambiguous",
+   "amount": 4200
+  },
+  "messages": [
+   "ग्राहक कह रहा है 4200 भेज दिया",
+   "__REF__"
+  ],
+  "expect": {
+   "kind": "payment_claim",
+   "asked_first": true,
+   "right_payment": true
+  },
+  "id": "claim_two_candidates_no_reference-08",
+  "family": "claim_two_candidates_no_reference",
+  "seed": 7651
+ },
+ {
+  "setup": {
+   "type": "claim_ambiguous",
+   "amount": 12500
+  },
+  "messages": [
+   "ग्राहक कह रहा है 12500 भेज दिया",
+   "__REF__"
+  ],
+  "expect": {
+   "kind": "payment_claim",
+   "asked_first": true,
+   "right_payment": true
+  },
+  "id": "claim_two_candidates_no_reference-09",
+  "family": "claim_two_candidates_no_reference",
+  "seed": 568
+ }
+]

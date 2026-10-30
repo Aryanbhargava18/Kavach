@@ -1,0 +1,42 @@
+{
+  "name": "Kavach follow-ups (starter)",
+  "nodes": [
+    {
+      "parameters": { "httpMethod": "POST", "path": "kavach", "responseMode": "onReceived", "options": {} },
+      "name": "Kavach event",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [200, 300],
+      "webhookId": "kavach-events"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Turn a Kavach event into a message. Kavach has already decided; n8n only delivers.\nconst e = $input.first().json.body || $input.first().json;\nconst p = e.payload || {};\nconst lines = {\n  followup_scheduled: `Kavach will check back: ${p.summary || ''}`,\n  followup_fired: `Follow-up due (${p.via || 'scheduled'}): ${p.purpose || ''}`,\n  approval_needed: `Approval needed for ${p.action}: ${(p.approvers || []).join(' + ')}. ${p.reason || ''}`,\n  escalation_letter_approved: `Meena approved an escalation letter: ${p.summary || ''}`,\n  escalated_to_human: `Escalated to a human: ${p.summary || ''}`,\n  evidence_pack_issued: `Signed evidence pack issued: ${p.summary || ''}`,\n  payouts_held: `Payouts held in the Paytm settlement balance (two-key approved).`,\n  edd_assigned: `EDD review assigned: ${p.merchant} (${(p.signals || []).join(', ')})`,\n  refund_initiated: `Refund started: ${p.summary || ''}`,\n  case_event_recorded: `Case event recorded: ${p.summary || ''}`\n};\nconst toRisk = ['escalated_to_human', 'edd_assigned', 'approval_needed'].includes(e.event);\nreturn [{ json: {\n  event: e.event,\n  audience: toRisk ? 'paytm-risk' : 'merchant',\n  subject: `[Kavach] ${e.event.replace(/_/g, ' ')} · ${p.incident || p.mid || ''}`,\n  text: (lines[e.event] || JSON.stringify(p)) + `\\n\\nSynthetic demo event from Kavach at ${e.at}.`\n} }];"
+      },
+      "name": "Write the message",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [440, 300]
+    },
+    {
+      "parameters": {
+        "fromEmail": "kavach@example.com",
+        "toEmail": "={{ $json.audience === 'paytm-risk' ? 'risk-desk@example.com' : 'meena@example.com' }}",
+        "subject": "={{ $json.subject }}",
+        "emailFormat": "text",
+        "text": "={{ $json.text }}",
+        "options": {}
+      },
+      "name": "Send email",
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [680, 300]
+    }
+  ],
+  "connections": {
+    "Kavach event": { "main": [[{ "node": "Write the message", "type": "main", "index": 0 }]] },
+    "Write the message": { "main": [[{ "node": "Send email", "type": "main", "index": 0 }]] }
+  },
+  "settings": {},
+  "pinData": {}
+}

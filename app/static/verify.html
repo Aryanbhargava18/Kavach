@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Verify a Kavach evidence pack</title>
+<link rel="stylesheet" href="/static/app.css">
+<style>
+  body { background: var(--paper); }
+  .v { max-width: 640px; margin: 0 auto; padding: 28px 18px 60px; }
+  .v h1 { font-size: 28px; font-weight: 700; font-stretch: 112%; line-height: 1.1; margin: 10px 0 8px; }
+  .v p { color: var(--ink-2); margin-bottom: 12px; }
+  .result { border-radius: var(--r-md); padding: 18px; margin: 18px 0; color: #fff; }
+  .result b { font-size: 26px; font-stretch: 110%; display: block; }
+  .VALID { background: var(--leaf); } .TAMPERED, .INVALID_SIGNATURE, .REVOKED, .WRONG_CASE, .EXPIRED, .UNKNOWN { background: var(--sindoor); }
+  .actions { display: flex; gap: 8px; flex-wrap: wrap; margin: 14px 0; }
+  .actions button, .actions label { border: 1px solid var(--line-2); background: #fff; border-radius: 999px; padding: 7px 14px; font-weight: 600; cursor: pointer; font-size: 14px; }
+  .actions .primary { background: var(--ink); color: #fff; border-color: var(--ink); }
+  dl { display: grid; grid-template-columns: 140px 1fr; gap: 4px 12px; font-size: 14px; margin: 0; }
+  dt { color: var(--ink-3); } dd { margin: 0; overflow-wrap: anywhere; }
+  .fp { font-family: var(--mono); font-size: 12px; }
+  .limits { font-size: 13px; color: var(--ink-3); border-top: 1px solid var(--line); padding-top: 12px; margin-top: 18px; }
+</style></head>
+<body><div class="v">
+  <p style="color:var(--sindoor);font-size:13px">Synthetic demo verifier. Not a Paytm service.</p>
+  <h1>Is this the evidence pack Kavach issued?</h1>
+  <p>Checks the issuer's Ed25519 signature on the pack's manifest, then recomputes the SHA-256 of the PDF bytes and compares it with the signed hash. Change one digit in the PDF and the check fails.</p>
+  <div class="actions">
+    <button class="primary" id="orig">Check the original pack</button>
+    <button id="tamp">Check a copy with one digit changed</button>
+    <label>Upload a PDF<input type="file" accept="application/pdf" id="up" hidden></label>
+    <a href="/pack/__TOKEN__.pdf" target="_blank" style="align-self:center;font-size:14px">Open the pack</a>
+    <a href="/pack/__TOKEN__/tampered.pdf" target="_blank" style="align-self:center;font-size:14px">Open the edited copy</a>
+  </div>
+  <div id="out"></div>
+  <p class="limits">A VALID result proves only that this PDF is byte-identical to what this Kavach instance signed with its demo key. It does not prove the sale was genuine, that the merchant is innocent, that Paytm signed it, or that a court would admit it.</p>
+</div>
+<script>
+const T = "__TOKEN__";
+const show = (r) => {
+  const m = r.manifest || {};
+  document.getElementById("out").innerHTML = `<div class="result ${r.result}"><b>${r.result === "VALID" ? "Valid: untouched since issue" : r.result.replace("_", " ")}</b>${r.why}</div>
+  ${m.case_id ? `<dl><dt>Case</dt><dd>${m.case_id}</dd><dt>Issued</dt><dd>${m.issued_at}</dd><dt>Expires</dt><dd>${m.expires_at}</dd>
+  <dt>Signed facts</dt><dd>${Object.entries(m.facts || {}).map(([k, v]) => `${k}: ${v}`).join("<br>")}</dd>
+  <dt>Signed PDF hash</dt><dd class="fp">${m.pdf_sha256}</dd>${r.actual ? `<dt>This PDF's hash</dt><dd class="fp" style="color:var(--sindoor)">${r.actual}</dd>` : ""}
+  ${r.fingerprint ? `<dt>Demo key</dt><dd class="fp">${r.fingerprint}</dd>` : ""}</dl>` : ""}`;
+};
+document.getElementById("orig").onclick = () => fetch(`/api/verify/${T}`).then(r => r.json()).then(show);
+document.getElementById("tamp").onclick = () => fetch(`/api/verify/${T}?tampered=true`).then(r => r.json()).then(show);
+document.getElementById("up").onchange = (e) => { const f = new FormData(); f.append("file", e.target.files[0]); fetch(`/api/verify/${T}`, { method: "POST", body: f }).then(r => r.json()).then(show); };
+fetch(`/api/verify/${T}`).then(r => r.json()).then(show);
+</script></body></html>
