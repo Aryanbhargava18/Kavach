@@ -516,6 +516,41 @@ async def api_verify_upload(token: str, file: UploadFile = File(...)):
     return proof.verify(token, body[: 8 * 1024 * 1024], W().now)
 
 
+@app.get("/api/bankdesk/{token}")
+def bank_desk(token: str):
+    """What a bank grievance officer needs under SOP 10.1, pre-filled from the signed pack. This is the shape a
+    bank-side Paytm Intelligence (Pi) agent would consume. Signed facts are marked; everything else says who still owes it."""
+    rec, _ = proof.load(token)
+    if not rec:
+        raise HTTPException(404, "unknown pack")
+    m, case = rec["manifest"], rec.get("case", {})
+    inc = E().incidents.get(m["case_id"])
+    f = inc.facts if inc else {}
+    ev = f.get("case_events", {})
+    bank = (ev.get("bank_complaint") or {}).get("date")
+    due = None
+    if bank:
+        from datetime import date, timedelta
+        due = (date.fromisoformat(bank) + timedelta(days=7)).isoformat()
+    lien, pa = f.get("lien_request"), f.get("pa_upload")
+    F = m.get("facts", {})
+    items = [
+        {"item": "Disputed transaction identified", "value": f"UTR {F.get('UTR')} · {F.get('Amount')} · {F.get('Time')}", "status": "signed", "by": "Paytm record, in the signed pack"},
+        {"item": "Where the money went", "value": F.get("Settled", "—"), "status": "signed", "by": "Paytm settlement engine, in the signed pack"},
+        {"item": "Payment aggregator's settlement trail (SOP 9.5(ii))", "value": f"Drafted for Paytm's nodal officer ({pa['ticket_id']})" if pa else "Not prepared",
+         "status": "drafted" if pa else "missing", "by": "Paytm nodal officer uploads to CFCFRMS"},
+        {"item": "Account holder's written complaint at the branch (SOP 10.1(a))", "value": f"Received {bank} (Meena-reported)" if bank else "Branch to record the date on receipt",
+         "status": "reported" if bank else "pending", "by": "Branch"},
+        {"item": "Hold scope requested by the account holder", "value": f"Limit to {lien['disputed_text']} (her request, signed by her)" if lien else "No request yet",
+         "status": "requested" if lien else "pending", "by": "Account holder"},
+        {"item": "CDD/EDD on the account holder", "value": "The bank's own decision. Kavach does not do or pre-judge it.", "status": "bank", "by": "Bank"},
+        {"item": "Submit to the grievance module", "value": f"Due {due} (7 calendar days from the complaint)" if due else "Clock starts when the complaint is received",
+         "status": "pending", "by": "Bank grievance officer"},
+    ]
+    return {"case_id": m["case_id"], "route": [r["id"] for r in case.get("route", [])], "checklist": items,
+            "lien_request": lien["en"] if lien else None, "manifest": m, "provenance": "SYNTHETIC_DEMO"}
+
+
 @app.get("/verify/{token}", response_class=HTMLResponse)
 def verify_page(token: str):
     return HTMLResponse((STATIC / "verify.html").read_text().replace("__TOKEN__", html.escape(token)))

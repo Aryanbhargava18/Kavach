@@ -332,6 +332,18 @@ class Engine:
             m = w.send_message("merchant", "app", letter["en"], inc.id)
             self._phone("kavach", "✉️ Bank ke grievance officer ke liye chitthi taiyaar hai (aapke naam se). Neeche padh lijiye:\n\n" + letter["en"], inc.id)
             return {"msg_id": m["msg_id"], "summary": f"Escalation letter to {a['to']} approved by Meena; ready to hand in or email"}
+        if action == "prepare_pa_upload":
+            t = w.txn_by_id(a["txn_id"])
+            stl = next((x for x in w.settlements if x["batch_id"] == t.get("settlement_batch")), {})
+            n = inc.facts.get("notice", {})
+            row = {"ncrp_ack": n.get("ack_number"), "reported_utr": t["utr"], "txn_id": t["txn_id"], "amount": t["amount"],
+                   "txn_time": t["created_at"].isoformat(), "merchant_mid": MERCHANT["mid"], "merchant_vpa": MERCHANT["vpa"],
+                   "settlement_batch": stl.get("batch_id"), "settled_on": str(stl.get("credited_at") or "")[:10],
+                   "settlement_bank_utr": stl.get("bank_utr"), "beneficiary_account": "XX4471 (masked)",
+                   "sop_para": "9.5(ii)", "prepared_by": "Kavach (draft)", "provenance": "SYNTHETIC"}
+            tk = w.add_ops_ticket("nodal", f"CFCFRMS 9.5(ii) settlement details · UTR …{t['utr'][-4:]}", {"row": row}, inc.id, True)
+            inc.facts["pa_upload"] = {"ticket_id": tk["ticket_id"], "row": row}
+            return {"ticket_id": tk["ticket_id"], "summary": f"{tk['ticket_id']}: SOP 9.5(ii) settlement row ready for Paytm's nodal officer to review and upload (11 fields from the settlement engine)"}
         if action == "draft_lien_request":
             letter = self._lien_letter(inc, a)
             inc.facts["lien_request"] = letter
@@ -381,6 +393,11 @@ class Engine:
                 return a["event"] in inc.facts.get("case_events", {}), "Case event is on the incident record"
             if action == "draft_escalation":
                 return bool(inc.facts.get("escalation_letter")), "Letter stored on the case"
+            if action == "prepare_pa_upload":
+                tk = next((x for x in w.ops_queue if x["ticket_id"] == res.get("ticket_id")), None)
+                t = w.txn_by_id(a["txn_id"])
+                ok = bool(tk) and tk["status"] == "AWAITING_HUMAN" and tk["detail"]["row"]["reported_utr"] == t["utr"]
+                return ok, "Nodal queue has the draft, awaiting a human; its UTR matches the switch record"
             if action == "draft_lien_request":
                 L = inc.facts.get("lien_request") or {}
                 t = w.txn_by_id(inc.facts.get("disputed_txn", ""))

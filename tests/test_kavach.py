@@ -449,3 +449,23 @@ def test_lien_request_after_pack_needs_meena_and_matches_record():
         assert "proposed, not yet in force" in L["en"] and "Not legal advice" in L["en"]
         assert any(s["kind"] == "verify" and s["action"] == "draft_lien_request" and s["ok"] for s in inc.steps)
     run(go())
+
+
+def test_paytm_nodal_upload_and_bank_desk():
+    async def go():
+        from fastapi.testclient import TestClient
+        from app import main
+        with TestClient(main.app) as c:
+            w, e = main.W(), main.E()
+            r = w.inject_freeze()
+            inc = await e.merchant_message("Bank ka SMS aur police ka notice yeh hai. Account mein 3.1 lakh atak gaye.", doc_id=r["doc_id"])
+            pa = inc.facts["pa_upload"]
+            tk = next(t for t in w.ops_queue if t["ticket_id"] == pa["ticket_id"])
+            assert tk["status"] == "AWAITING_HUMAN" and pa["row"]["sop_para"] == "9.5(ii)"
+            assert pa["row"]["reported_utr"] == w.txn_by_id(inc.facts["disputed_txn"])["utr"]
+            await e.approve(inc.id, "merchant")                     # lien request
+            d = c.get(f"/api/bankdesk/{inc.facts['pack']['token']}").json()
+            st = {x["item"]: x["status"] for x in d["checklist"]}
+            assert st["Disputed transaction identified"] == "signed" and st["CDD/EDD on the account holder"] == "bank"
+            assert st["Hold scope requested by the account holder"] == "requested" and d["lien_request"]
+    run(go())

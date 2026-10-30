@@ -16,6 +16,15 @@
   dl { display: grid; grid-template-columns: 140px 1fr; gap: 4px 12px; font-size: 14px; margin: 0; }
   dt { color: var(--ink-3); } dd { margin: 0; overflow-wrap: anywhere; }
   .fp { font-family: var(--mono); font-size: 12px; }
+  .desk { border-top: 1px solid var(--line); margin-top: 22px; padding-top: 6px; }
+  .desk h2 { font-size: 21px; margin: 12px 0 6px; }
+  .desk ol { list-style: none; padding: 0; margin: 10px 0; display: grid; gap: 10px; }
+  .desk li { background: #fff; border: 1px solid var(--line); border-radius: 12px; padding: 10px 12px; font-size: 14px; line-height: 1.4; }
+  .desk li small { display: block; color: var(--ink-3); font-size: 12px; margin-top: 2px; }
+  .tag { display: inline-block; font-size: 11px; font-weight: 700; border-radius: 999px; padding: 1px 8px; margin-right: 8px; background: #E8ECF4; color: var(--ink-2); }
+  .tag.signed { background: #D9F6E9; color: #0E7A4E; } .tag.drafted, .tag.requested, .tag.reported { background: #E3ECFF; color: #0D2A63; }
+  .tag.pending, .tag.missing { background: #FFF1D6; color: #8A5A00; }
+  .desk pre { white-space: pre-wrap; font-size: 12.5px; background: #fff; border: 1px solid var(--line); border-radius: 12px; padding: 12px; }
   .limits { font-size: 13px; color: var(--ink-3); border-top: 1px solid var(--line); padding-top: 12px; margin-top: 18px; }
 </style></head>
 <body><div class="v">
@@ -30,6 +39,13 @@
     <a href="/pack/__TOKEN__/tampered.pdf" target="_blank" style="align-self:center;font-size:14px">Open the edited copy</a>
   </div>
   <div id="out"></div>
+  <section id="desk" class="desk" hidden>
+    <h2>For the bank's grievance officer</h2>
+    <p>SOP 10.1 asks the bank to check the case and submit it within 7 days. Here is what is already established, and who still owes the rest. This is the input a bank-side Paytm Intelligence agent would read.</p>
+    <ol id="check"></ol>
+    <div class="actions"><button id="json">Download machine-readable case (JSON)</button><button id="lien" hidden>Read the account holder's request</button></div>
+    <pre id="lientext" hidden></pre>
+  </section>
   <p class="limits">A VALID result proves only that this PDF is byte-identical to what this Kavach instance signed with its demo key. It does not prove the sale was genuine, that the merchant is innocent, that Paytm signed it, or that a court would admit it.</p>
 </div>
 <script>
@@ -46,4 +62,13 @@ document.getElementById("orig").onclick = () => fetch(`/api/verify/${T}`).then(r
 document.getElementById("tamp").onclick = () => fetch(`/api/verify/${T}?tampered=true`).then(r => r.json()).then(show);
 document.getElementById("up").onchange = (e) => { const f = new FormData(); f.append("file", e.target.files[0]); fetch(`/api/verify/${T}`, { method: "POST", body: f }).then(r => r.json()).then(show); };
 fetch(`/api/verify/${T}`).then(r => r.json()).then(show);
+const TAG = { signed: "Signed", drafted: "Drafted", reported: "Reported", requested: "Requested", pending: "Pending", missing: "Missing", bank: "Bank decides" };
+const esc = (x) => String(x ?? "").replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+fetch(`/api/bankdesk/${T}`).then(r => r.ok ? r.json() : null).then((d) => {
+  if (!d) return;
+  document.getElementById("desk").hidden = false;
+  document.getElementById("check").innerHTML = d.checklist.map((c) => `<li><span class="tag ${c.status}">${TAG[c.status] || c.status}</span><b>${esc(c.item)}</b><br>${esc(c.value)}<small>${esc(c.by)}</small></li>`).join("");
+  document.getElementById("json").onclick = () => { const a = document.createElement("a"); a.href = URL.createObjectURL(new Blob([JSON.stringify(d, null, 2)], { type: "application/json" })); a.download = `kavach-${d.case_id}.json`; a.click(); };
+  if (d.lien_request) { const b = document.getElementById("lien"); b.hidden = false; b.onclick = () => { const p = document.getElementById("lientext"); p.textContent = d.lien_request; p.hidden = !p.hidden; }; }
+});
 </script></body></html>

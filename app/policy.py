@@ -252,6 +252,13 @@ def _evidence(world, args, ctx):
     return allow("One exact Paytm record; amounts agree.", "P10")
 
 
+def _pa_upload(world, args, ctx):
+    t = world.txn_by_id(args.get("txn_id", ""))
+    if not t or t["payee_vpa"] != MERCHANT["vpa"] or not t.get("settlement_batch"):
+        return deny("P10", "No settled Paytm record for this payment, so there is no settlement trail to report.")
+    return allow("Draft only: it goes to Paytm's nodal officer, who reviews and uploads. Kavach never submits to CFCFRMS.", "P7")
+
+
 def _human_only(world, args, ctx):
     return deny("P7", "Under the MHA/I4C SOP the account holder approaches the bank branch, and the bank submits the grievance. Kavach prepares; humans file.")
 
@@ -284,6 +291,7 @@ _CHECKS = {
     "record_case_event": _case_event,
     "draft_escalation": _draft,
     "draft_lien_request": _draft,
+    "prepare_pa_upload": _pa_upload,
     "issue_verified_receipt": _receipt,
     "replay_soundbox": _soundbox,
     "request_payment": _request_payment,

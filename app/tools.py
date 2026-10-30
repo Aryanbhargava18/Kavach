@@ -63,6 +63,8 @@ WRITE_TOOLS: dict[str, dict[str, Any]] = {
                           "params": {"event": "string", "date": "string"}},
     "draft_escalation": {"desc": "Draft an escalation letter for Meena to sign (e.g. to the bank's grievance officer). Never sent without her approval.",
                          "params": {"to": "string", "reason": "string"}},
+    "prepare_pa_upload": {"desc": "Prepare Paytm's own SOP 9.5(ii) duty as payment aggregator: the settlement details for a reported payment, for Paytm's nodal officer to review and upload to CFCFRMS. Kavach never uploads.",
+                          "params": {"txn_id": "string"}},
     "draft_lien_request": {"desc": "Draft a request, in Meena's name, asking her bank to limit the hold to the disputed amount and to tell her the reason, officer and removal process. Never sent without her approval.",
                            "params": {"reason": "string?"}},
     "escalate_to_human": {"desc": "Hand the incident to a Paytm human (Support/Risk).", "params": {"queue": "string", "summary": "string"}},

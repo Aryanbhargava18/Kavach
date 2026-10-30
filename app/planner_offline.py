@@ -792,6 +792,9 @@ class OfflinePlanner:
                                              "location_source": stl[0]["batch_id"] if settled else None})
         inc.facts["route"] = r["rules"]
         e.tick_plan(inc, "Route under the MHA/I4C SOP")
+        if any(x["id"] == "PA-SETTLED-9.5.ii" for x in r["rules"]):
+            # Paytm's own SOP duty as the payment aggregator: upload the settlement trail for the reported payment.
+            await e.act(inc, "prepare_pa_upload", {"txn_id": txn["txn_id"]})
         locked = inc.facts.get("locked_stated")
         if locked:
             await self.think(inc, f"Disputed: {rs(st['amount'])} (Paytm record). Locked: {rs(locked)} (merchant's own statement, T3). "

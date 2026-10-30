@@ -20,7 +20,7 @@
     route_sop: "policy", get_sop_clocks: "policy", ask_sop: "policy", read_document: "policy", parse_notice: "policy" };
   const A2N = { reconcile_payment: "ledger", initiate_refund: "refund", request_settlement_hold: "payout", change_settlement_account: "payout",
     send_customer_update_simulated: "customer", issue_verified_receipt: "customer", request_payment: "customer", generate_evidence_pack: "policy",
-    create_support_case: "policy", record_case_event: "policy", draft_escalation: "policy", draft_lien_request: "policy", escalate_to_human: "policy", replay_soundbox: null };
+    create_support_case: "policy", record_case_event: "policy", draft_escalation: "policy", draft_lien_request: "policy", prepare_pa_upload: "payout", escalate_to_human: "policy", replay_soundbox: null };
   const COL2N = { switch: "switch", ledger: "ledger", refund: "refund", settlement: "payout", claim: "customer" };
   const TVERB = { read_screenshot: "Reading the customer's screenshot", lookup_transaction: "Finding the payment at the UPI switch",
     get_payment_status: "Asking the UPI switch what really happened", get_merchant_ledger: "Checking Meena's billing app",
@@ -30,7 +30,7 @@
     read_document: "Reading the bank notice", parse_notice: "Pulling the facts out of the notice", route_sop: "Finding the right step in the cyber-fraud SOP",
     get_sop_clocks: "Working out the deadlines", ask_sop: "Looking it up in the SOP", check_sale_pattern: "Comparing with her usual sales",
     get_own_payment_declines: "Checking her own payments through the Paytm app", get_risk_signals: "Checking with Paytm Risk before saying anything" };
-  const FIXES = new Set(["draft_lien_request", "reconcile_payment", "issue_verified_receipt", "initiate_refund", "request_settlement_hold", "request_payment", "generate_evidence_pack", "send_customer_update_simulated"]);
+  const FIXES = new Set(["prepare_pa_upload", "draft_lien_request", "reconcile_payment", "issue_verified_receipt", "initiate_refund", "request_settlement_hold", "request_payment", "generate_evidence_pack", "send_customer_update_simulated"]);
 
   const ST = { nodeState: {}, activeNode: null, seenM: new Set(), billStatus: {}, sig: "", boxTimer: null, q: [], qBusy: false };
 
@@ -226,6 +226,8 @@
           <div class="bill-note">Payouts still land in this account, but she can't take money out. ${S.world && S.world.settlement_config && S.world.settlement_config.paused ? "New payouts now held with Paytm (two keys)." : "Holding new payouts with Paytm needs Meena and Paytm Risk."}</div></div>`);
       if (inc.decisive && inc.decisive.label === "Why Kavach held back") parts.push(`<div class="bill overhold"><div class="bill-top"><b>Details withheld (P17)</b></div>
           <div class="bill-note">${esc(inc.decisive.text)}. Meena got only Legal's neutral message. Paytm Risk decides; this is not a verdict on her.</div></div>`);
+      if (f.pa_upload) parts.push(`<div class="bill small"><div class="bill-top"><b>Paytm's own duty, drafted</b></div>
+          <div class="bill-note">SOP 9.5(ii) settlement row for UTR …${esc(String(f.pa_upload.row.reported_utr).slice(-4))} is in Paytm's nodal queue (${esc(f.pa_upload.ticket_id)}), waiting for an officer. Kavach never uploads.</div></div>`);
       if (f.lien_request) parts.push(`<div class="bill"><div class="bill-top"><b>Request to limit the hold</b><span class="bill-amt">${esc(f.lien_request.disputed_text)}</span></div>
           <div class="bill-note">In Meena's name, approved by her: hold only the disputed amount, tell her the reason, officer and removal process.</div>
           <details class="bill-note"><summary>Basis cited (${f.lien_request.basis.length})</summary><ul>${f.lien_request.basis.map((b) => `<li>${esc(b)}</li>`).join("")}</ul></details></div>`);
