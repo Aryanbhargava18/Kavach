@@ -737,3 +737,12 @@ $("#open-eval").onclick = async () => {
 };
 
 boot();
+
+// ===================================================================== judge's phone
+$("#open-phone").onclick = async () => {
+  const x = await fetch("/api/integrations").then((r) => r.json()).catch(() => ({}));
+  const url = (x.public_url || location.origin).replace(/\/$/, "") + "/m";
+  $("#phone-qr").src = `/api/qr?data=${encodeURIComponent(url)}`;
+  $("#phone-url").textContent = url;
+  $("#phone-dialog").showModal();
+};

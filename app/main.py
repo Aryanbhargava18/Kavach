@@ -89,6 +89,12 @@ def index():
     return FileResponse(STATIC / "index.html")
 
 
+@app.get("/m", response_class=HTMLResponse)
+def merchant_phone():
+    """Meena's phone, for a judge's own device: scan the QR on the Live screen (needs `make lan`)."""
+    return FileResponse(STATIC / "m.html")
+
+
 @app.get("/api/state")
 def api_state():
     e = E()
@@ -119,7 +125,7 @@ async def skip_to_payout():
 @app.get("/api/integrations")
 def integrations():
     from . import automation, sop_kb
-    return {"planner": planner_mode(), "sarvam": sarvam.available(), "ocr": shots.ocr_available(),
+    return {"planner": planner_mode(), "sarvam": sarvam.available(), "ocr": shots.ocr_available(), "public_url": PUBLIC_URL,
             "n8n": automation.n8n_configured(), "cognee": sop_kb.cognee_configured(),
             "models": {"chat": sarvam.CHAT_MODEL, "stt": sarvam.STT_MODEL, "tts": sarvam.TTS_MODEL}}
 
@@ -352,8 +358,9 @@ def doc_png(doc_id: str):
 @app.get("/api/qr")
 def qr(data: str):
     import io, qrcode
-    if not data.startswith("upi://pay?") or len(data) > 300:
-        raise HTTPException(400, "only UPI payment URIs")
+    phone = PUBLIC_URL.rstrip("/") + "/m"     # the one non-UPI QR: this server's own Meena's-phone page
+    if not (data.startswith("upi://pay?") or data == phone) or len(data) > 300:
+        raise HTTPException(400, "only UPI payment URIs or this server's phone page")
     buf = io.BytesIO(); qrcode.make(data, box_size=6, border=2).save(buf, "PNG")
     return Response(buf.getvalue(), media_type="image/png")
 
