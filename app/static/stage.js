@@ -16,10 +16,11 @@
   };
   const T2N = { read_screenshot: "customer", lookup_transaction: "switch", get_payment_status: "switch", find_duplicate_payments: "switch", check_sale_pattern: "switch",
     get_merchant_ledger: "ledger", get_refund_status: "refund", get_settlement_status: "payout", get_bank_signal: "payout", get_incident_policy: "policy",
+    get_own_payment_declines: "switch", get_risk_signals: "policy",
     route_sop: "policy", get_sop_clocks: "policy", ask_sop: "policy", read_document: "policy", parse_notice: "policy" };
   const A2N = { reconcile_payment: "ledger", initiate_refund: "refund", request_settlement_hold: "payout", change_settlement_account: "payout",
     send_customer_update_simulated: "customer", issue_verified_receipt: "customer", request_payment: "customer", generate_evidence_pack: "policy",
-    create_support_case: "policy", record_case_event: "policy", draft_escalation: "policy", escalate_to_human: "policy", replay_soundbox: null };
+    create_support_case: "policy", record_case_event: "policy", draft_escalation: "policy", draft_lien_request: "policy", escalate_to_human: "policy", replay_soundbox: null };
   const COL2N = { switch: "switch", ledger: "ledger", refund: "refund", settlement: "payout", claim: "customer" };
   const TVERB = { read_screenshot: "Reading the customer's screenshot", lookup_transaction: "Finding the payment at the UPI switch",
     get_payment_status: "Asking the UPI switch what really happened", get_merchant_ledger: "Checking Meena's billing app",
@@ -27,8 +28,9 @@
     get_soundbox_log: "Checking what the Soundbox announced", get_incident_policy: "Loading the rules for this kind of problem",
     find_duplicate_payments: "Looking for a double charge", get_bank_signal: "Checking what Paytm can see of her bank",
     read_document: "Reading the bank notice", parse_notice: "Pulling the facts out of the notice", route_sop: "Finding the right step in the cyber-fraud SOP",
-    get_sop_clocks: "Working out the deadlines", ask_sop: "Looking it up in the SOP", check_sale_pattern: "Comparing with her usual sales" };
-  const FIXES = new Set(["reconcile_payment", "issue_verified_receipt", "initiate_refund", "request_settlement_hold", "request_payment", "generate_evidence_pack", "send_customer_update_simulated"]);
+    get_sop_clocks: "Working out the deadlines", ask_sop: "Looking it up in the SOP", check_sale_pattern: "Comparing with her usual sales",
+    get_own_payment_declines: "Checking her own payments through the Paytm app", get_risk_signals: "Checking with Paytm Risk before saying anything" };
+  const FIXES = new Set(["draft_lien_request", "reconcile_payment", "issue_verified_receipt", "initiate_refund", "request_settlement_hold", "request_payment", "generate_evidence_pack", "send_customer_update_simulated"]);
 
   const ST = { nodeState: {}, activeNode: null, seenM: new Set(), billStatus: {}, sig: "", boxTimer: null, q: [], qBusy: false };
 
@@ -117,6 +119,7 @@
   function captionFor(s, inc) {
     switch (s.kind) {
       case "intake":
+        if (s.sender === "monitor" && s.engine === "psp-monitor") return ["Meena's bank just refused her own payment.", s.text + " · nobody has told Meena what it means", "warn", 2800];
         if (s.sender === "monitor" && s.engine === "payout-monitor") return ["Meena's bank just sent her payout back.", s.text + " · nobody has told Meena", "warn", 2800];
         if (s.sender === "monitor") return ["Meena's billing app never heard about this payment.", s.text, "warn", 2600];
         return [s.sender === "customer" ? `${(inc.customer && inc.customer.name) || "A customer"} writes in: “${firstSentence(s.text, 90)}”` : `Meena: “${firstSentence(s.text, 90)}”`, "Kavach owns this until it's fixed.", "", 1800];
@@ -215,6 +218,15 @@
           <div class="bill-who">Sent back by Meena's bank${f.proactive ? ", found by Kavach before anyone complained" : ""}</div><span class="bill-st UNPAID">Returned · account frozen</span>
           <div class="bill-note">${held ? "New payouts held in Paytm's settlement balance (Meena + Paytm Risk approved). Nothing moved to another account." : "Back in Paytm's settlement balance. Holding new payouts needs Meena and Paytm Risk."}</div></div>`);
       }
+      const own = inc.recon && inc.recon.own;
+      if (own) parts.push(`<div class="bill focus"><div class="bill-top"><b>Her payment to ${esc(own.note || "supplier")}</b><span class="bill-amt">${rs(own.amount)}</span></div>
+          <div class="bill-who">From her bank account, through the Paytm app · found by Kavach</div><span class="bill-st UNPAID">Declined · ${esc(own.ref || "YE")} · debit frozen</span>
+          <div class="bill-note">Payouts still land in this account, but she can't take money out. ${S.world && S.world.settlement_config && S.world.settlement_config.paused ? "New payouts now held with Paytm (two keys)." : "Holding new payouts with Paytm needs Meena and Paytm Risk."}</div></div>`);
+      if (inc.decisive && inc.decisive.label === "Why Kavach held back") parts.push(`<div class="bill overhold"><div class="bill-top"><b>Details withheld (P17)</b></div>
+          <div class="bill-note">${esc(inc.decisive.text)}. Meena got only Legal's neutral message. Paytm Risk decides; this is not a verdict on her.</div></div>`);
+      if (f.lien_request) parts.push(`<div class="bill"><div class="bill-top"><b>Request to limit the hold</b><span class="bill-amt">${esc(f.lien_request.disputed_text)}</span></div>
+          <div class="bill-note">In Meena's name, approved by her: hold only the disputed amount, tell her the reason, officer and removal process.</div>
+          <details class="bill-note"><summary>Basis cited (${f.lien_request.basis.length})</summary><ul>${f.lien_request.basis.map((b) => `<li>${esc(b)}</li>`).join("")}</ul></details></div>`);
       const disputed = f.disputed_txn && inc.recon && inc.recon.switch && inc.recon.switch.amount, locked = f.locked_stated;   // T1: the switch record, never the notice
       if (disputed && locked && locked > disputed) {
         const pct = Math.max(1.5, Math.min(100, (disputed / locked) * 100));
@@ -266,9 +278,11 @@
     let h = "";
     if (inc.pending && inc.pending.approvers && inc.pending.approvers.length) {
       h = `Waiting for <b>${inc.pending.approvers.map((a) => APPROVER[a] || a).join(" and ")}</b> to approve. Kavach won't ${esc(VERB[inc.pending.action] || inc.pending.action.replace(/_/g, " "))} on its own.`;
-    } else if (inc.kind === "freeze" && inc.facts && inc.facts.proactive && steps.some((s) => s.kind === "action" && s.action === "notify_merchant")) {
+    } else if (inc.kind === "freeze" && inc.facts && inc.facts.proactive && !(inc.decisive && inc.decisive.label === "Why Kavach held back") && steps.some((s) => s.kind === "action" && s.action === "notify_merchant")) {
       const warned = steps.find((s) => s.kind === "action" && s.action === "notify_merchant");
-      h = `Meena warned in <b class="good">${dur(secs(inc.created_at, warned.at))}</b>, before her first supplier payment bounced.`;
+      const viaPsp = steps.some((x) => x.kind === "intake" && x.engine === "psp-monitor");
+      h = viaPsp ? `Explained to Meena in <b class="good">${dur(secs(inc.created_at, warned.at))}</b>, the moment her own payment bounced, before more payouts got trapped.`
+        : `Meena warned in <b class="good">${dur(secs(inc.created_at, warned.at))}</b>, before her first supplier payment bounced.`;
       if (inc.money && inc.money.amount) h += ` <b class="amt-b">${rs(inc.money.amount)}</b> ${esc(inc.money.label)}.`;
       if (denies) h += ` Stopped <b class="bad">${denies}</b> unsafe step${denies > 1 ? "s" : ""}.`;
     } else if (fix) {
@@ -321,7 +335,7 @@
 
   // ------------------------------------------------------------------ phases: detect → investigate → reconcile → act → verify → follow up
   const ACT = new Set(["reconcile_payment", "issue_verified_receipt", "request_payment", "initiate_refund", "request_settlement_hold", "generate_evidence_pack",
-    "replay_soundbox", "record_case_event", "change_settlement_account", "draft_escalation"]);
+    "replay_soundbox", "record_case_event", "change_settlement_account", "draft_escalation", "draft_lien_request"]);
   const PH = ["detect", "investigate", "reconcile", "act", "verify", "follow"];
   function phaseOf(s) {
     switch (s.kind) {

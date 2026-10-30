@@ -394,3 +394,58 @@ def test_debit_freeze_stays_invisible_to_the_payout_watcher():
         await e.tick((w.next_settlement - w.now).total_seconds() + 60)
         assert w.settlements[-1]["status"] == "SETTLED" and not e.incidents   # honest limit: no signal, no case
     run(go())
+
+
+def test_debit_freeze_caught_from_her_own_declined_payment():
+    """Debit-only freeze: payouts still SETTLE, so the payout watcher is blind. Her own UPI payment through the
+    Paytm app comes back YE, and the PSP watcher opens the case before she reports anything."""
+    async def go():
+        w = World(); e = Engine(w)
+        w.inject_freeze(freeze_type="debit")
+        assert w.bank_signal()["last_return"] is None
+        p = w.merchant_pays(18000, "Gupta Traders")
+        assert p["status"] == "DECLINED" and p["code"] == "YE"
+        await e.tick(1)
+        inc = next(iter(e.incidents.values()))
+        assert inc.kind == "freeze" and inc.facts["proactive"] and steps(inc, "intake")[0]["engine"] == "psp-monitor"
+        assert any(s["tool"] == "get_risk_signals" for s in steps(inc, "tool"))
+        assert any(s["action"] == "notify_merchant" and "DEBIT FREEZE" in s["args"]["text"] for s in steps(inc, "action"))
+        assert inc.pending and inc.pending["action"] == "request_settlement_hold"
+        ok = World(); ok_e = Engine(ok)
+        assert ok.merchant_pays(500, "Gupta Traders")["status"] == "SUCCESS"
+        await ok_e.tick(1)
+        assert not ok_e.incidents                                   # a healthy account raises nothing
+    run(go())
+
+
+def test_tipping_off_guard_withholds_case_details():
+    async def go():
+        w = World(); e = Engine(w)
+        w.inject_freeze(freeze_type="total", bounce_next=True); w.inject_mule_signals()
+        await e.tick((w.next_settlement - w.now).total_seconds() + 60)
+        inc = next(iter(e.incidents.values()))
+        msgs = [s for s in steps(inc, "action") if s["action"] == "notify_merchant"]
+        assert len(msgs) == 1 and msgs[0]["args"]["template"] == "legal_neutral"
+        assert not policy.CASE_DETAIL.search(msgs[0]["args"]["text"])
+        assert inc.status == "with_human" and not inc.pending and not w.settlement_config["paused"]
+        assert any(s["action"] == "escalate_to_human" and "Risk" in s["args"]["queue"] for s in steps(inc, "action"))
+        # backstop: even if a planner tries, the policy refuses case details under the guard
+        d = policy.evaluate(w, "notify_merchant", {"text": "Aapka account freeze hai, police notice aaya"}, {})
+        assert d.verdict == "DENY" and d.rule == "P17"
+    run(go())
+
+
+def test_lien_request_after_pack_needs_meena_and_matches_record():
+    async def go():
+        w = World(); e = Engine(w); r = w.inject_freeze()
+        inc = await e.merchant_message("Bank ka SMS aur police ka notice yeh hai. Account mein 3.1 lakh atak gaye.", doc_id=r["doc_id"])
+        # nothing else is pending here, so the lien request is offered straight after the pack
+        assert inc.pending and inc.pending["action"] == "draft_lien_request" and inc.pending["approvers"] == ["merchant"]
+        assert "lien_request" not in inc.facts
+        await e.approve(inc.id, "merchant")
+        L = inc.facts["lien_request"]
+        t = w.txn_by_id(inc.facts["disputed_txn"])
+        assert L["disputed"] == t["amount"] == 2400 and t["utr"] in L["en"] and "my own figure" in L["en"]
+        assert "proposed, not yet in force" in L["en"] and "Not legal advice" in L["en"]
+        assert any(s["kind"] == "verify" and s["action"] == "draft_lien_request" and s["ok"] for s in inc.steps)
+    run(go())

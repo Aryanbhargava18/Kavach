@@ -609,6 +609,8 @@ class OfflinePlanner:
         inc.title = "Bank account frozen · payout bounced"
         await self.think(inc, "This isn't a Paytm delay. The bank froze the account, so it's a different job now: I can't unfreeze it, but I can protect new sales and build the case.", "warn")
         await self._freeze_plan(inc)
+        if inc.facts.get("proactive") and await self._risk_guarded(inc):
+            return
         if inc.facts.get("proactive"):
             await self.think(inc, "Paytm only sees this because the bank also refused credits. A debit-only freeze would stay invisible to Paytm: payouts would keep landing. "
                                   "So this watcher catches some freezes early, not all of them.", "info")
@@ -624,6 +626,66 @@ class OfflinePlanner:
                                                 "speak": "आपका बैंक खाता फ्रीज़ है। बैंक का SMS या पुलिस नोटिस भेजिए।"})
         inc.money = {"amount": b["amount"], "label": "payout bounced, safe with Paytm"}
         await self._propose_hold(inc)
+
+    async def _risk_guarded(self, inc) -> bool:
+        """Check Paytm Risk's signals BEFORE telling the merchant anything about a freeze (tipping-off guard, P17)."""
+        e = self.e
+        r = await e.call(inc, "get_risk_signals", {})
+        if not r["guard"]:
+            await self.think(inc, f"Checked Paytm Risk first: {r['independent']} independent signal{'s' if r['independent'] != 1 else ''} on this shop. Safe to tell Meena what's happening.")
+            return False
+        names = " and ".join(x["detail"] for x in r["signals"][:2])
+        await self.think(inc, f"Stopping before I tell her anything. Paytm Risk holds {r['independent']} independent signals: {names}. "
+                              "Case details could tip off a mule operator. That's not a verdict on her; it's a decision for a human.", "warn")
+        await e.act(inc, "notify_merchant", {"text": "Namaste Meena ji, aapke payout mein ek rukawat aayi hai. Paytm ki team jald aapse baat karegi. Tab tak aapka paisa Paytm ke paas surakshit hai.",
+                                            "template": "legal_neutral"})
+        await e.act(inc, "escalate_to_human", {"queue": "Paytm Risk (EDD)", "summary": "Bounced payout on a merchant with 2 independent Risk signals; details withheld from merchant (P17)"})
+        inc.status = "with_human"
+        inc.headline = "Possible mule pattern. Details withheld; Paytm Risk decides."
+        inc.decisive = {"label": "Why Kavach held back", "text": f"{r['independent']} independent Risk signals: {names}"}
+        return True
+
+    async def proactive_decline(self, inc, p):
+        """Nobody complained. Meena's own UPI payment from her bank account came back YE: the bank has blocked debits."""
+        e = self.e
+        await e.step(inc, "intake", text=f"Paytm app: Meena's {rs(p['amount'])} payment to {p['payee']} DECLINED by her bank · UPI code {p['code']} (account blocked/frozen)",
+                     intent="account_freeze", amount=p["amount"], utrs=[], language="system", engine="psp-monitor", sender="monitor")
+        await self._freeze_plan(inc, first="Check what Paytm can see")
+        await self.think(inc, "Her bank refused a payment FROM her account. A debit freeze is otherwise invisible to Paytm, because credits still land. "
+                              "So every payout we send now goes into an account she can't take money out of.", "warn")
+        await e.act(inc, "create_support_case", {"summary": f"Merchant's own UPI payment declined YE (account blocked/frozen); found by Kavach's PSP monitor", "channel": "monitor"})
+        await e.call(inc, "get_own_payment_declines", {})
+        sig = await e.call(inc, "get_bank_signal", {})
+        stl = await e.call(inc, "get_settlement_status", {})
+        b = (stl.get("batches") or [{}])[0]
+        await e.step(inc, "evidence", stamp="DEBIT FROZEN", title="What Paytm can see", tone="bad", verdict="Her bank blocks debits; Paytm's payouts still land there",
+                     rows=[{"field": "Her payment", "claim": f"{rs(p['amount'])} to {p['payee']}", "truth": f"DECLINED · {p['code']}", "match": False},
+                           {"field": "Last payout", "claim": "—", "truth": f"{b.get('batch_id', '—')} {b.get('status', '—')}", "match": b.get("status") == "SETTLED"},
+                           {"field": "Payout returns", "claim": "—", "truth": "none" if not sig["last_return"] else sig["last_return"]["code"], "match": not sig["last_return"]}])
+        inc.decisive = {"label": "Decisive evidence", "text": f"UPI code {p['code']} on her own {rs(p['amount'])} payment: her bank has blocked debits"}
+        e.tick_plan(inc, "Check what Paytm can see")
+        if await self._risk_guarded(inc):
+            return
+        await e.act(inc, "notify_merchant", {
+            "text": (f"⚠️ Meena ji, {p['payee']} ko aapka {rs(p['amount'])} ka payment aapke bank ne rok diya (code {p['code']}): bank ke hisaab se account se paisa nikalna band hai, yaani DEBIT FREEZE. "
+                     "Paytm ke payouts abhi bhi us account mein ja rahe hain, jahan se aap nikal nahi sakti.\n"
+                     "Branch se yeh teen cheezein maangiye:\n1) NCRP acknowledgement number\n2) Police ka notice ya requisition\n3) Kitni rakam disputed hai\n"
+                     "Bank ka SMS ya notice aaye to yahan bhejiye."),
+            "speak": "मीना जी, आपके बैंक ने आपका भुगतान रोक दिया। खाते से पैसा निकालना बंद है। शाखा से नोटिस और विवादित रकम पूछिए।"})
+        inc.money = {"amount": b.get("amount") or 0, "label": "would land next in an account she can't use"}
+        await self._propose_hold(inc, debit=True)
+
+    async def _propose_lien(self, inc):
+        """After the pack: offer a request, in Meena's name, to limit the hold to the disputed amount."""
+        e = self.e
+        if inc.pending or inc.facts.get("lien_request") or "pack" not in inc.facts:
+            return
+        res = await e.act(inc, "draft_lien_request", {"reason": "Notice names one disputed payment; the whole account is frozen"})
+        if res["status"] == "NEEDS_APPROVAL":
+            amt = rs((inc.money or {}).get("amount"))
+            await e.act(inc, "notify_merchant", {"text": f"Ek aur kadam: bank ko aapke naam se likhit request bana doon ki hold sirf {amt} (vivadit rakam) tak rakhein, aur baaki account chalu karein? Aap padh kar hi bhejengi.",
+                                                "speak": "बैंक को चिट्ठी बना दूँ कि रोक सिर्फ विवादित रकम तक रहे?", "extra": {"approval": inc.id}})
+            inc.headline = "Signed pack ready. Lien-limiting request waiting for Meena's OK."
 
     async def _freeze_plan(self, inc, first: str = "Confirm why payouts bounce"):
         self.e.set_plan(inc, [first, "Protect new sales (two-key hold)", "Read the bank / cyber-cell notice",
@@ -750,6 +812,7 @@ class OfflinePlanner:
         inc.headline = "Signed pack ready for the bank branch."
         inc.money = {"amount": st["amount"], "label": (f"is all that's disputed, out of {rs(locked)} frozen (Meena's figure)" if locked
                                                        else "is the only payment the notice disputes")}
+        await self._propose_lien(inc)
 
     async def scam(self, inc, u):
         e = self.e
@@ -830,6 +893,12 @@ class OfflinePlanner:
             await e.act(inc, "notify_merchant", {"text": "✅ Chitthi taiyaar. Branch mein de dijiye ya email kar dijiye; signed pack saath mein hai. Main aage bhi nazar rakhunga."})
             inc.headline = "Escalation letter signed off by Meena."
             inc.status = "with_human"
+        elif action == "draft_lien_request":
+            L = inc.facts.get("lien_request", {})
+            await e.act(inc, "notify_merchant", {"text": f"✅ Request taiyaar: hold sirf {L.get('disputed_text', '')} tak. Ise signed pack ke saath branch mein dijiye aur dated acknowledgement lijiye.",
+                                                "speak": "चिट्ठी तैयार है। शाखा में पैक के साथ दीजिए और तारीख वाली पावती लीजिए।"})
+            inc.headline = "Pack and lien-limiting request ready for the branch."
+            inc.status = "with_human"
         elif action == "request_settlement_hold":
             e.tick_plan(inc, "Protect new sales (two-key hold)")
             await e.act(inc, "notify_merchant", {"text": "✅ Ab se aapke payouts Paytm settlement balance mein surakshit rahenge. Kisi doosre account mein kuch nahi gaya." +
@@ -837,6 +906,7 @@ class OfflinePlanner:
                                                 "speak": "आपके पैसे पेटीएम के पास सुरक्षित हैं।"})
             inc.status = "waiting_merchant" if "disputed_txn" not in inc.facts else "with_human"
             inc.headline = "Payouts held safely. Waiting for the notice." if "disputed_txn" not in inc.facts else inc.headline
+            await self._propose_lien(inc)
 
     async def followup(self, inc, purpose):
         e = self.e

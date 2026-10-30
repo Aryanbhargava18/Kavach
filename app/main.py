@@ -229,6 +229,7 @@ class Scenario(BaseModel):
     paytm_record: bool = True
     genuine: bool = True
     freeze_type: str = "debit"
+    mule: bool = False
 
 
 CUSTOMER_LINES = {
@@ -281,13 +282,26 @@ async def scenario(name: str, s: Scenario):
         cust = {"name": "Sunita", "wa": "+91 98•• ••418"}
         run_bg(E().customer_message(f"I was charged twice for ₹{d['amount']:,} at Meena Kirana. Please refund one.", None, cust))
         return {"ok": True}
+    elif name == "supplier_declined":
+        # Debit-only freeze: credits still land, so payouts tell Paytm nothing. Meena pays her supplier through the Paytm app;
+        # her bank declines it with YE. Kavach's PSP watcher has to notice on its own.
+        r = w.inject_freeze(notice_amount=s.notice_amount, paytm_record=s.paytm_record, freeze_type="debit")
+        if s.mule:
+            w.inject_mule_signals()
+        w.merchant_pays(s.amount or 18000, "Gupta Traders")
+        draft = {"text": "", "next_doc": None if s.mule else r["doc_id"]}
+        state["drafts"] = [draft]
+        bus.publish({"type": "world", "world": w.snapshot()})
+        return draft
     elif name == "payout_bounce":
         # The bank freezes Meena's account (debit AND credit) today. Nobody tells Paytm. Skip to the next 9:00 payout run:
         # the bank sends it back, and Kavach's settlement watcher has to notice on its own.
         r = w.inject_freeze(notice_amount=s.notice_amount, paytm_record=s.paytm_record, freeze_type="total", bounce_next=True)
+        if s.mule:
+            w.inject_mule_signals()
         secs = (w.next_settlement - w.now).total_seconds() + 60
         await E().tick(secs, background=True)
-        draft = {"text": "", "next_doc": r["doc_id"]}
+        draft = {"text": "", "next_doc": None if s.mule else r["doc_id"]}
         state["drafts"] = [draft]
         bus.publish({"type": "draft", "draft": draft})
         bus.publish({"type": "world", "world": w.snapshot()})

@@ -81,6 +81,8 @@ class World:
     ledger: list[dict[str, Any]] = field(default_factory=list)      # POS ledger entries (one per payment applied)
     webhooks: dict[str, dict[str, Any]] = field(default_factory=dict)  # txn_id -> delivery record
     support_cases: list[dict[str, Any]] = field(default_factory=list)
+    own_payments: list[dict[str, Any]] = field(default_factory=list)  # Meena's own UPI payments via the Paytm app (Paytm = her PSP)
+    risk_signals: list[dict[str, Any]] = field(default_factory=list)  # Paytm Risk's review signals on this merchant (never a verdict)
     lock: threading.RLock = field(default_factory=threading.RLock, repr=False)
 
     def __post_init__(self) -> None:
@@ -464,6 +466,33 @@ class World:
             rec = self._deliver_webhook(txn, at=self.now, fail=webhook_fails, backoff=2)
             rec["watched"] = True
             return {"txn_id": txn["txn_id"], "bill_id": bill["bill_id"], "utr": txn["utr"], "event": ev}
+
+    def merchant_pays(self, amount: int, payee: str, payee_vpa: str = "guptatraders@okhdfc") -> dict[str, Any]:
+        """Meena pays a supplier from her linked bank account through the Paytm app. Paytm is her PSP, so it sees
+        her bank's response. A debit freeze declines it with UPI code YE ('remitting account blocked/frozen'),
+        the one signal of a debit-only freeze that reaches Paytm."""
+        with self.lock:
+            frozen = self.bank_account.get("state") in ("DEBIT_FROZEN", "FROZEN")
+            p = {"pay_id": f"OUT-{len(self.own_payments) + 1:04d}", "amount": amount, "payee": payee, "payee_vpa": payee_vpa,
+                 "from_account": MERCHANT["settlement_bank"], "at": self.now.isoformat(), "status": "DECLINED" if frozen else "SUCCESS",
+                 "code": "YE" if frozen else "00",
+                 "reason": ("Remitting account blocked/frozen (synthetic; modelled on UPI decline code YE as PSPs document it)"
+                            if frozen else "Approved"), "watched": True}
+            self.own_payments.append(p)
+            self._event("psp", f"Paytm app: Meena's ₹{amount:,} to {payee} {'DECLINED by her bank · YE' if frozen else 'paid'}", pay_id=p["pay_id"])
+            return p
+
+    def declines_due(self) -> list[dict[str, Any]]:
+        return [p for p in self.own_payments if p.get("watched") and p["code"] == "YE"]
+
+    def inject_mule_signals(self) -> list[dict[str, Any]]:
+        """Paytm Risk already holds independent review signals on this merchant (synthetic)."""
+        with self.lock:
+            self.risk_signals = [
+                {"signal": "repeat_reports", "detail": "Merchant VPA named in 3 separate NCRP complaints in 9 days", "source": "CFCFRMS feed (synthetic)"},
+                {"signal": "fan_in", "detail": "41 first-time payers in 48 hours, 6× her usual", "source": "Payments ledger"},
+            ]
+            return self.risk_signals
 
     def failed_webhooks_due(self) -> list[dict[str, Any]]:
         """Deliveries whose last retry has already failed, as Paytm's own delivery monitor would see them."""

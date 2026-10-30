@@ -36,6 +36,10 @@ READ_TOOLS: dict[str, dict[str, Any]] = {
     "ask_sop": {"desc": "Answer a question about the MHA/I4C SOP with checked citations (Cognee/local retrieval + Sarvam).", "params": {"question": "string"}},
     "check_sale_pattern": {"desc": "How does this payment compare with the shop's own last 45 days? Supporting evidence only, never proof.",
                            "params": {"txn_id": "string"}},
+    "get_own_payment_declines": {"desc": "The merchant's own outgoing UPI payments made through the Paytm app (Paytm is her PSP), with her bank's response codes. YE = remitting account blocked/frozen.",
+                                 "params": {}},
+    "get_risk_signals": {"desc": "Paytm Risk's review signals on this merchant (repeat CFCFRMS reports, fan-in, shared accounts). Review signals only, never a verdict.",
+                         "params": {}},
 }
 
 WRITE_TOOLS: dict[str, dict[str, Any]] = {
@@ -59,6 +63,8 @@ WRITE_TOOLS: dict[str, dict[str, Any]] = {
                           "params": {"event": "string", "date": "string"}},
     "draft_escalation": {"desc": "Draft an escalation letter for Meena to sign (e.g. to the bank's grievance officer). Never sent without her approval.",
                          "params": {"to": "string", "reason": "string"}},
+    "draft_lien_request": {"desc": "Draft a request, in Meena's name, asking her bank to limit the hold to the disputed amount and to tell her the reason, officer and removal process. Never sent without her approval.",
+                           "params": {"reason": "string?"}},
     "escalate_to_human": {"desc": "Hand the incident to a Paytm human (Support/Risk).", "params": {"queue": "string", "summary": "string"}},
     "resolve_incident": {"desc": "Close the incident with a verified outcome.", "params": {"outcome": "string"}},
 }
@@ -320,7 +326,23 @@ def _pattern(w: World, a):
                  f"{'first-time payer' if first_time else 'repeat payer'}")
 
 
+def _declines(w: World, a):
+    out = [{k: p[k] for k in ("pay_id", "amount", "payee", "from_account", "at", "status", "code", "reason")} for p in w.own_payments]
+    ye = [p for p in out if p["code"] == "YE"]
+    return ({"payments": out[-5:][::-1], "frozen_declines": len(ye)},
+            (f"{len(ye)} of her own payments declined by her bank · YE (account blocked/frozen)" if ye else "no declines on her own payments"))
+
+
+def _risk(w: World, a):
+    sig = list(w.risk_signals)
+    kinds = {x["signal"] for x in sig}
+    return ({"signals": sig, "independent": len(kinds), "guard": len(kinds) >= 2},
+            f"{len(kinds)} independent risk signal{'s' if len(kinds) != 1 else ''}" + (" · tipping-off guard applies" if len(kinds) >= 2 else ""))
+
+
 _READ_IMPL = {
+    "get_own_payment_declines": _declines,
+    "get_risk_signals": _risk,
     "get_merchant_ledger": _ledger,
     "get_incident_policy": _policy,
     "check_sale_pattern": _pattern,

@@ -83,6 +83,7 @@ class Engine:
         self.locks: dict[str, asyncio.Lock] = {}
         self.seen_webhooks: set[str] = set()   # failed POS deliveries Kavach has already picked up
         self.seen_returns: set[str] = set()    # payout batches the merchant's bank sent back that Kavach has already picked up
+        self.seen_declines: set[str] = set()   # Meena's own UPI payments her bank declined as frozen (YE)
         self.alive = True   # set False on reset so a run still in flight can't paint the new screen
         from .llm import make_planner
         self.planner = make_planner(self)
@@ -143,6 +144,10 @@ class Engine:
             f = r.get("fields", {})
             self._col(inc, "claim", label="Police notice", tier="Claim", ref=(f.get("utr") or {}).get("value"),
                       amount=(f.get("amount") or {}).get("value"), status=str(r.get("action_kind") or "?").replace("_", " ").upper(), when=(f.get("transaction_date") or {}).get("value"))
+        elif name == "get_own_payment_declines" and r.get("frozen_declines"):
+            pd = next(x for x in r["payments"] if x["code"] == "YE")
+            self._col(inc, "own", label="Her own payment", tier="T1", ref=pd["code"], amount=pd["amount"], status="DECLINED", when=t12(pd["at"]),
+                      note=pd["payee"])
         elif name == "get_bank_signal":
             lr = r.get("last_return") or {}
             self._col(inc, "bank", label="Her bank, as Paytm sees it", tier="T1", ref=lr.get("batch_id"), amount=None,
@@ -236,7 +241,7 @@ class Engine:
         await self.step(inc, "action", action=action, args=_redact(args), summary=res.get("summary", ""), result=res)
         ev = {"schedule_followup": "followup_scheduled", "escalate_to_human": "escalated_to_human", "generate_evidence_pack": "evidence_pack_issued",
               "request_settlement_hold": "payouts_held", "draft_escalation": "escalation_letter_approved", "record_case_event": "case_event_recorded",
-              "initiate_refund": "refund_initiated"}.get(action)
+              "initiate_refund": "refund_initiated", "draft_lien_request": "lien_request_approved"}.get(action)
         if ev:
             self._automation(ev, inc, {"action": action, "args": _redact(args), "summary": res.get("summary", "")})
         if verify:
@@ -327,6 +332,13 @@ class Engine:
             m = w.send_message("merchant", "app", letter["en"], inc.id)
             self._phone("kavach", "✉️ Bank ke grievance officer ke liye chitthi taiyaar hai (aapke naam se). Neeche padh lijiye:\n\n" + letter["en"], inc.id)
             return {"msg_id": m["msg_id"], "summary": f"Escalation letter to {a['to']} approved by Meena; ready to hand in or email"}
+        if action == "draft_lien_request":
+            letter = self._lien_letter(inc, a)
+            inc.facts["lien_request"] = letter
+            m = w.send_message("merchant", "app", letter["en"], inc.id)
+            self._phone("kavach", "✉️ Bank ke liye chitthi taiyaar (aapke naam se): hold sirf vivadit rakam tak seemit karne ki request. Neeche padh lijiye:\n\n" + letter["en"],
+                        inc.id, extra={"letter": "lien"})
+            return {"msg_id": m["msg_id"], "summary": f"Lien-limiting request approved by Meena: hold {letter['disputed_text']} of {letter['locked_text']}; ready to hand in at the branch"}
         if action == "resolve_incident":
             inc.status = "resolved"
             inc.outcome = a["outcome"]
@@ -369,6 +381,11 @@ class Engine:
                 return a["event"] in inc.facts.get("case_events", {}), "Case event is on the incident record"
             if action == "draft_escalation":
                 return bool(inc.facts.get("escalation_letter")), "Letter stored on the case"
+            if action == "draft_lien_request":
+                L = inc.facts.get("lien_request") or {}
+                t = w.txn_by_id(inc.facts.get("disputed_txn", ""))
+                ok = bool(L) and t is not None and L.get("disputed") == t["amount"] and t["utr"] in L.get("en", "")
+                return ok, ("Letter's disputed amount and UTR re-read against the UPI switch record: they match" if ok else "Letter does not match the Paytm record")
             if action == "escalate_to_human":
                 return any(t["ticket_id"] == res.get("ticket_id") for t in w.ops_queue), "Ticket present in ops queue"
             if action == "resolve_incident":
@@ -396,6 +413,37 @@ class Engine:
               f"I have not been told that it was submitted. Please confirm the submission date and reference. "
               f"A signed evidence pack is attached (verify at {pack.get('verify_url', '[link]')}).\n\n{MERCHANT['owner']}")
         return {"en": en, "reason": a.get("reason", "")}
+
+    def _lien_letter(self, inc: Incident, a: dict[str, Any]) -> dict[str, Any]:
+        """A request in Meena's name. Figures come from the Paytm record; her own figure is labelled as hers."""
+        from .planner_offline import rs
+        n = inc.facts.get("notice", {})
+        t = self.world.txn_by_id(inc.facts["disputed_txn"])
+        stl = inc.facts.get("disputed_settlement") or {}
+        pack = inc.facts.get("pack", {})
+        locked = inc.facts.get("locked_stated")
+        kind = "debit and credit" if self.world.bank_account.get("state") == "FROZEN" else "debit"
+        basis = [
+            "MHA/I4C SOP for NCRP-CFCFRMS (02.01.2026): holds are placed on the reported amount; para 10.1 sets the grievance route through the bank.",
+            "Karnataka High Court, 27 Mar 2026: law-enforcement agencies may ask banks to mark an amount, not freeze accounts.",
+            "Kerala High Court, 21 May 2026, WP(C) 31951/2024: where a disputed amount is supplied, the lien is confined to it.",
+            "Allahabad High Court, Aug 2026: an entire account ordinarily cannot be debit-frozen when only a specific disputed amount is identified.",
+            "RBI draft KYC (Amendment) Directions, 2026 (11 Sep 2026; proposed, not yet in force): debit holds on the suspected amount by default; the account holder is told the reason, the removal process and the officer's contact.",
+        ]
+        en = (f"DRAFT prepared by Kavach for {MERCHANT['owner']} to review and sign. Not legal advice.\n\n"
+              f"To: The Branch Manager and Grievance Officer, {MERCHANT['settlement_bank'].replace('Bank account ', 'bank account ')}\n"
+              f"From: {MERCHANT['owner']}, {MERCHANT['name']} ({MERCHANT['vpa']})\n"
+              f"Subject: Request to limit the hold on my account to the disputed amount\n\n"
+              f"My account has a {kind} freeze linked to NCRP acknowledgement {n.get('ack_number', '[ack]')}. The notice names one transaction: "
+              f"UTR {t['utr']}, {rs(t['amount'])}, on {t['created_at']:%d %b %Y}. Paytm's records show it was a payment to my shop's QR"
+              f"{', settled in ' + stl['batch_id'] if stl.get('batch_id') else ''}. A signed evidence pack is attached (verify: {pack.get('verify_url', '[link]')}).\n\n"
+              f"The amount frozen is about {rs(locked) + ' (my own figure)' if locked else '[amount, to be confirmed by the bank]'}. I request that:\n"
+              f"1. the hold be limited to the disputed {rs(t['amount'])}, and the rest of the account be made operable;\n"
+              f"2. I be told in writing the reason for the hold, the authority and officer's contact, and the process for removal;\n"
+              f"3. I be given a dated acknowledgement of this request.\n\n"
+              "For the bank's consideration:\n" + "\n".join(f"• {b}" for b in basis) + f"\n\n{MERCHANT['owner']}")
+        return {"en": en, "basis": basis, "disputed": t["amount"], "disputed_text": rs(t["amount"]), "locked": locked,
+                "locked_text": rs(locked) if locked else "the amount frozen", "reason": a.get("reason", "")}
 
     def _pack_case(self, inc: Incident, a: dict[str, Any]) -> dict[str, Any]:
         f = inc.facts
@@ -530,6 +578,13 @@ class Engine:
                 self.seen_returns.add(ev["batch_id"])
                 returned.append(ev["batch_id"])
         self._emit("clock", {"now": self.world.now.isoformat()})
+        for p in self.world.declines_due():   # the PSP watcher: her own payment bounced off a debit freeze
+            if p["pay_id"] not in self.seen_declines:
+                self.seen_declines.add(p["pay_id"])
+                if background:
+                    asyncio.create_task(self._safe(self.proactive_decline(p["pay_id"])))
+                else:
+                    await self.proactive_decline(p["pay_id"])
         for batch_id in returned:     # the payout watcher: the bank bounced a payout before Meena knows anything is wrong
             if background:
                 asyncio.create_task(self._safe(self.proactive_payout(batch_id)))
@@ -590,6 +645,27 @@ class Engine:
         inc.facts.update({"proactive": True, "returned_batch": batch_id})
         async with self.locks[inc.id]:
             await self.planner.proactive_payout(inc, b)
+        self._emit("incident", {"incident": inc.summary()})
+        return inc
+
+    async def proactive_decline(self, pay_id: str) -> Incident | None:
+        """Kavach on duty: Meena's own payment from her bank account was declined with YE (account blocked/frozen).
+        For a debit-only freeze this is the one signal that reaches Paytm: payouts still land."""
+        p = next((x for x in self.world.own_payments if x["pay_id"] == pay_id), None)
+        if not p or any(i.facts.get("declined_payment") == pay_id for i in self.incidents.values()):
+            return None
+        live = self.open_incident("freeze")
+        if live:
+            live.facts["declined_payment"] = pay_id
+            return live
+        self._msg_ctx = {"channel": "merchant", "customer": {}}
+        try:
+            inc = self.new_incident("freeze", f"Debit freeze · her ₹{p['amount']:,} payment declined")
+        finally:
+            self._msg_ctx = {}
+        inc.facts.update({"proactive": True, "declined_payment": pay_id})
+        async with self.locks[inc.id]:
+            await self.planner.proactive_decline(inc, p)
         self._emit("incident", {"incident": inc.summary()})
         return inc
 

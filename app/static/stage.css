@@ -210,3 +210,5 @@ body:not(.view-stage) #stage { display: none; }
 .oh-bar { height: 10px; border-radius: 999px; background: #F3D5BF; margin-top: 8px; overflow: hidden; }
 .oh-bar i { display: block; height: 100%; background: #0D2A63; border-radius: 999px; }
 .bill-note.dim { color: #7A869E; font-size: 11px; }
+.bill details summary { cursor: pointer; color: #0D2A63; font-weight: 600; }
+.bill details ul { margin: 6px 0 0 16px; padding: 0; } .bill details li { margin: 3px 0; }

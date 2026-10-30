@@ -117,12 +117,24 @@ class LLMPlanner(OfflinePlanner):
         await e.step(inc, "intake", text=f"Settlement engine: payout {b['batch_id']} of ₹{b['amount']:,} RETURNED by Meena's bank ({b.get('return_code') or 'no code'})",
                      intent="settlement_missing", amount=b["amount"], utrs=[], language="system", engine="payout-monitor", sender="monitor")
         note = (f"[Monitor alert, nobody has complained] Settlement batch {b['batch_id']} (₹{b['amount']:,}) was RETURNED by the merchant's bank "
-                f"with code {b.get('return_code')}. Meena probably does not know yet. Confirm with get_settlement_status and get_bank_signal. "
+                f"with code {b.get('return_code')}. Meena probably does not know yet. First call get_risk_signals: if guard=true, send only Legal's neutral template (notify_merchant with template='legal_neutral', no case details) and escalate to Paytm Risk. Otherwise confirm with get_settlement_status and get_bank_signal. "
                 f"If the bank is returning payouts as frozen: tell Meena in short Hinglish (include a Devanagari 'speak' line), ask her to get the "
                 f"NCRP acknowledgement number, the police notice and the disputed amount from her branch, and propose request_settlement_hold "
                 f"(it needs her and Paytm Risk). Never change the settlement account. Never promise an unfreeze. "
                 f"Incident {inc.id}. Current time {e.world.now:%H:%M:%S}.")
         await self._loop(inc, note, fallback=lambda: OfflinePlanner.settlement(self, inc, batch_id=b["batch_id"]))
+
+    async def proactive_decline(self, inc, p):
+        """Debit-freeze watcher on the live planner. The rules playbook is the fallback and does the intake itself."""
+        e = self.e
+        note = (f"[Monitor alert, nobody has complained] Meena's own UPI payment {p['pay_id']} of ₹{p['amount']:,} to {p['payee']}, made through the "
+                f"Paytm app from her linked bank account, was DECLINED by her bank with UPI code {p['code']} (remitting account blocked/frozen). "
+                f"Payouts may still be landing in that account. First call get_risk_signals: if it reports guard=true, send only Legal's neutral "
+                f"template (notify_merchant with template='legal_neutral', no case details) and escalate to Paytm Risk. Otherwise confirm with "
+                f"get_own_payment_declines, get_bank_signal and get_settlement_status, tell Meena in short Hinglish (include a Devanagari 'speak' line), "
+                f"ask her to get the NCRP acknowledgement number, the notice and the disputed amount from her branch, and propose request_settlement_hold. "
+                f"Never change the settlement account. Incident {inc.id}. Current time {e.world.now:%H:%M:%S}.")
+        await self._loop(inc, note, fallback=lambda: OfflinePlanner.proactive_decline(self, inc, p))
 
     async def followup(self, inc, purpose):
         await self._loop(inc, f"[Scheduled follow-up fired at {self.e.world.now:%H:%M:%S}] {purpose}",

@@ -38,13 +38,14 @@ RULES = {
     "P14": "Money that is being refunded is never counted as paid: no receipt and no ledger entry for it.",
     "P15": "One payment settles one bill. A UTR already in the shop's ledger is never applied again.",
     "P16": "A ledger entry is posted only for a switch-confirmed payment that fits the amount still due on that bill.",
+    "P17": "When Paytm Risk holds two or more independent signals on a merchant, Kavach does not tell them about a freeze, notice or report. Only Legal's neutral template goes out, and Paytm Risk decides.",
 }
 
 RULES_BY_KIND = {
     "payment_claim": ["P1", "P2", "P3", "P8", "P12", "P14", "P15", "P16"],
     "duplicate": ["P4", "P5", "P8", "P11", "P12"],
-    "freeze": ["P6", "P7", "P9", "P10", "P13"],
-    "settlement": ["P6", "P7", "P9"],
+    "freeze": ["P6", "P7", "P9", "P10", "P13", "P17"],
+    "settlement": ["P6", "P7", "P9", "P17"],
 }
 
 AUTONOMY = {
@@ -199,9 +200,19 @@ def _customer_update(world, args, ctx):
     return allow("Neutral wording; no identities exposed.", "P8")
 
 
+CASE_DETAIL = re.compile(r"freez|frozen|police|cyber|notice|ncrp|complaint|1930|lien|hold|फ्रीज़|पुलिस|नोटिस|शिकायत", re.I)
+
+
+def risk_guard(world) -> bool:
+    """Two or more independent Risk signals: telling the merchant about the case could tip off a mule operator."""
+    return len({x["signal"] for x in world.risk_signals}) >= 2
+
+
 def _notify_merchant(world, args, ctx):
     if FULL_VPA.search(args.get("text", "")) and MERCHANT["vpa"] not in args.get("text", ""):
         return deny("P8", "Merchant message would expose a payer's full UPI handle.")
+    if risk_guard(world) and args.get("template") != "legal_neutral" and CASE_DETAIL.search(args.get("text", "") + " " + str(args.get("speak") or "")):
+        return deny("P17", "Paytm Risk holds two independent signals on this merchant. Case details could tip off a mule operator; only Legal's neutral template may go out.")
     return allow("Message to the account owner.")
 
 
@@ -272,6 +283,7 @@ _CHECKS = {
     "create_support_case": lambda w, a, c: allow("Opening a case is always allowed."),
     "record_case_event": _case_event,
     "draft_escalation": _draft,
+    "draft_lien_request": _draft,
     "issue_verified_receipt": _receipt,
     "replay_soundbox": _soundbox,
     "request_payment": _request_payment,
