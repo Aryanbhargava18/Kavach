@@ -565,11 +565,23 @@ class OfflinePlanner:
         inc.money = {"amount": inc.facts["amount"], "label": "returned to the customer, exactly once"}
 
     # ------------------------------------------------------- settlement
-    async def settlement(self, inc):
+    async def proactive_payout(self, inc, b):
+        """Nobody complained. The settlement engine shows the merchant's bank sent a payout back."""
+        e = self.e
+        await e.step(inc, "intake", text=f"Settlement engine: payout {b['batch_id']} of {rs(b['amount'])} RETURNED by Meena's bank ({b.get('return_code') or 'no code'})",
+                     intent="settlement_missing", amount=b["amount"], utrs=[], language="system", engine="payout-monitor", sender="monitor")
+        await self.think(inc, "Nobody has complained. Meena's bank refused this morning's payout, so she probably doesn't know yet: "
+                              "the first she'd hear is a supplier payment bouncing. Finding out why before that happens.")
+        await e.act(inc, "create_support_case", {"summary": f"Payout {b['batch_id']} {rs(b['amount'])} returned by the merchant's bank; found by Kavach's monitor",
+                                                 "channel": "monitor"})
+        await e.call(inc, "get_incident_policy", {"kind": "settlement"})
+        await self.settlement(inc, batch_id=b["batch_id"])
+
+    async def settlement(self, inc, batch_id: str | None = None):
         e = self.e
         plan = ["Check yesterday's payout", "Check how the bank responded", "Pick the next step"]
         e.set_plan(inc, plan)
-        r = await e.call(inc, "get_settlement_status", {})
+        r = await e.call(inc, "get_settlement_status", {"batch_id": batch_id} if batch_id else {})
         e.tick_plan(inc, plan[0])
         b = (r.get("batches") or [None])[0]
         if not b:
@@ -597,8 +609,19 @@ class OfflinePlanner:
         inc.title = "Bank account frozen · payout bounced"
         await self.think(inc, "This isn't a Paytm delay. The bank froze the account, so it's a different job now: I can't unfreeze it, but I can protect new sales and build the case.", "warn")
         await self._freeze_plan(inc)
-        await e.act(inc, "notify_merchant", {"text": f"⚠️ Kal ka {rs(b['amount'])} aapke bank ne wapas bhej diya — bank ke hisaab se aapka account FREEZE hai. Main freeze hata nahi sakta, par aapka case taiyaar kar sakta hoon. Bank ka SMS ya police notice yahan bhejiye.",
-                                            "speak": "आपका बैंक खाता फ्रीज़ है। बैंक का SMS या पुलिस नोटिस भेजिए।"})
+        if inc.facts.get("proactive"):
+            await self.think(inc, "Paytm only sees this because the bank also refused credits. A debit-only freeze would stay invisible to Paytm: payouts would keep landing. "
+                                  "So this watcher catches some freezes early, not all of them.", "info")
+            await e.act(inc, "notify_merchant", {
+                "text": (f"⚠️ Meena ji, aaj subah ka {rs(b['amount'])} payout aapke bank ne wapas bhej diya. Bank ke hisaab se aapka account FREEZE hai. "
+                         "Shayad aapko abhi pata nahi chala. Supplier ko payment karne se pehle bank se baat kar lijiye.\n"
+                         "Main freeze hata nahi sakta, par case taiyaar kar sakta hoon. Branch se yeh teen cheezein maangiye:\n"
+                         "1) NCRP acknowledgement number\n2) Police ka notice ya requisition\n3) Kitni rakam disputed hai\n"
+                         "Bank ka SMS ya notice aaye to yahan bhejiye."),
+                "speak": "मीना जी, आपके बैंक ने आज का पेआउट वापस भेज दिया। खाता फ्रीज़ है। सप्लायर को पेमेंट करने से पहले बैंक से बात कीजिए।"})
+        else:
+            await e.act(inc, "notify_merchant", {"text": f"⚠️ Kal ka {rs(b['amount'])} aapke bank ne wapas bhej diya — bank ke hisaab se aapka account FREEZE hai. Main freeze hata nahi sakta, par aapka case taiyaar kar sakta hoon. Bank ka SMS ya police notice yahan bhejiye.",
+                                                "speak": "आपका बैंक खाता फ्रीज़ है। बैंक का SMS या पुलिस नोटिस भेजिए।"})
         inc.money = {"amount": b["amount"], "label": "payout bounced, safe with Paytm"}
         await self._propose_hold(inc)
 
@@ -840,6 +863,11 @@ class OfflinePlanner:
                 inc.headline = "Fixed before anyone complained, and paid out. Closed." if inc.facts.get("proactive") else "Repaired, receipted, and paid out. Closed."
                 await e.act(inc, "resolve_incident", {"outcome": (f"Fixed before anyone complained; payout {b['batch_id']} confirmed" if inc.facts.get("proactive")
                                                               else f"Ledger repaired, customer receipted, payout {b['batch_id']} confirmed")})
+            elif b["status"] == "RETURNED":
+                await self.think(inc, f"The bill itself is fixed, but the payout {b['batch_id']} bounced at Meena's bank. That's the account freeze, "
+                                      "which has its own case. The money is back in Paytm's settlement balance, not lost.", "warn")
+                inc.status = "with_human"
+                inc.headline = "Bill fixed. Payout bounced with the freeze; tracked in the freeze case."
             else:
                 await e.act(inc, "escalate_to_human", {"queue": "Paytm Merchant Support", "summary": f"Payout {b['batch_id']} {b['status']}"})
                 inc.status = "with_human"

@@ -111,6 +111,19 @@ class LLMPlanner(OfflinePlanner):
                 f"Do not message the customer: they have not written in. Incident {inc.id}. Current time {e.world.now:%H:%M:%S}.")
         await self._loop(inc, note, fallback=lambda: OfflinePlanner.proactive_ledger(self, inc, t))
 
+    async def proactive_payout(self, inc, b):
+        """Payout watcher on the live planner. Same tools, same gate; the rules playbook is the fallback."""
+        e = self.e
+        await e.step(inc, "intake", text=f"Settlement engine: payout {b['batch_id']} of ₹{b['amount']:,} RETURNED by Meena's bank ({b.get('return_code') or 'no code'})",
+                     intent="settlement_missing", amount=b["amount"], utrs=[], language="system", engine="payout-monitor", sender="monitor")
+        note = (f"[Monitor alert, nobody has complained] Settlement batch {b['batch_id']} (₹{b['amount']:,}) was RETURNED by the merchant's bank "
+                f"with code {b.get('return_code')}. Meena probably does not know yet. Confirm with get_settlement_status and get_bank_signal. "
+                f"If the bank is returning payouts as frozen: tell Meena in short Hinglish (include a Devanagari 'speak' line), ask her to get the "
+                f"NCRP acknowledgement number, the police notice and the disputed amount from her branch, and propose request_settlement_hold "
+                f"(it needs her and Paytm Risk). Never change the settlement account. Never promise an unfreeze. "
+                f"Incident {inc.id}. Current time {e.world.now:%H:%M:%S}.")
+        await self._loop(inc, note, fallback=lambda: OfflinePlanner.settlement(self, inc, batch_id=b["batch_id"]))
+
     async def followup(self, inc, purpose):
         await self._loop(inc, f"[Scheduled follow-up fired at {self.e.world.now:%H:%M:%S}] {purpose}",
                          fallback=lambda: OfflinePlanner.followup(self, inc, purpose))

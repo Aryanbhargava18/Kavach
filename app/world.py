@@ -201,7 +201,7 @@ class World:
             b = self._post_settlement(d, due, status="SETTLED")
             b["credited_at"] = self.now
         return self._event("settlement", f"Settlement engine: {b['batch_id']} ₹{b['amount']:,} ({b['txn_count']} payments) {b['status']}",
-                           batch_id=b["batch_id"], txn_ids=list(b["txn_ids"]))
+                           batch_id=b["batch_id"], txn_ids=list(b["txn_ids"]), status=b["status"], return_code=b.get("return_code"))
 
     def _make_txn(self, amount: int, ts: datetime, status: str, *, payer: str | None = None, announced: bool = False,
                   debited: bool | None = None, resolve_at: datetime | None = None, resolve_to: str | None = None,
@@ -492,11 +492,14 @@ class World:
             return {"payer": payer, "amount": amount, "txn_ids": [t1["txn_id"], t2["txn_id"]]}
 
     def inject_freeze(self, *, disputed_amount: int = 2400, notice_amount: int | None = None,
-                      paytm_record: bool = True, days_ago: int = 22, freeze_type: str = "debit") -> dict[str, Any]:
+                      paytm_record: bool = True, days_ago: int = 22, freeze_type: str = "debit",
+                      bounce_next: bool = False) -> dict[str, Any]:
         """The merchant's bank account gets frozen on a cyber-cell request linked to one old payment.
         freeze_type="debit" (the common case): credits still land, so Paytm's payouts keep SETTLING into an
         account the merchant cannot withdraw from, and Paytm sees nothing. freeze_type="total": the bank also
-        rejects credits, so Paytm sees yesterday's payout come back RETURNED."""
+        rejects credits, so Paytm sees yesterday's payout come back RETURNED. bounce_next=True (total only):
+        the freeze lands after this morning's payout, so the NEXT payout run is the first one to bounce, which is
+        when Kavach's settlement watcher can notice it before the merchant does."""
         with self.lock:
             when = (self.now - timedelta(days=days_ago)).replace(hour=19, minute=18, second=4)
             disputed = None
@@ -508,15 +511,17 @@ class World:
                 for s in self.settlements:
                     if s["batch_id"] == disputed["settlement_batch"]:
                         s["txn_ids"].append(disputed["txn_id"]); s["amount"] += disputed_amount; s["txn_count"] += 1
+            frozen_on = self.now.date() if bounce_next else (self.now - timedelta(days=1)).date()
             self.bank_account = {"state": "DEBIT_FROZEN" if freeze_type == "debit" else "FROZEN",
-                                 "since": (self.now - timedelta(days=1)).date().isoformat(), "balance_locked": 310000}
+                                 "since": frozen_on.isoformat(), "balance_locked": 310000}
             y = (self.now - timedelta(days=1)).date()
-            batch = next((s for s in self.settlements if s["business_date"] == y.isoformat()), None) if freeze_type == "total" else None
+            batch = (next((s for s in self.settlements if s["business_date"] == y.isoformat()), None)
+                     if freeze_type == "total" and not bounce_next else None)
             if batch:
                 batch.update({"status": "RETURNED", "bank_utr": None, "credited_at": None, "return_code": "SYN-ACCT-FROZEN",
                               "return_reason": "Beneficiary account blocked/frozen (synthetic code modelled on IMPS 'account frozen' returns)"})
             utr = disputed["utr"] if disputed else _utr(self.rng)
-            hold_date = (self.now - timedelta(days=1)).date().isoformat()
+            hold_date = frozen_on.isoformat()
             ack = "3" + "".join(str(self.rng.randint(0, 9)) for _ in range(13))
             shown = notice_amount or disputed_amount
             notice = (

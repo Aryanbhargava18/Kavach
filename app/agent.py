@@ -82,6 +82,7 @@ class Engine:
         self.chat: list[dict[str, Any]] = []
         self.locks: dict[str, asyncio.Lock] = {}
         self.seen_webhooks: set[str] = set()   # failed POS deliveries Kavach has already picked up
+        self.seen_returns: set[str] = set()    # payout batches the merchant's bank sent back that Kavach has already picked up
         self.alive = True   # set False on reset so a run still in flight can't paint the new screen
         from .llm import make_planner
         self.planner = make_planner(self)
@@ -521,10 +522,19 @@ class Engine:
     async def tick(self, seconds: float, background: bool = False) -> None:
         with self.world.lock:
             happened = self.world.advance(seconds)
+        returned = []
         for ev in happened:
             self._emit("world_event", {"event": ev})
             self._wake_on_callback(ev)
+            if ev.get("kind") == "settlement" and ev.get("status") == "RETURNED" and ev["batch_id"] not in self.seen_returns:
+                self.seen_returns.add(ev["batch_id"])
+                returned.append(ev["batch_id"])
         self._emit("clock", {"now": self.world.now.isoformat()})
+        for batch_id in returned:     # the payout watcher: the bank bounced a payout before Meena knows anything is wrong
+            if background:
+                asyncio.create_task(self._safe(self.proactive_payout(batch_id)))
+            else:
+                await self.proactive_payout(batch_id)
         for rec in self.world.failed_webhooks_due():     # the watcher: nobody has to complain first
             if rec["txn_id"] not in self.seen_webhooks:
                 self.seen_webhooks.add(rec["txn_id"])
@@ -557,6 +567,29 @@ class Engine:
         inc.facts["proactive"] = True
         async with self.locks[inc.id]:
             await self.planner.proactive_ledger(inc, t)
+        self._emit("incident", {"incident": inc.summary()})
+        return inc
+
+    async def proactive_payout(self, batch_id: str) -> Incident | None:
+        """Kavach on duty: the merchant's bank sent a payout back. Nobody has complained; she may not know yet."""
+        b = next((s for s in self.world.settlements if s["batch_id"] == batch_id), None)
+        if not b or any(i.facts.get("returned_batch") == batch_id for i in self.incidents.values()):
+            return None
+        live = self.open_incident("freeze")
+        if live:        # a freeze case is already open: this bounce is more evidence for it, not a new case
+            live.facts["returned_batch"] = batch_id
+            async with self.locks[live.id]:
+                await self.step(live, "followup", purpose=f"Payout {batch_id} ₹{b['amount']:,} returned by the bank", followup_id="watcher",
+                                via="settlement-engine callback")
+            return live
+        self._msg_ctx = {"channel": "merchant", "customer": {}}
+        try:
+            inc = self.new_incident("settlement", f"Payout bounced · ₹{b['amount']:,}")
+        finally:
+            self._msg_ctx = {}
+        inc.facts.update({"proactive": True, "returned_batch": batch_id})
+        async with self.locks[inc.id]:
+            await self.planner.proactive_payout(inc, b)
         self._emit("incident", {"incident": inc.summary()})
         return inc
 

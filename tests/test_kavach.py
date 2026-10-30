@@ -355,3 +355,42 @@ def test_watcher_ignores_failures_from_before_it_was_on_duty():
     for _ in range(30):
         run(e.tick(1))
     assert not e.incidents
+
+
+def test_payout_watcher_catches_freeze_before_merchant_knows():
+    """Total freeze lands today. Nobody tells Paytm or Kavach. The next 9:00 payout bounces and the watcher
+    opens the case itself; the merchant's notice later joins the same case and over-hold facts are kept apart."""
+    async def go():
+        w = World(); e = Engine(w)
+        r = w.inject_freeze(freeze_type="total", bounce_next=True)
+        assert w.bank_signal()["last_return"] is None            # nothing visible to Paytm yet
+        assert not e.incidents
+        await e.tick((w.next_settlement - w.now).total_seconds() + 60)
+        inc = next(iter(e.incidents.values()))
+        assert inc.facts.get("proactive") and inc.kind == "freeze"
+        intake = steps(inc, "intake")[0]
+        assert intake["sender"] == "monitor" and intake["engine"] == "payout-monitor"
+        assert not any(s["kind"] == "intake" and s.get("sender") == "merchant" for s in inc.steps)
+        warn = [s for s in steps(inc, "action") if s["action"] == "notify_merchant"][0]
+        assert "NCRP" in warn["args"]["text"] and warn["args"].get("speak")
+        assert inc.pending and set(inc.pending["approvers"]) == {"merchant", "paytm_ops"}
+        assert not w.settlement_config["paused"]                   # nothing held until both keys turn
+        await e.approve(inc.id, "merchant"); await e.approve(inc.id, "paytm_ops")
+        assert w.settlement_config["paused"] and w.settlement_config["account"] == MERCHANT["settlement_bank"]
+        same = await e.merchant_message("Bank ka SMS aur police ka notice yeh hai. Account mein 3.1 lakh atak gaye.", doc_id=r["doc_id"])
+        assert same.id == inc.id and "pack" in inc.facts
+        assert inc.facts["locked_stated"] == 310000 and inc.money["amount"] == 2400
+        assert len(e.incidents) == 1
+        w.inject_live_payment(amount=640, webhook_fails=False)      # a normal sale today...
+        await e.tick(86400)                                         # ...is held at the next payout, not bounced again
+        assert w.settlements[-1]["status"] == "HELD" and len(e.incidents) == 1
+    run(go())
+
+
+def test_debit_freeze_stays_invisible_to_the_payout_watcher():
+    async def go():
+        w = World(); e = Engine(w)
+        w.inject_freeze(freeze_type="debit", bounce_next=True)
+        await e.tick((w.next_settlement - w.now).total_seconds() + 60)
+        assert w.settlements[-1]["status"] == "SETTLED" and not e.incidents   # honest limit: no signal, no case
+    run(go())

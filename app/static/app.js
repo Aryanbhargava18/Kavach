@@ -516,7 +516,7 @@ function renderSuggest() {
 function suggestOpts() {
   const i = S.incidents[S.sel];
   const opts = [];
-  if (S.nextDoc && !(S.draft && S.draft.doc_id)) opts.push({ cls: "doc", label: "📎 Meena forwards the bank notice", as: "merchant", draft: { text: "Bank ka SMS aur police ka notice yeh hai.", doc_id: S.nextDoc } });
+  if (S.nextDoc && !(S.draft && S.draft.doc_id)) opts.push({ cls: "doc", label: "📎 Meena forwards the bank notice", as: "merchant", draft: { text: "Bank ka SMS aur police ka notice yeh hai. Account mein 3.1 lakh atak gaye.", doc_id: S.nextDoc } });
   if (i && i.status !== "resolved") {
     if (i.kind === "payment_claim" && i.status === "watching" && i.facts.txn_id && i.recon.switch && i.recon.switch.status === "PENDING") opts.push({ cls: "as-m", label: "Dobara pay karwa do", as: "merchant", draft: { text: "Customer se dobara pay karwa do" } });
     if (i.channel === "whatsapp") opts.push({ cls: "as-c", label: "Any update?", as: "customer", draft: { text: "Any update on my payment?" } });
@@ -643,6 +643,7 @@ async function scenario(ds) {
   if (ds.amount) body.amount = Math.max(20, Math.round(Number(ds.amount)) || 4200);
   const d = await post(`/api/scenario/${ds.scn}`, body);
   if (d && d.text) { setDraft({ ...d, auto: true }); }
+  else if (d && d.next_doc) { S.nextDoc = d.next_doc; renderSuggest(); }   // proactive: nobody types; Meena can forward the notice later
 }
 $$("[data-scn]").forEach((b) => b.onclick = () => scenario({ ...b.dataset }));
 $("#own-go").onclick = () => scenario({ scn: "customer_claim", mode: "fake_amount", amount: $("#own-amt").value });   // bill + screenshot show your number; the bank shows what was really paid

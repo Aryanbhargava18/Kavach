@@ -67,7 +67,8 @@
       <div class="voice" id="voice" hidden><canvas id="wave" width="560" height="44" aria-hidden="true"></canvas><p class="hindi" id="hindi" lang="hi"></p></div>
       <p class="sub" id="sub">It watches every payment, refund and payout, fixes what it safely can, and tells Meena out loud.</p>
       <div class="go-row" id="go-row">
-        <button class="go" data-scn="live_payment">Take a ₹4,200 payment</button>
+        <button class="go" data-scn="payout_bounce">Meena's bank freezes her account</button>
+        <button class="ghost" data-scn="live_payment">Take a ₹4,200 payment</button>
         <button class="ghost" id="st-menu-open2">Judge challenges</button>
       </div>
     </div>
@@ -90,6 +91,7 @@
     </div>
     <div class="st-menu" id="st-menu" hidden>
       <p>Each one changes what really happened in Paytm's systems (simulated). Kavach has to find out on its own.</p>
+      <button data-scn="payout_bounce" class="hero"><b>Meena's bank freezes her account</b><small>Nobody tells her. The next payout bounces; Kavach notices first.</small></button>
       <button data-scn="live_payment" class="hero"><b>A payment comes in; the billing app misses it</b><small>Nobody complains. Kavach catches it.</small></button>
       <button data-scn="customer_claim" data-mode="success_missed"><b>Customer says paid; shop says no</b><small>Rahul writes in on WhatsApp</small></button>
       <button data-scn="customer_claim" data-mode="fake_amount"><b>Screenshot ₹4,200, bank says ₹2,400</b><small>Priya</small></button>
@@ -129,6 +131,7 @@
         <button data-scn="customer_claim" data-mode="wrong_merchant"><b>Paid a different shop</b><small>Sanjay</small></button>
         <button data-scn="duplicate"><b>Charged twice</b><small>Sunita · ₹2,450, 37 s apart</small></button>
         <button data-scn="duplicate" data-genuine="false"><b>Two customers, same amount</b><small>not a duplicate</small></button>
+        <button data-scn="payout_bounce"><b>Payout bounces before Meena knows</b><small>bank froze debit and credit; Kavach's payout watcher</small></button>
         <button data-scn="freeze" data-ftype="total"><b>Total freeze</b><small>bank bounces Paytm's payouts</small></button>
         <button data-scn="freeze" data-notice="2900"><b>Police notice gets the amount wrong</b><small>notice ₹2,900 vs record ₹2,400</small></button>
         <button data-scn="freeze" data-record="false"><b>Freeze over a non-Paytm payment</b><small>no record to build on</small></button>

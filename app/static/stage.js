@@ -117,6 +117,7 @@
   function captionFor(s, inc) {
     switch (s.kind) {
       case "intake":
+        if (s.sender === "monitor" && s.engine === "payout-monitor") return ["Meena's bank just sent her payout back.", s.text + " · nobody has told Meena", "warn", 2800];
         if (s.sender === "monitor") return ["Meena's billing app never heard about this payment.", s.text, "warn", 2600];
         return [s.sender === "customer" ? `${(inc.customer && inc.customer.name) || "A customer"} writes in: “${firstSentence(s.text, 90)}”` : `Meena: “${firstSentence(s.text, 90)}”`, "Kavach owns this until it's fixed.", "", 1800];
       case "think": return [firstSentence(s.text), s.text.length > 170 ? "" : "", s.tone === "warn" ? "warn" : "", 2200];
@@ -207,10 +208,25 @@
       const f = inc.facts || {};
       const doc = (S.steps[inc.id] || []).find((s) => s.kind === "tool" && s.tool === "read_document");
       const parts = [];
+      const back = inc.recon && inc.recon.settlement && inc.recon.settlement.status === "RETURNED" ? inc.recon.settlement : null;
+      if (back) {
+        const held = S.world && S.world.settlement_config && S.world.settlement_config.paused;
+        parts.push(`<div class="bill focus"><div class="bill-top"><b>Payout ${esc(back.ref || "")}</b><span class="bill-amt">${rs(back.amount)}</span></div>
+          <div class="bill-who">Sent back by Meena's bank${f.proactive ? ", found by Kavach before anyone complained" : ""}</div><span class="bill-st UNPAID">Returned · account frozen</span>
+          <div class="bill-note">${held ? "New payouts held in Paytm's settlement balance (Meena + Paytm Risk approved). Nothing moved to another account." : "Back in Paytm's settlement balance. Holding new payouts needs Meena and Paytm Risk."}</div></div>`);
+      }
+      const disputed = f.disputed_txn && inc.money && inc.money.amount, locked = f.locked_stated;
+      if (disputed && locked && locked > disputed) {
+        const pct = Math.max(1.5, Math.min(100, (disputed / locked) * 100));
+        parts.push(`<div class="bill overhold"><div class="bill-top"><b>Disputed vs frozen</b><span class="bill-amt">${Math.round(locked / disputed)}×</span></div>
+          <div class="oh-bar" role="img" aria-label="${rs(disputed)} disputed out of ${rs(locked)} frozen"><i style="width:${pct}%"></i></div>
+          <div class="bill-note"><b>${rs(disputed)}</b> disputed (Paytm record) · <b>${rs(locked)}</b> frozen (Meena's figure, unverified). The SOP prefers holding only the disputed amount where it can be identified.</div>
+          <div class="bill-note dim">Nationally, I4C's own table to 30 Jun 2026: ₹303 cr frozen against ₹29 cr disputed (our sum of its rows).</div></div>`);
+      }
       if (doc) parts.push(`<div class="bill case-file"><b>Bank SMS and police notice</b><img src="/api/doc/${doc.args.doc_id}.png" alt="Notice" data-zoom></div>`);
       if (f.pack) parts.push(`<div class="bill"><div class="bill-top"><b>Signed evidence pack</b></div><div class="bill-note">Token ${esc(f.pack.token)}. Change one digit and verification fails.</div><div class="bill-note"><a href="/pack/${esc(f.pack.token)}.pdf" target="_blank" rel="noopener">Open PDF</a> · <a href="/verify/${esc(f.pack.token)}" target="_blank" rel="noopener">Verify it</a></div></div>`);
       (f.clocks || []).forEach((c) => parts.push(`<div class="bill small"><div class="bill-top"><b>${esc(c.clock)}</b></div><div class="bill-note">${c.start ? `${esc(c.start)} → ${esc(c.due || "?")}` : esc(c.starts_on || "needs a dated event")}</div></div>`));
-      if (inc.money && inc.money.amount) parts.push(`<div class="bill small"><div class="bill-note">${rs(inc.money.amount)} ${esc(inc.money.label)}</div></div>`);
+      if (inc.money && inc.money.amount && !back && !(disputed && locked)) parts.push(`<div class="bill small"><div class="bill-note">${rs(inc.money.amount)} ${esc(inc.money.label)}</div></div>`);
       body.innerHTML = parts.join("") || `<p class="ph-hint">Kavach builds the case here as Meena shares the notice.</p>`;
     } else {
       top.innerHTML = `<i class="ph-av bill">₹</i><div><b>Billing app</b><span>Meena Kirana Store · today's bills</span></div>`;
@@ -250,6 +266,11 @@
     let h = "";
     if (inc.pending && inc.pending.approvers && inc.pending.approvers.length) {
       h = `Waiting for <b>${inc.pending.approvers.map((a) => APPROVER[a] || a).join(" and ")}</b> to approve. Kavach won't ${esc(VERB[inc.pending.action] || inc.pending.action.replace(/_/g, " "))} on its own.`;
+    } else if (inc.kind === "freeze" && inc.facts && inc.facts.proactive && steps.some((s) => s.kind === "action" && s.action === "notify_merchant")) {
+      const warned = steps.find((s) => s.kind === "action" && s.action === "notify_merchant");
+      h = `Meena warned in <b class="good">${dur(secs(inc.created_at, warned.at))}</b>, before her first supplier payment bounced.`;
+      if (inc.money && inc.money.amount) h += ` <b class="amt-b">${rs(inc.money.amount)}</b> ${esc(inc.money.label)}.`;
+      if (denies) h += ` Stopped <b class="bad">${denies}</b> unsafe step${denies > 1 ? "s" : ""}.`;
     } else if (fix) {
       const proactive = inc.facts && inc.facts.proactive;
       const repaired = steps.some((x) => x.kind === "verify" && x.ok && x.action === "reconcile_payment");

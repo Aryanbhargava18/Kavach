@@ -281,6 +281,17 @@ async def scenario(name: str, s: Scenario):
         cust = {"name": "Sunita", "wa": "+91 98•• ••418"}
         run_bg(E().customer_message(f"I was charged twice for ₹{d['amount']:,} at Meena Kirana. Please refund one.", None, cust))
         return {"ok": True}
+    elif name == "payout_bounce":
+        # The bank freezes Meena's account (debit AND credit) today. Nobody tells Paytm. Skip to the next 9:00 payout run:
+        # the bank sends it back, and Kavach's settlement watcher has to notice on its own.
+        r = w.inject_freeze(notice_amount=s.notice_amount, paytm_record=s.paytm_record, freeze_type="total", bounce_next=True)
+        secs = (w.next_settlement - w.now).total_seconds() + 60
+        await E().tick(secs, background=True)
+        draft = {"text": "", "next_doc": r["doc_id"]}
+        state["drafts"] = [draft]
+        bus.publish({"type": "draft", "draft": draft})
+        bus.publish({"type": "world", "world": w.snapshot()})
+        return draft
     elif name == "freeze":
         r = w.inject_freeze(notice_amount=s.notice_amount, paytm_record=s.paytm_record, freeze_type=s.freeze_type)
         draft = ({"text": "Kal ka paisa bank mein nahi aaya. Kya hua?", "next_doc": r["doc_id"]} if s.freeze_type == "total" else

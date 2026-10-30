@@ -204,3 +204,9 @@ body:not(.view-stage) #stage { display: none; }
   .phases li { font-size: 12.5px; }
   .line { font-size: clamp(20px, 2vw, 28px); }
 }
+/* disputed vs frozen meter in the freeze case file */
+.bill.overhold { border: 1px solid #F5C9A8; background: #FFF8F2; }
+.bill.overhold .bill-amt { color: #B35A00; }
+.oh-bar { height: 10px; border-radius: 999px; background: #F3D5BF; margin-top: 8px; overflow: hidden; }
+.oh-bar i { display: block; height: 100%; background: #0D2A63; border-radius: 999px; }
+.bill-note.dim { color: #7A869E; font-size: 11px; }
