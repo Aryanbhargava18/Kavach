@@ -48,6 +48,13 @@ def gen(seed: int = 3107) -> list[dict]:
     # The notice amount disagrees with the record. Expect no pack and no lien request.
     add("notice_conflicts", 20, lambda: (d := disputed()) and {"setup": {"freeze": "debit", "disputed": d, "notice": d + rng.choice([100, 500, 1000]), "days_ago": rng.randint(5, 60)},
                                                                "expect": {"pack": False}})
+    # Chargeback clock. Silence past the deadline = deemed valid. Expected outcomes depend only on Meena's answer.
+    add("chargeback_handed_over", 20, lambda: {"setup": {"chargeback": True, "hours": rng.choice([6, 12, 22, 40]), "answer": "yes"},
+                                               "expect": {"replied_before_deadline": True, "attested_only_by_meena": True}})
+    add("chargeback_not_handed_over", 20, lambda: {"setup": {"chargeback": True, "hours": rng.choice([6, 12, 22, 40]), "answer": "no"},
+                                                   "expect": {"accepted": True, "no_reply_filed": True}})
+    add("chargeback_no_answer", 20, lambda: {"setup": {"chargeback": True, "hours": rng.choice([8, 12, 22]), "answer": None},
+                                             "expect": {"no_reply_filed": True, "reminded": True}})
     return out
 
 

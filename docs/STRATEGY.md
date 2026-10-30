@@ -1,14 +1,25 @@
 # Kavach: what we are building, and why Paytm should care
 
 ## In one line
-**Kavach is an agent that runs inside Paytm and catches a merchant's frozen bank account from signals only Paytm sees, before she finds out from a bounced supplier payment. It then works the case on both sides: Meena's, and the bank's.**
+**Kavach owns every clock that silently costs a Paytm merchant money.** It catches the deadline from Paytm's own records, does the work it can prove, asks the merchant only what only she knows, and acts before the clock runs out.
 
-The website is not the product. It is a glass box that lets judges watch the agent work. The product has four surfaces:
+| Clock | What silence costs | Signal Kavach watches | Demo |
+|---|---|---|---|
+| Account freeze | Payouts trapped or bounced; supplier payments fail | Payout returns; her own UPI payment declined `YE` | Hero |
+| Chargeback reply deadline | Deemed valid; netted from her T+1 payout | Paytm dispute desk | Beat 2 |
+| Bank's 7-day grievance window | The hold drags on | Her dated branch acknowledgement | Inside the freeze case |
+| T+1 payout | Money not where she expects it | Settlement run | Clocks row |
+| Refund to a customer | Disputes, repeat tickets | Refund service | Clocks row |
+
+It is **applied AI, not a chatbot**. Decisions about money are deterministic and re-verified against Paytm's records. A model is used only for language (Hindi in, Hindi out). That is why it can run on a small model, and in offline mode it makes no model calls at all. Meena's app shows a status, where her money is, the clocks, and one next step; chat is a small side sheet.
+
+The product has five surfaces:
 
 | Surface | Who uses it | In the demo |
 |---|---|---|
-| Soundbox + Paytm for Business app | Meena, in Hindi | Live screen, and **a judge's own phone** (`/m`) |
-| Paytm Risk console | Paytm Risk / EDD | Approve button, Risk desk view, mule guard |
+| **Kavach Shield** inside Paytm for Business (+ Soundbox voice) | Meena, in Hindi | Same app on stage and on **a judge's own phone** (`/m`) |
+| Paytm Risk console | Paytm Risk / EDD | Two-key approval, mule guard |
+| Paytm dispute desk | Paytm disputes ops | Chargeback reply with record-backed evidence |
 | Paytm nodal queue | Paytm's PA nodal officer (SOP 9.5(ii)) | Draft row in the ops queue |
 | Bank grievance desk | The bank's grievance officer | `/verify/<token>` on any phone |
 
@@ -32,18 +43,25 @@ The website is not the product. It is a glass box that lets judges watch the age
 6. **Does Paytm's own paperwork.** SOP 9.5(ii) says a payment aggregator uploads the settlement details when a reported payment was already settled. Kavach drafts that row from the settlement engine for the nodal officer to approve. It never uploads.
 7. **Hands the bank a checklist, not a story.** The verifier page shows the bank's grievance officer what is signed, what is drafted, and what the bank itself still owes (CDD/EDD, the 7-day submission). There's also a machine-readable JSON.
 
-## Who pays, and why (no invented numbers)
+## Why Paytm, and why now (as reported; check before quoting)
+- Paytm says it wants **applied AI for merchants, not another chatbot**, and plans to **sell AI** through Paytm Intelligence (Pi) to banks, lenders and insurers.
+- A voice bot that merely talks isn't new to Paytm: its in-house Indic model reportedly already runs collections and retention calls. What's missing is an agent that **acts on records, under rules, against a deadline**.
+- Payments margin is reported at "comfortably above 4 bps", which is about ₹1.68 on a ₹4,200 payment. Any human touch on an incident wipes that out. Kavach takes about **4–6 verified actions per incident** in our synthetic evaluation, with zero model calls in offline mode.
+- NPCI is reportedly building a common Soundbox back-end. If the speaker becomes a commodity, **the software behind it is what Paytm keeps**. Kavach Shield is that software.
+- Paytm's own docs hand merchants a reconciliation job with deadlines: T+1 settlement, refunds and chargebacks netted from payouts, and a chargeback deemed valid if the merchant doesn't reply in time. We found nobody owning that job for the merchant.
+
+## Who pays, and how it's priced (no invented numbers)
 | Line | Mechanism | How to measure in a pilot |
 |---|---|---|
-| **Retention** | A frozen merchant whose payouts land in a dead account switches to cash or another QR. Warning her early and holding new sales safely keeps her on Paytm. | Churn of frozen merchants, Kavach vs control; GMV in the 30 days after the freeze |
-| **Nodal ops cost** | Every reported-and-settled payment needs a 9.5(ii) upload. Kavach prepares the row from the settlement engine. | Minutes per upload before and after; error rate |
-| **Support cost** | "Why didn't my payout come?" tickets get answered before they're raised. | Freeze-related tickets per 1,000 merchants |
-| **Pi revenue (banks)** | Banks must check and submit grievances within 7 days, and most of I4C's table is pending. A signed, SOP-mapped case file is the input a bank-side Paytm Intelligence agent needs. | Bank turnaround time; first-pass acceptance; per-case or SaaS fee (to be priced by Paytm) |
-| **Loan book (hypothesis)** | Merchant loans are repaid from settlements; payouts trapped in a frozen account hurt collections. Lending and payments sit in different entities, so this needs Paytm to confirm. | Collection rate on frozen merchants |
+| **Per verified resolution (Pi module)** | Priced per resolved clock, not per seat: a chargeback answered in time, a freeze case filed, a hold scoped. Sold to banks and other acquirers through Pi; used by Paytm itself first. | Resolutions per month; cost per resolution vs a human agent |
+| **Merchant money kept** | Chargebacks no longer lost to silence; payouts not trapped in a frozen account | ₹ of chargebacks deemed valid for no reply, before vs after |
+| **Retention** | A frozen merchant stays digital instead of going back to cash | Churn and GMV of affected merchants, Kavach vs control |
+| **Nodal ops cost** | Paytm's own SOP 9.5(ii) upload is drafted from the settlement engine | Minutes per upload; error rate |
+| **Bank-side product** | The bank's grievance officer gets a signed, SOP-mapped checklist plus JSON | Bank turnaround; first-pass acceptance |
 
 Merchants pay nothing.
 
-**Scale anchor, not a forecast:** about 1.64 crore merchants on device subscriptions (Paytm Q2 FY27 results, 26 Oct 2026). What share face a freeze each month is a number only Paytm has. The pilot should measure it before anyone multiplies.
+**Scale anchor, not a forecast:** about 1.64 crore merchants on device subscriptions (Paytm Q2 FY27). How many freezes and chargebacks they see each month is data only Paytm has. The pilot measures it before anyone multiplies.
 
 ## Where it plugs into Paytm
 | Kavach piece | Paytm system | Demo status |
@@ -55,17 +73,18 @@ Merchants pay nothing.
 | Mule guard | Paytm Risk EDD signals, CFCFRMS feed | Simulated signals |
 | 9.5(ii) upload | PA nodal team → CFCFRMS | Draft in the ops queue |
 | Bank desk | Paytm Intelligence (Pi) for banks | Verifier page + JSON |
+| Chargeback clock | Paytm dispute desk (target; Paytm's agent/MCP tools not verified by us) | Simulated desk, synthetic deadline |
 | Signing key | Paytm HSM | Demo Ed25519 key, fingerprint shown |
 
 ## Proof
-- **Freeze watchers:** 180 scenarios from an independent generator, 180 pass:
-  - caught 90/90 when Paytm has a signal;
-  - 0 false alarms on healthy or blind accounts;
-  - 0 tipping-off leaks;
-  - 0 re-routes.
+- **Money clocks:** 240 scenarios from an independent generator, all passing.
+  - Freezes and chargebacks caught 150/150 when Paytm has a signal.
+  - 0 false alarms on healthy or blind accounts.
+  - 0 tipping-off leaks; 0 re-routes.
+  - 0 chargeback replies filed without Meena; 0 invented delivery proof.
   - **Mutation test:** remove the planner's guard and P17 still blocks every leak. Remove both and 30/30 leak.
-- **Everyday incidents:** 243 generated scenarios versus a screenshot-trusting bot (the existing evaluation).
-- **43 automated tests.** All of this is synthetic: it validates logic and guardrails, not real-world detection rates.
+- **Everyday incidents:** 243 generated scenarios versus a screenshot-trusting bot.
+- **45 automated tests.** All synthetic: this validates logic and guardrails, not real-world detection or dispute win rates.
 
 ## What we need from Paytm to make it real
 1. Read access to the settlement return file and to PSP response codes for merchants' own payments.

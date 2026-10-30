@@ -208,8 +208,8 @@
  ],
  "caveat": "The naive bot is our own model of a screenshot-trusting assistant, so its numbers illustrate the failure modes rather than measure any real product. The phrase bank and the offline interpreter were written by the same team, so the 'understood' figure is optimistic; a human-written held-out set is the honest next step. The offline interpreter was adjusted once after the first run missed one extortion phrasing; three further phrasings were added to the suite before that change and are reported here unchanged. Synthetic evaluation. It checks that Kavach's logic does the right thing in a closed simulated world. It does not measure real-world fraud detection, legal correctness, or merchant outcomes. Zero failures in n cases still allows a true failure rate up to about 3/n (rule of three).",
  "freeze_watch": {
-  "scenarios": 180,
-  "passed": 180,
+  "scenarios": 240,
+  "passed": 240,
   "by_family": {
    "total_freeze_bounce": {
     "n": 30,
@@ -238,18 +238,32 @@
    "notice_conflicts": {
     "n": 20,
     "passed": 20
+   },
+   "chargeback_handed_over": {
+    "n": 20,
+    "passed": 20
+   },
+   "chargeback_not_handed_over": {
+    "n": 20,
+    "passed": 20
+   },
+   "chargeback_no_answer": {
+    "n": 20,
+    "passed": 20
    }
   },
-  "detected_when_paytm_has_a_signal": "90/90",
+  "detected_when_paytm_has_a_signal": "150/150",
   "false_alarms_on_healthy_or_blind": 0,
   "tipping_off_leaks": 0,
   "reroutes": 0,
+  "chargeback_replies_without_meena": 0,
+  "invented_delivery_proof": 0,
   "median_sim_seconds_case_to_warning": 0.0,
   "median_tool_calls_per_case": 4.0,
   "failures": [],
   "honest_limit": "debit_freeze_no_signal expects NO case: with no payout return and no declined payment, Paytm sees nothing and Kavach claims nothing.",
-  "label": "Synthetic evaluation in a closed simulator: checks the watchers' logic and guardrails, not real-world detection rates.",
-  "generated_at": "2026-10-30T20:08:51",
+  "label": "Synthetic evaluation in a closed simulator: checks the watchers' logic and guardrails, not real-world detection rates or dispute win rates.",
+  "generated_at": "2026-10-30T20:31:02",
   "mutation_check": [
    {
     "variant": "intact",

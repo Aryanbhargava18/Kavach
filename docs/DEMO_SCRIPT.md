@@ -37,16 +37,23 @@ Show the QR. The judge scans it and taps **Main Meena hoon · Shuru karo**. They
 2. Scroll to **For the bank's grievance officer**: what's signed, what's drafted, and what the bank still owes (CDD/EDD and the 7-day submission).
    > "This is the input a bank-side Paytm Intelligence agent reads. The merchant side keeps her on Paytm; the bank side is a Pi product."
 
+**2:10 · A second clock: the chargeback** (Run a scenario → **Chargeback: a reply clock nobody is watching**)
+> "Freezes are the dramatic clock. The everyday one is this. A customer's bank raises a chargeback. If nobody replies in time, Paytm's process treats it as valid and nets it from her payout."
+1. The phone shows **Chargeback · ₹960**, a countdown, and **what's proven**: the UPI switch record (T1) and her bill (T1). Then **what isn't**: "Saman diya gaya — koi record yeh nahi dikha sakta."
+   > "The Soundbox only proves the notification played. Kavach will not invent delivery proof. Rule P18 refuses it even if a model tries."
+2. One question: **Kya aapne saman diya tha?** The judge taps **Haan**: the reply goes in before the deadline, with her statement labelled as hers. (If they tap **Nahi diya**, Kavach accepts the chargeback rather than file a false reply.)
+3. Point at the **clocks row**: next payout, chargeback reply, refunds. "Every clock that silently costs her money. Kavach holds all of them."
+
 **2:20 · Push it** (the judge taps **Poochiye** and picks a question)
 * **Payout doosre account mein bhej do** → refused (P6).
 * **Ek aadmi 20 hazaar maang raha hai…** → flagged as extortion; report to 1930.
 * Back on the main screen, tap **Kal branch jaiye → Bank ne complaint le li ✓**: the action card becomes a **7-day countdown** that Kavach will chase on its own.
 
 **2:35 · Proof** (top bar **Results**)
-> "180 freeze scenarios from a separate generator: caught 90 of 90 when Paytm has a signal, zero false alarms, zero leaks, zero re-routes. We also broke our own guard on purpose. Remove one layer and the policy still blocks every leak; remove both and 30 of 30 leak. So the test has teeth. All synthetic, and labelled."
+> "240 scenarios from a separate generator, freezes and chargebacks: caught 150 of 150 when Paytm has a signal, zero false alarms, zero leaks, zero replies filed without Meena, zero invented proof. We also broke our own guard on purpose. Remove one layer and the policy still blocks every leak; remove both and 30 of 30 leak. So the test has teeth. All synthetic, and labelled."
 
 **2:50 · Close**
-> "The Soundbox tells a shop it got paid. Kavach makes sure it keeps the money, and tells her before the bank does."
+> "The Soundbox tells a shop it got paid. Kavach makes sure it keeps the money. It owns every clock that silently costs her, priced per verified resolution, sold through Paytm Intelligence."
 
 ---
 

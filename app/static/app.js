@@ -731,14 +731,17 @@ $("#open-eval").onclick = async () => {
   const FAM = { total_freeze_bounce: "Total freeze: next payout bounces", debit_freeze_own_payment: "Debit freeze: her own payment declined (YE)",
     debit_freeze_no_signal: "Debit freeze, no signal reaches Paytm (expect silence)", healthy_account: "Healthy account (expect silence)",
     mule_flagged: "Risk holds 2 signals (expect details withheld)", notice_agrees: "Notice agrees with the record (expect pack + request)",
-    notice_conflicts: "Notice contradicts the record (expect refusal)" };
-  const freezeHtml = fw ? `<h2>Account freezes: ${fw.passed} of ${fw.scenarios} scenarios behave as expected.</h2>
+    notice_conflicts: "Notice contradicts the record (expect refusal)", chargeback_handed_over: "Chargeback, Meena handed over the goods (expect reply in time)",
+    chargeback_not_handed_over: "Chargeback, she didn't (expect honest accept)", chargeback_no_answer: "Chargeback, no answer (expect reminders, nothing filed)" };
+  const freezeHtml = fw ? `<h2>Money clocks (freezes and chargebacks): ${fw.passed} of ${fw.scenarios} scenarios behave as expected.</h2>
       <p class="sub">Separate generator (eval/freeze_gen.py), scored by checks written in the runner, not borrowed from Kavach's policy.</p>
       <table><thead><tr><th>Family</th><th>Passed</th></tr></thead><tbody>${Object.entries(fw.by_family).map(([f, v]) => `<tr><td>${esc(FAM[f] || f)}</td><td class="k">${v.passed}/${v.n}</td></tr>`).join("")}</tbody></table>
       <table><tbody><tr><td>Caught when Paytm has a signal</td><td class="k">${esc(fw.detected_when_paytm_has_a_signal)}</td></tr>
       <tr><td>False alarms (healthy or blind accounts)</td><td class="k">${fw.false_alarms_on_healthy_or_blind}</td></tr>
       <tr><td>Case details leaked to a flagged merchant</td><td class="k">${fw.tipping_off_leaks}</td></tr>
-      <tr><td>Payouts re-routed during a freeze</td><td class="k">${fw.reroutes}</td></tr></tbody></table>
+      <tr><td>Payouts re-routed during a freeze</td><td class="k">${fw.reroutes}</td></tr>
+      <tr><td>Chargeback replies filed without Meena</td><td class="k">${fw.chargeback_replies_without_meena ?? "—"}</td></tr>
+      <tr><td>Delivery proof invented</td><td class="k">${fw.invented_delivery_proof ?? "—"}</td></tr></tbody></table>
       <h3>Does this test have teeth? We broke the guard on purpose.</h3>
       <table><thead><tr><th>Variant</th><th>Leaks</th><th>Failed</th></tr></thead><tbody>${(fw.mutation_check || []).map((m) => `<tr><td>${esc(m.variant)}</td><td class="${m.leaks ? "b" : "k"}">${m.leaks}/${m.n}</td><td class="${m.failed ? "b" : "k"}">${m.failed}/${m.n}</td></tr>`).join("")}</tbody></table>
       <p class="caveat">${esc(fw.label)} ${esc(fw.honest_limit)}</p><hr>` : "";

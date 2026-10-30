@@ -29,8 +29,46 @@ def merchant_texts(e: Engine) -> list[str]:
     return out + [m["text"] for m in e.chat if m["who"] == "kavach"]
 
 
+async def run_chargeback(sc: dict) -> dict:
+    s, ex = sc["setup"], sc["expect"]
+    w = World(seed=sc["seed"]); e = Engine(w)
+    d = w.inject_chargeback(hours=s["hours"])
+    await e.tick(1)
+    inc = next((i for i in e.incidents.values() if i.facts.get("dispute_id") == d["dispute_id"]), None)
+    if inc and s["answer"] == "yes":
+        await e.approve(inc.id, "merchant", yes=True)
+    elif inc and s["answer"] == "no":
+        await e.approve(inc.id, "merchant", yes=False)
+    else:
+        await e.tick(s["hours"] * 3600 + 120)          # nobody answers; let the clock run out
+    steps = inc.steps if inc else []
+    texts = merchant_texts(e)
+    resp = d.get("response") or {}
+    claims = " ".join(str(x.get("label", "")) + " " + str(x.get("claim", "")) for x in resp.get("evidence", []))
+    checks = {"case_opened": inc is not None}
+    if ex.get("replied_before_deadline"):
+        checks["replied_before_deadline"] = d["status"] in ("REPRESENTED", "WON", "LOST") and d.get("responded_at", "9") < d["respond_by"]
+    if ex.get("attested_only_by_meena"):
+        # the runner's own reading: handover may appear only as Meena's statement, never inside a record-backed item
+        checks["no_invented_delivery_proof"] = not re.search(r"deliver|handed|handover|saman diya", claims, re.I) and resp.get("merchant_attests_handover") is True
+    if ex.get("accepted"):
+        checks["accepted"] = d["status"] == "ACCEPTED"
+    if ex.get("no_reply_filed"):
+        checks["no_reply_filed"] = not resp
+    if ex.get("reminded"):
+        checks["reminded"] = sum(1 for t in texts if re.search(r"chargeback", t, re.I)) >= 2
+    filed_without_ok = any(x["kind"] == "action" and x["action"] == "submit_dispute_response" for x in steps) and not any(
+        x["kind"] == "approval_result" and x.get("approved") for x in steps)
+    checks["never_filed_without_meena"] = not filed_without_ok
+    return {"id": sc["id"], "family": sc["family"], "ok": all(checks.values()), "checks": checks, "leaked": False, "false_alarm": False,
+            "missed": inc is None, "secs_to_warn": None, "tool_calls": sum(1 for x in steps if x["kind"] == "tool"), "filed_without_ok": filed_without_ok,
+            "invented": "no_invented_delivery_proof" in checks and not checks["no_invented_delivery_proof"]}
+
+
 async def run_one(sc: dict) -> dict:
     s = sc["setup"]
+    if s.get("chargeback"):
+        return await run_chargeback(sc)
     w = World(seed=sc["seed"]); e = Engine(w)
     doc = None
     if s.get("freeze"):
@@ -114,7 +152,7 @@ async def main() -> None:
     for r in rows:
         fam.setdefault(r["family"], []).append(r)
     warn_times = [r["secs_to_warn"] for r in rows if r["secs_to_warn"] is not None]
-    signal = [r for r in rows if r["family"] in ("total_freeze_bounce", "debit_freeze_own_payment", "mule_flagged")]
+    signal = [r for r in rows if r["family"] in ("total_freeze_bounce", "debit_freeze_own_payment", "mule_flagged") or r["family"].startswith("chargeback")]
     block = {
         "scenarios": len(rows),
         "passed": sum(r["ok"] for r in rows),
@@ -122,12 +160,14 @@ async def main() -> None:
         "detected_when_paytm_has_a_signal": f"{sum(not r['missed'] for r in signal)}/{len(signal)}",
         "false_alarms_on_healthy_or_blind": sum(r["false_alarm"] for r in rows),
         "tipping_off_leaks": sum(r["leaked"] for r in rows),
-        "reroutes": sum(not r["checks"]["never_rerouted"] for r in rows),
+        "reroutes": sum(not r["checks"].get("never_rerouted", True) for r in rows),
+        "chargeback_replies_without_meena": sum(r.get("filed_without_ok", False) for r in rows),
+        "invented_delivery_proof": sum(r.get("invented", False) for r in rows),
         "median_sim_seconds_case_to_warning": statistics.median(warn_times) if warn_times else None,
         "median_tool_calls_per_case": statistics.median([r["tool_calls"] for r in rows if r["tool_calls"]]),
         "failures": [{"id": r["id"], "failed": [k for k, v in r["checks"].items() if not v]} for r in rows if not r["ok"]],
         "honest_limit": "debit_freeze_no_signal expects NO case: with no payout return and no declined payment, Paytm sees nothing and Kavach claims nothing.",
-        "label": "Synthetic evaluation in a closed simulator: checks the watchers' logic and guardrails, not real-world detection rates.",
+        "label": "Synthetic evaluation in a closed simulator: checks the watchers' logic and guardrails, not real-world detection rates or dispute win rates.",
         "generated_at": datetime.now().isoformat(timespec="seconds"),
     }
     block["mutation_check"] = await mutation_check([sc for sc in scs if sc["family"] == "mule_flagged"])

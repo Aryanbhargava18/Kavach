@@ -124,3 +124,21 @@ Because the bank doesn't see the sale. Paytm sees the counter, the settlement tr
 
 **Is the RBI rule in force?**
 No. The draft was released on 11 Sep 2026 and comments closed on 2 Oct 2026. Kavach labels it as a draft everywhere it appears. The SOP and the High Court orders are what apply today.
+
+## The money clocks
+
+**What is Kavach, in one sentence, now?**
+It owns every clock that silently costs a Paytm merchant money: account freezes, chargeback reply deadlines, the bank's 7-day grievance window, T+1 payouts and refunds. It catches each one from Paytm's own records, proves what the records prove, asks the merchant only what only she knows, and acts before the deadline.
+
+**Why chargebacks?**
+Paytm's own documentation says refunds and chargebacks are netted from settlements, and a chargeback is deemed valid if the merchant doesn't reply in time. A kirana owner doesn't watch a dispute desk, so silence costs her money. In the demo the deadline is synthetic and the desk is simulated.
+
+**Couldn't Kavach just win more disputes by saying the goods were delivered?**
+That would be inventing evidence in her name. Kavach files only items backed by a Paytm record (the switch record and her bill). It says plainly that the Soundbox only proves the notification played. A handover goes in only if Meena says so, labelled as her statement. If she says she didn't hand over the goods, Kavach accepts the chargeback. Rule P18 enforces this, and the evaluation checks it: 0 invented proof and 0 replies filed without her in 60 chargeback scenarios.
+
+**How would Paytm make money from this?**
+As a Paytm Intelligence operations module, priced per verified resolution, not per seat. Paytm uses it on its own merchant base first, then sells it to banks and acquirers. The decisions are deterministic and the model only handles language, so it can run on a small model; offline mode makes no model calls.
+
+**Isn't this a chatbot with extra steps?**
+Meena's app has no chat on its main screen. It shows a status, where her money is, the clocks Kavach is holding, and one next step, with chat as an optional side sheet. Every money decision is a rule that re-reads Paytm's records, every action is re-verified, and a mutation test proves the guardrails are load-bearing.
+
