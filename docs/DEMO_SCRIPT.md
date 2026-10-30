@@ -14,32 +14,33 @@ One person drives the laptop. One person talks. **The judge holds Meena's phone.
 > "A shop took a ₹1,000 UPI payment. The customer was later named in a fraud case, and the shop's whole account, ₹8.26 lakh, was frozen for ten months. I4C's own table shows about ₹303 crore frozen against ₹29 crore actually disputed. And the shopkeeper finds out last, when her supplier payment bounces. Paytm finds out first. Nobody acts on that."
 
 **0:20 · Give the judge Meena's phone**
-Show the QR. The judge scans it and taps **Main Meena hoon · Start**.
+Show the QR. The judge scans it and taps **Main Meena hoon · Shuru karo**. They now hold Meena's Paytm for Business app with **Kavach Shield**: a status card, today's sales, what Kavach has already fixed. It's not a chat.
 > "You're Meena now. Keep the sound on."
 
 **0:35 · Kavach notices first** (click **Meena's bank freezes her account**)
 1. The clock jumps to the 9:00 payout run. Meena's bank sends the payout back. **Detect** lights up. Nobody typed anything.
 2. The Soundbox shows CHECKING, then **checks Paytm Risk before saying a word**.
    > "If Risk already had two independent signals on this shop, Kavach would stay quiet. Telling a possible mule operator would tip them off."
-3. **The judge's phone buzzes and speaks in Hindi:** don't pay suppliers yet; ask the branch for the NCRP number, the notice and the disputed amount.
-4. The phone asks to hold new payouts with Paytm. **The judge taps "Haan, karo".** The driver clicks **Approve as Paytm Risk**.
+3. **The judge's phone buzzes, a push banner drops in, and it speaks in Hindi.** The app turns into a case: **Account freeze**, caught at 9:01 "before anyone told you", with the money map and a tracker.
+4. **Aapka agla kadam:** hold new sales with Paytm? **The judge taps "Haan, surakshit rakho".** The driver clicks **Approve as Paytm Risk**. On the phone, "Nayi sale surakshit" ticks green.
    > "Two keys: hers and Paytm Risk's. The money stays with Paytm and never moves to another account."
 
-**1:15 · The case builds itself** (judge taps **📎 Bank ka SMS + notice bhejo** on the phone)
+**1:15 · The case builds itself** (judge taps **Bank ka SMS + notice bhejo** on the phone, or photographs a printed notice with **📷 Photo kheecho**)
 1. Kavach reads the notice, **ignores the instruction hidden in it**, matches the one ₹2,400 payment, and refuses to go on if the amounts disagree.
 2. It routes the case under the MHA/I4C SOP and drafts **Paytm's own SOP 9.5(ii) upload** for the nodal officer.
-3. It signs the pack. On the case file: **₹2,400 disputed vs ₹3.1 lakh frozen, 129×.**
-4. The phone asks: write to the bank, in her name, to limit the hold to ₹2,400? **The judge approves.**
+3. It signs the pack. **On the judge's phone the money map fills in: ₹3,10,000 frozen, a sliver of ₹2,400 disputed, "129× zyada", and what's safe with Paytm.** The tracker ticks through Notice and Case.
+4. Next step: **Bank ko request: hold sirf ₹2,400 tak.** **The judge taps "Request taiyaar karo".** The letter appears under *Aapke documents*. Tap it to read it.
    > "It cites the SOP, three High Courts and the RBI's September draft, labelled as a draft. She signs; the bank decides."
 
-**1:55 · The bank's side, on the judge's phone** (judge taps **Signed pack · verify on this phone**)
+**1:55 · The bank's side, on the judge's phone** (judge taps **Signed evidence pack › Verify**)
 1. Green: **Valid**. Tap **Check a copy with one digit changed**: red, **TAMPERED**.
 2. Scroll to **For the bank's grievance officer**: what's signed, what's drafted, and what the bank still owes (CDD/EDD and the 7-day submission).
    > "This is the input a bank-side Paytm Intelligence agent reads. The merchant side keeps her on Paytm; the bank side is a Pi product."
 
-**2:20 · Push it** (chips on the phone)
-* **Payout doosre account mein** → refused (P6).
-* **Caller ₹20,000 maang raha** → flagged as extortion; report to 1930.
+**2:20 · Push it** (the judge taps **Poochiye** and picks a question)
+* **Payout doosre account mein bhej do** → refused (P6).
+* **Ek aadmi 20 hazaar maang raha hai…** → flagged as extortion; report to 1930.
+* Back on the main screen, tap **Kal branch jaiye → Bank ne complaint le li ✓**: the action card becomes a **7-day countdown** that Kavach will chase on its own.
 
 **2:35 · Proof** (top bar **Results**)
 > "180 freeze scenarios from a separate generator: caught 90 of 90 when Paytm has a signal, zero false alarms, zero leaks, zero re-routes. We also broke our own guard on purpose. Remove one layer and the policy still blocks every leak; remove both and 30 of 30 leak. So the test has teeth. All synthetic, and labelled."
