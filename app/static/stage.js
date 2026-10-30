@@ -215,7 +215,7 @@
           <div class="bill-who">Sent back by Meena's bank${f.proactive ? ", found by Kavach before anyone complained" : ""}</div><span class="bill-st UNPAID">Returned · account frozen</span>
           <div class="bill-note">${held ? "New payouts held in Paytm's settlement balance (Meena + Paytm Risk approved). Nothing moved to another account." : "Back in Paytm's settlement balance. Holding new payouts needs Meena and Paytm Risk."}</div></div>`);
       }
-      const disputed = f.disputed_txn && inc.money && inc.money.amount, locked = f.locked_stated;
+      const disputed = f.disputed_txn && inc.recon && inc.recon.switch && inc.recon.switch.amount, locked = f.locked_stated;   // T1: the switch record, never the notice
       if (disputed && locked && locked > disputed) {
         const pct = Math.max(1.5, Math.min(100, (disputed / locked) * 100));
         parts.push(`<div class="bill overhold"><div class="bill-top"><b>Disputed vs frozen</b><span class="bill-amt">${Math.round(locked / disputed)}×</span></div>
