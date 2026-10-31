@@ -4,6 +4,8 @@
   unicode-range: U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+1E00-1EFF,U+20A0-20AB,U+20AD-20C0,U+2113; }
 @font-face { font-family: "Anek"; src: url(fonts/anek-devanagari.woff2) format("woff2"); font-weight: 100 800; font-stretch: 75% 125%;
   unicode-range: U+0900-097F,U+1CD0-1CF9,U+200C-200D,U+20A8,U+20B9,U+20F0,U+25CC,U+A830-A839,U+A8E0-A8FF; }
+@font-face { font-family: "Geist"; src: url(vendor/fonts/Geist-Variable.woff2) format("woff2"); font-weight: 100 900; font-display: swap; }
+@font-face { font-family: "Geist Mono"; src: url(vendor/fonts/GeistMono-Variable.woff2) format("woff2"); font-weight: 100 900; font-display: swap; }
 @font-face { font-family: "Plex Mono"; src: url(fonts/ibm-plex-mono-latin-400-normal.woff2) format("woff2"); font-weight: 400; }
 @font-face { font-family: "Plex Mono"; src: url(fonts/ibm-plex-mono-latin-500-normal.woff2) format("woff2"); font-weight: 500; }
 
@@ -14,8 +16,8 @@
   --cyan: #123E7A; --cyan-deep: #0C2C59; --chalk: #F2F7FF; --chalk-2: #A9C3EA; --chalk-3: #6F8FC0; --grid: rgba(220, 235, 255, .09);
   --stamp: #E8432F; --stamp-wash: #FDECEA; --ok: #12805C; --ok-hi: #43D69A; --ok-wash: #E3F4EC; --wait: #B87300; --wait-hi: #FFC24B; --wait-wash: #FFF4DC;
   --wa: #E5F6EA; --wa-line: #BFE6CB; --note: #FFF7DA; --note-line: #F1DE9C;
-  --mono: "Plex Mono", ui-monospace, Menlo, monospace;
-  --sans: "Anek", "Noto Sans Devanagari", system-ui, sans-serif;
+  --mono: "Geist Mono", "Plex Mono", ui-monospace, Menlo, monospace;
+  --sans: "Geist", "Anek", "Noto Sans Devanagari", system-ui, sans-serif;
   --ease: cubic-bezier(.2, .8, .2, 1);
 }
 * { box-sizing: border-box; }
@@ -51,8 +53,11 @@ h1, h2, h3, h4, p { margin: 0; }
 .ichip.on { border: 1px solid var(--ok-hi); color: var(--ok-hi); }
 .ichip.on::before { content: "● "; font-size: 8px; vertical-align: 1px; }
 .clock { font-variant-numeric: tabular-nums; font-weight: 600; font-size: 14px; color: #fff; padding: 0 2px; }
-.tbtn { background: transparent; border: 1px solid #2d3f63; color: #dbe3f0; border-radius: 999px; padding: 4px 11px; font-size: 12.5px; }
-.tbtn:hover { border-color: #6f84ad; } .tbtn.icon { padding: 3px 8px; }
+.tbtn { display: inline-flex; align-items: center; gap: 6px; height: 32px; background: rgba(255,255,255,.06); border: 1px solid rgba(255,255,255,.1); color: #E6ECF5; border-radius: 10px; padding: 0 11px; font-size: 13px; font-weight: 500; transition: background .15s, border-color .15s; }
+.tbtn:hover { background: rgba(255,255,255,.12); border-color: rgba(255,255,255,.2); } .tbtn.icon { padding: 0 8px; }
+.tbtn svg { width: 15px; height: 15px; stroke-width: 2; opacity: .85; }
+.top { background: linear-gradient(180deg, #07142F, #0A1B3C); border-bottom: 1px solid rgba(255,255,255,.06); }
+.menu-btn svg, .st-menu svg { width: 16px; height: 16px; vertical-align: -3px; margin-right: 6px; }
 
 /* ============================ layout ============================ */
 .app { height: calc(100vh - 56px); display: grid; grid-template-columns: 296px minmax(0, 1fr) minmax(360px, 420px); }

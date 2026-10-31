@@ -160,12 +160,6 @@ async def skip_days(sk: Skip):
     return {"ok": True}
 
 
-@app.get("/api/business")
-def business_case():
-    from . import business
-    return business.build()
-
-
 @app.get("/api/integrations")
 def integrations():
     from . import automation, sop_kb

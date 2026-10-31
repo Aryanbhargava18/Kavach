@@ -3,228 +3,128 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="theme-color" content="#002E6E">
+<meta name="theme-color" content="#001B44">
 <title>Kavach Shield</title>
+<!-- Open-source UI stack, vendored so the demo runs offline: Tailwind CSS (browser build), Lucide icons, Motion, Geist -->
+<script src="/static/vendor/tailwind.browser.js"></script>
+<script src="/static/vendor/lucide.min.js"></script>
+<script src="/static/vendor/motion.js"></script>
 <style>
-@font-face { font-family: "Anek"; src: url(/static/fonts/anek-latin.woff2) format("woff2"); font-weight: 100 800; font-stretch: 75% 125%; }
-@font-face { font-family: "Anek"; src: url(/static/fonts/anek-devanagari.woff2) format("woff2"); font-weight: 100 800; font-stretch: 75% 125%;
+@font-face { font-family: "Geist"; src: url(/static/vendor/fonts/Geist-Variable.woff2) format("woff2"); font-weight: 100 900; font-display: swap; }
+@font-face { font-family: "Geist Mono"; src: url(/static/vendor/fonts/GeistMono-Variable.woff2) format("woff2"); font-weight: 100 900; font-display: swap; }
+@font-face { font-family: "Anek"; src: url(/static/fonts/anek-devanagari.woff2) format("woff2"); font-weight: 100 800;
   unicode-range: U+0900-097F,U+1CD0-1CF9,U+200C-200D,U+20A8,U+20B9,U+20F0,U+25CC,U+A830-A839,U+A8E0-A8FF; }
-:root {
-  --navy: #002E6E; --sky: #00BAF2; --sky-2: #E6F7FD; --ink: #0B1B33; --ink-2: #4B5B73; --ink-3: #8794A8; --line: #E4E9F0; --bg: #F3F6FA; --card: #fff;
-  --good: #0E8A55; --good-2: #E5F6EE; --warn: #B76B00; --warn-2: #FFF3DF; --bad: #C2341F; --bad-2: #FDECE8;
-  --r: 18px; --sh: 0 1px 2px rgba(11,27,51,.06), 0 6px 18px rgba(11,27,51,.06);
+</style>
+<style type="text/tailwindcss">
+@theme {
+  --font-sans: "Geist", "Anek", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: "Geist Mono", ui-monospace, monospace;
+  --color-navy: #001B44; --color-navy-2: #002E6E; --color-sky: #00B9F1; --color-sky-50: #E8F8FE;
+  --color-ink: #0A1628; --color-ink-2: #475569; --color-ink-3: #94A3B8; --color-line: #E7ECF3; --color-page: #F4F6FA;
+  --color-ok: #059669; --color-ok-50: #ECFDF5; --color-warn: #D97706; --color-warn-50: #FFFBEB; --color-bad: #E11D48; --color-bad-50: #FFF1F2;
 }
-* { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-html, body { margin: 0; background: var(--bg); color: var(--ink); font-family: "Anek", system-ui, sans-serif; font-stretch: 100%; }
-body { max-width: 480px; margin: 0 auto; min-height: 100dvh; padding-bottom: 84px; }
-button { font: inherit; color: inherit; }
-.bar { position: sticky; top: 0; z-index: 5; background: #fff; border-bottom: 1px solid var(--line); padding: 10px 16px; display: flex; align-items: center; gap: 10px; }
-.bar .logo { width: 34px; height: 34px; border-radius: 10px; background: linear-gradient(135deg, var(--sky), var(--navy)); display: grid; place-items: center; color: #fff; flex: none; }
-.bar .logo svg { width: 19px; height: 19px; fill: none; stroke: #fff; stroke-width: 2.2; stroke-linejoin: round; }
-.bar small { display: block; font-size: 11.5px; color: var(--ink-3); letter-spacing: .02em; }
-.bar b { font-size: 17px; font-weight: 750; }
-.bar .tag { margin-left: auto; font-size: 10.5px; font-weight: 700; color: var(--ink-3); border: 1px dashed var(--ink-3); border-radius: 999px; padding: 2px 8px; }
-main { padding: 14px 14px 0; display: flex; flex-direction: column; gap: 12px; }
-
-/* status hero */
-.hero { border-radius: 22px; padding: 18px 18px 16px; color: #fff; position: relative; overflow: hidden; box-shadow: var(--sh); }
-.hero.ok { background: linear-gradient(140deg, #00A5E0 0%, #0062B0 55%, #002E6E 100%); }
-.hero.bad { background: linear-gradient(140deg, #13336B 0%, #0B2350 60%, #2A1240 100%); }
-.hero .trust { margin-top: 10px; font-size: 12.5px; color: rgba(255,255,255,.72); }
-.act.done { border-color: var(--good); background: linear-gradient(180deg, var(--good-2), #fff 60%); }
-.act.done .eyebrow { color: var(--good); } .act.done .eyebrow::before { background: var(--good); animation: none; }
-.mrow .dot.muted { background: var(--line); } .mrow .v.muted { color: var(--ink-3); text-decoration: line-through; font-weight: 600; }
-.hero.wait { background: linear-gradient(140deg, #3A4A63 0%, #1F2C44 100%); }
-.hero .row { display: flex; align-items: center; gap: 10px; }
-.hero .shield { width: 44px; height: 44px; border-radius: 14px; background: rgba(255,255,255,.14); display: grid; place-items: center; flex: none; position: relative; }
-.hero .shield svg { width: 24px; height: 24px; fill: none; stroke: #fff; stroke-width: 2; stroke-linejoin: round; stroke-linecap: round; }
-.hero.bad .shield::after { content: ""; position: absolute; inset: -4px; border-radius: 18px; border: 2px solid #FF8A73; animation: ring 1.8s ease-out infinite; }
-@keyframes ring { from { opacity: .9; transform: scale(.9); } to { opacity: 0; transform: scale(1.25); } }
-.hero .pill { font-size: 12px; font-weight: 700; background: rgba(255,255,255,.16); border-radius: 999px; padding: 3px 10px; }
-.hero.bad .pill { background: #FF6A4F; color: #fff; }
-.hero h1 { font-size: 27px; line-height: 1.12; margin: 14px 0 6px; font-weight: 750; font-stretch: 105%; }
-.hero p { margin: 0; font-size: 15px; line-height: 1.4; color: rgba(255,255,255,.86); }
-.hero .listen { margin-top: 14px; display: inline-flex; align-items: center; gap: 8px; background: rgba(255,255,255,.14); border: 0; border-radius: 999px; padding: 8px 14px; color: #fff; font-weight: 600; font-size: 14px; cursor: pointer; }
-.hero .listen svg { width: 16px; height: 16px; fill: #fff; }
-.hero .big { font-size: 40px; font-weight: 800; font-stretch: 110%; margin: 10px 0 0; letter-spacing: -.01em; }
-.hero .kv { display: flex; gap: 18px; margin-top: 10px; font-size: 13px; color: rgba(255,255,255,.8); }
-.hero .kv b { display: block; color: #fff; font-size: 15px; }
-
-/* cards */
-.card { background: var(--card); border-radius: var(--r); box-shadow: var(--sh); padding: 16px; }
-.card h2 { font-size: 13px; text-transform: uppercase; letter-spacing: .06em; color: var(--ink-3); margin: 0 0 12px; font-weight: 700; }
-
-/* money map */
-.money .top { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; }
-.money .top .amt { font-size: 30px; font-weight: 800; font-stretch: 108%; letter-spacing: -.01em; }
-.money .ratio { font-size: 13px; font-weight: 800; color: var(--bad); background: var(--bad-2); border-radius: 999px; padding: 4px 10px; white-space: nowrap; }
-.money .bar2 { height: 14px; border-radius: 999px; background: #F6D8D1; margin: 12px 0 14px; overflow: hidden; display: flex; }
-.money .bar2 i { display: block; height: 100%; background: var(--warn); min-width: 4px; border-radius: 999px; transition: width .8s cubic-bezier(.2,.8,.2,1); }
-.mrow { display: flex; align-items: center; gap: 10px; padding: 10px 0; border-top: 1px solid var(--line); }
-.mrow .dot { width: 10px; height: 10px; border-radius: 50%; flex: none; }
-.mrow .dot.bad { background: #E8A597; } .mrow .dot.warn { background: var(--warn); } .mrow .dot.good { background: var(--good); }
-.mrow div { flex: 1; min-width: 0; } .mrow b { font-size: 15px; } .mrow small { display: block; color: var(--ink-3); font-size: 12px; }
-.mrow .v { font-size: 17px; font-weight: 750; flex: none; }
-.mrow .v.good { color: var(--good); }
-
-/* the one action */
-.act { border: 2px solid var(--sky); background: linear-gradient(180deg, var(--sky-2), #fff 60%); }
-.act .eyebrow { font-size: 12px; font-weight: 800; color: #0079B8; letter-spacing: .06em; text-transform: uppercase; display: flex; align-items: center; gap: 6px; }
-.act .eyebrow::before { content: ""; width: 8px; height: 8px; border-radius: 50%; background: var(--sky); animation: blink 1.4s ease-in-out infinite; }
-@keyframes blink { 50% { opacity: .25; } }
-.act h3 { font-size: 21px; line-height: 1.2; margin: 8px 0 6px; font-weight: 750; }
-.act p { margin: 0 0 14px; color: var(--ink-2); font-size: 15px; line-height: 1.45; }
-.cta { width: 100%; min-height: 52px; border: 0; border-radius: 14px; background: var(--navy); color: #fff; font-size: 17px; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; }
-.cta:active { transform: scale(.985); }
-.cta.alt { background: #fff; color: var(--navy); border: 1.5px solid var(--line); margin-top: 8px; min-height: 46px; font-size: 15px; }
-.cta[disabled] { opacity: .55; }
-.act.wait { border-color: var(--line); background: #fff; }
-.act.wait .eyebrow::before { background: var(--ink-3); animation: none; }
-.count { font-size: 44px; font-weight: 800; font-stretch: 110%; color: var(--navy); line-height: 1; }
-
-/* tracker */
-.trk { list-style: none; margin: 0; padding: 0; }
-.trk li { display: grid; grid-template-columns: 26px 1fr; gap: 10px; position: relative; padding-bottom: 14px; }
-.trk li:last-child { padding-bottom: 0; }
-.trk li::before { content: ""; position: absolute; left: 12px; top: 24px; bottom: -2px; width: 2px; background: var(--line); }
-.trk li:last-child::before { display: none; }
-.trk li.done::before { background: var(--good); }
-.trk .k { width: 26px; height: 26px; border-radius: 50%; border: 2px solid var(--line); background: #fff; display: grid; place-items: center; z-index: 1; transition: background .3s, border-color .3s; }
-.trk .k svg { width: 14px; height: 14px; fill: none; stroke: #fff; stroke-width: 3; stroke-linecap: round; stroke-linejoin: round; opacity: 0; transition: opacity .3s; }
-.trk li.done .k { background: var(--good); border-color: var(--good); } .trk li.done .k svg { opacity: 1; }
-.trk li.now .k { border-color: var(--sky); box-shadow: 0 0 0 5px rgba(0,186,242,.18); }
-.trk li.now .k::after { content: ""; width: 10px; height: 10px; border-radius: 50%; background: var(--sky); animation: blink 1.2s ease-in-out infinite; }
-.trk li.blocked .k { border-color: var(--bad); background: var(--bad); }
-.trk b { font-size: 15.5px; font-weight: 650; display: block; padding-top: 2px; }
-.trk li.todo b { color: var(--ink-3); font-weight: 500; }
-.trk small { display: block; color: var(--ink-2); font-size: 13px; line-height: 1.35; }
-.trk li.todo small { color: var(--ink-3); }
-.trk li.blocked small { color: var(--bad); }
-
-/* documents */
-.docs { display: grid; gap: 10px; }
-.doc { display: flex; gap: 12px; align-items: center; border: 1px solid var(--line); border-radius: 14px; padding: 12px; background: #fff; text-decoration: none; color: inherit; cursor: pointer; text-align: left; width: 100%; }
-.doc .ic { width: 40px; height: 48px; border-radius: 8px; background: var(--sky-2); color: var(--navy); display: grid; place-items: center; font-size: 11px; font-weight: 800; flex: none; }
-.doc .ic.letter { background: var(--warn-2); color: var(--warn); }
-.doc div { flex: 1; min-width: 0; } .doc b { font-size: 15px; display: block; } .doc small { color: var(--ink-3); font-size: 12.5px; }
-.doc .go { color: var(--navy); font-weight: 700; font-size: 13px; flex: none; }
-
-/* home feed */
-.feed { display: grid; gap: 0; }
-.fi { display: flex; gap: 10px; padding: 10px 0; border-top: 1px solid var(--line); }
-.fi:first-child { border-top: 0; padding-top: 0; }
-.fi .ok { width: 28px; height: 28px; border-radius: 50%; background: var(--good-2); color: var(--good); display: grid; place-items: center; flex: none; font-weight: 800; }
-.fi b { font-size: 14.5px; display: block; } .fi small { color: var(--ink-2); font-size: 13px; }
-.empty { color: var(--ink-3); font-size: 14px; }
-
-/* ask Kavach */
-.ask { position: fixed; left: 50%; transform: translateX(-50%); bottom: calc(16px + env(safe-area-inset-bottom)); z-index: 6; display: flex; align-items: center; gap: 10px;
-  background: var(--navy); color: #fff; border: 0; border-radius: 999px; padding: 9px 16px 9px 10px; font-size: 15px; font-weight: 650; box-shadow: 0 8px 24px rgba(0,46,110,.35); cursor: pointer; white-space: nowrap; }
-.ask .mic { width: 30px; height: 30px; border-radius: 50%; background: var(--sky); display: grid; place-items: center; }
-.ask .mic svg { width: 16px; height: 16px; fill: none; stroke: #fff; stroke-width: 2.2; stroke-linecap: round; }
-.ask .n { background: #FF6A4F; border-radius: 999px; font-size: 11px; padding: 1px 7px; margin-left: 2px; }
-.sheet { position: fixed; inset: 0; z-index: 8; background: rgba(11,27,51,.42); display: none; }
-.sheet.on { display: block; }
-.sheet .panel { position: absolute; left: 50%; transform: translateX(-50%); bottom: 0; width: 100%; max-width: 480px; height: 82dvh; background: var(--bg); border-radius: 22px 22px 0 0; display: flex; flex-direction: column; overflow: hidden; animation: up .25s cubic-bezier(.2,.8,.2,1); }
-@keyframes up { from { transform: translate(-50%, 30px); opacity: 0; } }
-.sheet header { display: flex; align-items: center; justify-content: space-between; padding: 14px 16px; background: #fff; border-bottom: 1px solid var(--line); }
-.sheet header b { font-size: 17px; } .sheet header button { border: 0; background: var(--bg); border-radius: 999px; width: 34px; height: 34px; cursor: pointer; font-size: 16px; }
-.chat { flex: 1; overflow-y: auto; padding: 12px; display: flex; flex-direction: column; gap: 8px; }
-.msg { max-width: 86%; padding: 9px 12px; border-radius: 16px; font-size: 15px; line-height: 1.4; white-space: pre-wrap; overflow-wrap: anywhere; }
-.msg.k { background: #fff; align-self: flex-start; border-top-left-radius: 4px; box-shadow: var(--sh); }
-.msg.m { background: var(--navy); color: #fff; align-self: flex-end; border-top-right-radius: 4px; }
-.msg small { display: block; margin-top: 3px; font-size: 11px; color: var(--ink-3); } .msg.m small { color: #A9C3EA; }
-.chips { display: flex; gap: 8px; overflow-x: auto; padding: 8px 12px; scrollbar-width: none; background: var(--bg); }
-.chips button { flex: none; border: 1px solid var(--line); background: #fff; border-radius: 999px; padding: 8px 13px; font-size: 14px; color: var(--navy); min-height: 38px; cursor: pointer; }
-.compose { display: flex; gap: 8px; padding: 8px 12px calc(10px + env(safe-area-inset-bottom)); background: #fff; border-top: 1px solid var(--line); }
-.compose input[type=text] { flex: 1; min-width: 0; border: 1px solid var(--line); border-radius: 999px; padding: 0 16px; font: 16px "Anek", sans-serif; min-height: 44px; }
-.ib { width: 44px; height: 44px; border-radius: 50%; border: 0; background: var(--navy); color: #fff; display: grid; place-items: center; cursor: pointer; flex: none; }
-.ib.cam { background: var(--sky-2); color: var(--navy); }
-.ib svg { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
-.letter pre { white-space: pre-wrap; font: 13.5px/1.5 "Anek", sans-serif; margin: 0; padding: 16px; overflow-y: auto; flex: 1; background: #fff; }
-
-/* push banner */
-.push { position: fixed; left: 50%; top: 8px; transform: translate(-50%, -140%); width: calc(100% - 16px); max-width: 464px; z-index: 9; background: rgba(255,255,255,.97); border-radius: 18px;
-  box-shadow: 0 10px 30px rgba(11,27,51,.22); padding: 12px 14px; display: flex; gap: 10px; transition: transform .35s cubic-bezier(.2,.8,.2,1); cursor: pointer; }
-.push.on { transform: translate(-50%, 0); }
-.push .logo { width: 30px; height: 30px; border-radius: 9px; background: linear-gradient(135deg, var(--sky), var(--navy)); flex: none; }
-.push b { font-size: 13px; display: block; } .push span { font-size: 14px; color: var(--ink-2); display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
-
-/* gate */
-#gate { position: fixed; inset: 0; z-index: 20; background: linear-gradient(160deg, #00A5E0, #002E6E 60%); color: #fff; display: flex; flex-direction: column; justify-content: flex-end; padding: 28px 22px calc(28px + env(safe-area-inset-bottom)); gap: 14px; }
-#gate h1 { font-size: 36px; line-height: 1.05; margin: 0; font-weight: 800; font-stretch: 110%; }
-#gate p { margin: 0; color: rgba(255,255,255,.85); font-size: 16px; line-height: 1.45; }
-#gate button { background: #fff; color: var(--navy); border: 0; border-radius: 16px; min-height: 56px; font-size: 18px; font-weight: 800; cursor: pointer; margin-top: 8px; }
-#gate small { color: rgba(255,255,255,.65); font-size: 12.5px; text-align: center; }
-.embed #gate, .embed .bar .tag { display: none; }
-.embed .ask { display: none; }
-.embed .ask .n { font-size: 11px; position: absolute; top: -4px; right: -4px; }
-.embed body, body.embed { padding-bottom: 80px; }
-
-/* clocks Kavach is holding */
-.clk-wrap h2 { margin-bottom: 10px; }
-.clks { display: flex; gap: 10px; overflow-x: auto; margin: 0 -16px; padding: 0 16px 2px; scrollbar-width: none; }
-.clk { flex: none; width: 168px; border: 1px solid var(--line); border-radius: 16px; padding: 12px; background: #fff; display: grid; grid-template-columns: 44px 1fr; gap: 8px; align-items: center; }
-.clk.bad { border-color: #F5C2B8; background: #FFF8F6; }
-.clk svg.ring { width: 44px; height: 44px; transform: rotate(-90deg); }
-.clk .ring circle { fill: none; stroke-width: 5; } .clk .ring .bg { stroke: var(--line); }
-.clk .ring .fg { stroke: var(--sky); stroke-linecap: round; transition: stroke-dashoffset .6s; }
-.clk.bad .ring .fg { stroke: var(--bad); } .clk.wait .ring .fg { stroke: var(--warn); }
-.clk b { font-size: 13.5px; display: block; line-height: 1.2; } .clk .t { font-size: 16px; font-weight: 800; color: var(--navy); }
-.clk.bad .t { color: var(--bad); } .clk small { grid-column: 1 / -1; color: var(--ink-3); font-size: 11.5px; line-height: 1.3; }
-/* chargeback */
-.stake { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
-.stake .amt { font-size: 30px; font-weight: 800; font-stretch: 108%; } .stake .left { text-align: right; }
-.stake .left b { font-size: 28px; font-weight: 800; color: var(--bad); display: block; line-height: 1; } .stake .left small { color: var(--ink-3); font-size: 12px; }
-.proof { list-style: none; margin: 12px 0 0; padding: 0; display: grid; gap: 8px; }
-.proof li { display: grid; grid-template-columns: 26px 1fr auto; gap: 8px; align-items: start; font-size: 14px; line-height: 1.35; }
-.proof .m { width: 22px; height: 22px; border-radius: 50%; display: grid; place-items: center; font-size: 12px; font-weight: 800; background: var(--good-2); color: var(--good); }
-.proof li.no .m { background: var(--warn-2); color: var(--warn); }
-.proof .tier { font-size: 11px; font-weight: 700; color: var(--ink-3); border: 1px solid var(--line); border-radius: 999px; padding: 1px 7px; }
+@layer base {
+  html, body { @apply bg-page text-ink font-sans antialiased; -webkit-tap-highlight-color: transparent; }
+  .num { font-variant-numeric: tabular-nums; letter-spacing: -0.02em; }
+}
+@layer components {
+  .card { @apply bg-white rounded-3xl ring-1 ring-black/[0.04] shadow-[0_1px_2px_rgba(10,22,40,.04),0_8px_24px_-12px_rgba(10,22,40,.12)]; }
+  .eyebrow { @apply text-[11px] font-semibold uppercase tracking-[0.12em] text-ink-3; }
+  .btn-primary { @apply w-full h-13 rounded-2xl bg-navy-2 text-white text-[16px] font-semibold flex items-center justify-center gap-2 active:scale-[.98] transition shadow-[0_8px_20px_-8px_rgba(0,46,110,.6)] disabled:opacity-50; }
+  .btn-ghost { @apply w-full h-12 rounded-2xl bg-page text-navy-2 text-[15px] font-semibold flex items-center justify-center gap-2 active:scale-[.98] transition disabled:opacity-50; }
+  .chip { @apply shrink-0 h-10 px-4 rounded-full bg-white ring-1 ring-line text-[14px] font-medium text-navy-2 active:scale-95 transition; }
+}
+.glow { position: absolute; inset: -40% -20% auto auto; width: 70%; aspect-ratio: 1; border-radius: 9999px; filter: blur(48px); opacity: .55; pointer-events: none; }
+.pulse-dot { position: relative; } .pulse-dot::after { content: ""; position: absolute; inset: -4px; border-radius: 9999px; border: 2px solid currentColor; animation: ping 1.6s cubic-bezier(0,0,.2,1) infinite; }
+@keyframes ping { 75%, 100% { transform: scale(1.8); opacity: 0; } }
+.ring-track { stroke: #E7ECF3; } .ring-fill { transition: stroke-dashoffset .8s cubic-bezier(.2,.8,.2,1); }
+.sheet { transform: translateY(100%); visibility: hidden; transition: transform .35s cubic-bezier(.2,.8,.2,1), visibility 0s .35s; } .sheet.on { transform: translateY(0); visibility: visible; transition: transform .35s cubic-bezier(.2,.8,.2,1); }
+.scrim { opacity: 0; pointer-events: none; transition: opacity .25s; } .scrim.on { opacity: 1; pointer-events: auto; }
+.push { transform: translate(-50%, -150%); transition: transform .4s cubic-bezier(.2,.8,.2,1); } .push.on { transform: translate(-50%, 0); }
+.no-scrollbar { scrollbar-width: none; } .no-scrollbar::-webkit-scrollbar { display: none; }
+html.embed #gate, html.embed .sim-tag, html.embed #ask { display: none !important; }
 @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition: none !important; } }
 </style>
 </head>
-<body>
-<div id="gate">
-  <h1>Aap Meena hain.</h1>
-  <p>Meena Kirana Store, Lucknow. Kavach Shield aapke Paytm for Business app ke andar hai. Phone haath mein rakhiye, awaaz chalu rakhiye. Paise ke saath kuch bhi galat ho, Kavach pehle batayega.</p>
-  <button id="start" type="button">Main Meena hoon · Shuru karo</button>
-  <small>Synthetic demo. No real money, bank or police systems.</small>
+<body class="min-h-dvh">
+<div class="mx-auto max-w-[480px] min-h-dvh pb-24 relative">
+
+  <div id="gate" class="fixed inset-0 z-50 flex flex-col justify-end overflow-hidden bg-navy text-white px-6 pt-10 pb-[calc(28px+env(safe-area-inset-bottom))]">
+    <div class="glow bg-sky" style="inset:-10% -30% auto auto"></div>
+    <div class="glow bg-[#3B5BFF]" style="inset:auto auto 30% -40%;opacity:.35"></div>
+    <div class="relative">
+      <div class="size-16 rounded-2xl bg-white/10 ring-1 ring-white/20 grid place-items-center mb-8 backdrop-blur"><i data-lucide="shield-check" class="size-8 text-sky"></i></div>
+      <p class="eyebrow !text-sky mb-3">Paytm for Business · Kavach Shield</p>
+      <h1 class="text-[40px] leading-[1.02] font-bold tracking-tight">Aap Meena hain.</h1>
+      <p class="mt-4 text-[16px] leading-relaxed text-white/75">Meena Kirana Store, Lucknow. Phone haath mein rakhiye, awaaz chalu rakhiye. Paise ke saath kuch bhi galat ho, Kavach pehle batayega.</p>
+      <button id="start" type="button" class="mt-8 w-full h-14 rounded-2xl bg-white text-navy text-[17px] font-semibold flex items-center justify-center gap-2 active:scale-[.98] transition">Main Meena hoon · Shuru karo <i data-lucide="arrow-right" class="size-5"></i></button>
+      <p class="mt-4 text-center text-[12px] text-white/50">Synthetic demo. No real money, bank or police systems.</p>
+    </div>
+  </div>
+
+  <header class="sticky top-0 z-30 bg-page/80 backdrop-blur-xl px-4 pt-[calc(10px+env(safe-area-inset-top))] pb-3 flex items-center gap-3">
+    <div class="size-10 rounded-2xl bg-gradient-to-br from-sky to-navy-2 grid place-items-center text-white shadow-lg shadow-sky/20"><i data-lucide="shield-check" class="size-5"></i></div>
+    <div class="flex-1 min-w-0">
+      <p class="text-[11.5px] text-ink-3 truncate">Paytm for Business · Meena Kirana Store</p>
+      <p class="text-[17px] font-semibold tracking-tight leading-tight">Kavach Shield</p>
+    </div>
+    <span class="sim-tag text-[10px] font-semibold tracking-wider text-ink-3 ring-1 ring-ink-3/40 rounded-full px-2 py-0.5">SIMULATED</span>
+    <button id="bell" type="button" class="relative size-10 rounded-full bg-white ring-1 ring-line grid place-items-center" aria-label="Messages">
+      <i data-lucide="bell" class="size-[18px] text-navy-2"></i><span id="unread" hidden class="absolute -top-0.5 -right-0.5 min-w-[18px] h-[18px] px-1 rounded-full bg-bad text-white text-[10px] font-bold grid place-items-center"></span>
+    </button>
+  </header>
+
+  <main id="app" class="px-4 flex flex-col gap-3"></main>
 </div>
-<div class="bar">
-  <div class="logo"><svg viewBox="0 0 24 24"><path d="M12 3l7 3v6c0 4-3 7-7 9-4-2-7-5-7-9V6z"/></svg></div>
-  <div><small>Paytm for Business · Meena Kirana Store</small><b>Kavach Shield</b></div>
-  <span class="tag">SIMULATED</span>
-</div>
-<main id="app"></main>
-<button class="ask" id="ask" type="button"><span class="mic"><svg viewBox="0 0 24 24"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg></span>Poochiye<span class="n" id="unread" hidden></span></button>
-<div class="sheet" id="sheet"><div class="panel">
-  <header><b>Kavach</b><button type="button" data-close aria-label="Close">✕</button></header>
-  <div class="chat" id="chat"></div>
-  <div class="chips" id="chips"></div>
-  <form class="compose" id="compose" autocomplete="off">
-    <label class="ib cam" title="Photo of a bank SMS or notice"><input class="camin" type="file" accept="image/*" capture="environment" hidden><svg viewBox="0 0 24 24"><path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.5"/></svg></label>
-    <input id="t" type="text" placeholder="Likhiye…" aria-label="Message to Kavach">
-    <button class="ib" type="submit" aria-label="Send"><svg viewBox="0 0 24 24"><path d="M4 12h14M13 6l6 6-6 6"/></svg></button>
+
+<button id="ask" type="button" aria-label="Kavach se poochiye" class="fixed z-30 right-4 bottom-[calc(18px+env(safe-area-inset-bottom))] size-14 rounded-full bg-navy text-white grid place-items-center shadow-[0_12px_30px_-8px_rgba(0,27,68,.6)] active:scale-95 transition">
+  <i data-lucide="sparkles" class="size-6 text-sky"></i>
+</button>
+
+<div id="scrim" class="scrim fixed inset-0 z-40 bg-ink/40 backdrop-blur-[2px]"></div>
+<section id="sheet" class="sheet fixed z-50 inset-x-0 bottom-0 mx-auto max-w-[480px] h-[84dvh] bg-page rounded-t-[28px] flex flex-col overflow-hidden">
+  <div class="pt-2.5 pb-3 px-4 bg-white border-b border-line">
+    <div class="mx-auto mb-2.5 h-1 w-10 rounded-full bg-line"></div>
+    <div class="flex items-center gap-3"><div class="size-9 rounded-xl bg-gradient-to-br from-sky to-navy-2 grid place-items-center text-white"><i data-lucide="sparkles" class="size-4"></i></div>
+      <div class="flex-1"><p class="font-semibold leading-tight">Kavach</p><p class="text-[12px] text-ink-3">Hindi ya Hinglish mein poochiye</p></div>
+      <button type="button" data-close class="size-9 rounded-full bg-page grid place-items-center" aria-label="Close"><i data-lucide="x" class="size-4"></i></button></div>
+  </div>
+  <div id="chat" class="flex-1 overflow-y-auto px-4 py-4 flex flex-col gap-2.5"></div>
+  <div id="chips" class="no-scrollbar flex gap-2 overflow-x-auto px-4 py-2.5"></div>
+  <form id="compose" autocomplete="off" class="flex items-center gap-2 px-3 pt-2 pb-[calc(12px+env(safe-area-inset-bottom))] bg-white border-t border-line">
+    <label class="size-11 shrink-0 rounded-full bg-sky-50 text-navy-2 grid place-items-center cursor-pointer"><input class="camin" type="file" accept="image/*" capture="environment" hidden><i data-lucide="camera" class="size-5"></i></label>
+    <input id="t" type="text" placeholder="Likhiye…" aria-label="Message to Kavach" class="flex-1 min-w-0 h-11 rounded-full bg-page px-4 text-[16px] outline-none focus:ring-2 focus:ring-sky/40">
+    <button type="submit" class="size-11 shrink-0 rounded-full bg-navy-2 text-white grid place-items-center" aria-label="Send"><i data-lucide="arrow-up" class="size-5"></i></button>
   </form>
-</div></div>
-<div class="sheet letter" id="letter"><div class="panel"><header><b>Bank ke liye request</b><button type="button" data-close aria-label="Close">✕</button></header><pre id="lettertext"></pre></div></div>
-<div class="push" id="push"><div class="logo"></div><div><b>Kavach · abhi</b><span id="pushtext"></span></div></div>
+</section>
+
+<section id="letter" class="sheet fixed z-50 inset-x-0 bottom-0 mx-auto max-w-[480px] h-[84dvh] bg-white rounded-t-[28px] flex flex-col overflow-hidden">
+  <div class="px-4 pt-2.5 pb-3 border-b border-line"><div class="mx-auto mb-2.5 h-1 w-10 rounded-full bg-line"></div>
+    <div class="flex items-center gap-3"><div class="size-9 rounded-xl bg-warn-50 text-warn grid place-items-center"><i data-lucide="file-signature" class="size-4"></i></div><p class="flex-1 font-semibold">Bank ke liye request</p>
+      <button type="button" data-close class="size-9 rounded-full bg-page grid place-items-center" aria-label="Close"><i data-lucide="x" class="size-4"></i></button></div></div>
+  <pre id="lettertext" class="flex-1 overflow-y-auto whitespace-pre-wrap p-5 text-[13.5px] leading-relaxed font-sans text-ink"></pre>
+</section>
+
+<div id="push" class="push fixed z-[60] left-1/2 top-2 w-[calc(100%-16px)] max-w-[464px] rounded-[22px] bg-white/90 backdrop-blur-xl ring-1 ring-black/5 shadow-2xl px-3.5 py-3 flex gap-3 cursor-pointer">
+  <div class="size-9 shrink-0 rounded-xl bg-gradient-to-br from-sky to-navy-2 grid place-items-center text-white"><i data-lucide="shield-check" class="size-[18px]"></i></div>
+  <div class="min-w-0"><p class="text-[12.5px] font-semibold">Kavach <span class="text-ink-3 font-normal">· abhi</span></p><p id="pushtext" class="text-[14px] text-ink-2 line-clamp-2"></p></div>
+</div>
 <input id="cam" class="camin" type="file" accept="image/*" capture="environment" hidden>
+
 <script>
 "use strict";
 const $ = (q) => document.querySelector(q);
 const EMBED = new URLSearchParams(location.search).has("embed");
-if (EMBED) { document.body.classList.add("embed"); document.documentElement.classList.add("embed"); }
-const S = { view: null, chat: [], drafts: [], audio: false, sarvam: false, unread: 0, lastSay: null };
+if (EMBED) document.documentElement.classList.add("embed");
+const S = { view: null, chat: [], drafts: [], audio: false, sarvam: false, unread: 0, lastSay: null, keys: new Set(), nums: {} };
 const esc = (s) => String(s ?? "").replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
-const rs = (n) => n == null ? "₹?" : "₹" + Number(n).toLocaleString("en-IN");
+const rs = (n) => n == null ? "₹—" : "₹" + Number(n).toLocaleString("en-IN");
 const tm = (iso) => { try { return new Date(iso).toLocaleTimeString("en-IN", { hour: "numeric", minute: "2-digit" }); } catch { return ""; } };
 const post = (u, b) => fetch(u, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify(b) }).then((r) => r.json()).catch(() => null);
-const SHIELD = '<svg viewBox="0 0 24 24"><path d="M12 3l7 3v6c0 4-3 7-7 9-4-2-7-5-7-9V6z"/><path d="M9 12l2 2 4-4"/></svg>';
-const CHECK = '<svg viewBox="0 0 24 24"><path d="M5 12l4 4 10-10"/></svg>';
+const icon = (n, cls = "size-5") => `<i data-lucide="${n}" class="${cls}"></i>`;
+const left = (secs) => secs >= 86400 ? `${Math.floor(secs / 86400)} din` : secs >= 3600 ? `${Math.floor(secs / 3600)} ghante` : `${Math.max(1, Math.round(secs / 60))} min`;
 
-// ---------------------------------------------------------------- voice (Sarvam Bulbul when live, else the phone's Hindi voice)
+// ---------------------------------------------------------------- voice: Sarvam Bulbul when live, else the phone's own Hindi voice
 const voiceQ = []; let speaking = false;
 function speak(t) { if (!S.audio || !t || EMBED) return; voiceQ.push(t); if (!speaking) nextVoice(); }
 async function nextVoice() {
@@ -240,94 +140,184 @@ function say(t) {
   u.onend = nextVoice; u.onerror = nextVoice; speechSynthesis.speak(u);
 }
 
-// ---------------------------------------------------------------- render: state, not chat
-function render() {
-  const v = S.view; if (!v) return;
-  const app = $("#app");
-  if (v.mode === "home") app.innerHTML = home(v) + clocksHtml(v.clocks);
-  else if (v.case === "chargeback") app.innerHTML = [hero(v.shield.tone, v.shield.account, v.shield.title, v.shield.sub, true), action(v.action), stake(v), clocksHtml(v.clocks), tracker(v.steps)].join("");
-  else if (v.mode === "neutral") app.innerHTML = hero("wait", "Paytm team", v.shield.title, v.shield.sub);
-  else app.innerHTML = [hero(v.shield.tone, "Account " + esc(v.shield.account), v.shield.title, v.shield.sub, true, v.shield.trust), action(v.action), money(v), clocksHtml(v.clocks), tracker(v.steps), docs(v.docs)].join("");
-  bind();
-}
-function hero(tone, pill, title, sub, listen, trust) {
-  return `<section class="hero ${tone}"><div class="row"><div class="shield">${SHIELD}</div><span class="pill">${esc(pill)}</span></div>
-    <h1>${esc(title)}</h1><p>${esc(sub)}</p>${trust ? `<p class="trust">🔒 ${esc(trust)}</p>` : ""}${listen && S.lastSay ? `<button class="listen" data-listen type="button"><svg viewBox="0 0 24 24"><path d="M4 9v6h4l5 4V5L8 9zM16 8a5 5 0 0 1 0 8"/></svg>Kavach ko suniye</button>` : ""}</section>`;
+// ---------------------------------------------------------------- views (state, not chat)
+const TONE = {
+  ok: { bg: "from-[#0091D5] via-[#0062B0] to-navy", glow: "bg-sky", pill: "bg-white/15 text-white", icon: "shield-check" },
+  bad: { bg: "from-[#0B1F45] via-navy to-[#2A0E2E]", glow: "bg-bad", pill: "bg-bad text-white", icon: "shield-alert" },
+  wait: { bg: "from-[#334155] to-[#0F172A]", glow: "bg-ink-3", pill: "bg-white/15 text-white", icon: "shield" },
+};
+function hero(k, tone, pill, title, sub, opts = {}) {
+  const t = TONE[tone] || TONE.ok;
+  return `<section data-k="${k}" class="hero relative overflow-hidden rounded-[28px] bg-gradient-to-br ${t.bg} text-white p-5 shadow-[0_20px_40px_-20px_rgba(0,27,68,.7)]">
+    <div class="glow ${t.glow}"></div>
+    <div class="relative flex items-center gap-2.5">
+      <div class="size-11 rounded-2xl bg-white/10 ring-1 ring-white/15 grid place-items-center backdrop-blur">${icon(t.icon, "size-6")}</div>
+      <span class="inline-flex items-center gap-1.5 h-7 px-3 rounded-full text-[12px] font-semibold ${t.pill}">${tone === "bad" ? '<span class="pulse-dot size-1.5 rounded-full bg-white text-white"></span>' : ""}${esc(pill)}</span>
+    </div>
+    <h1 class="relative mt-5 text-[30px] leading-[1.05] font-bold tracking-tight">${esc(title)}</h1>
+    <p class="relative mt-2.5 text-[15px] leading-relaxed text-white/80">${esc(sub)}</p>
+    ${opts.trust ? `<p class="relative mt-3 flex items-start gap-1.5 text-[12px] text-white/60">${icon("lock", "size-3.5 mt-0.5 shrink-0")}<span>${esc(opts.trust)}</span></p>` : ""}
+    ${opts.extra || ""}
+    ${opts.listen && S.lastSay ? `<button data-listen type="button" class="relative mt-4 inline-flex items-center gap-2 h-10 px-4 rounded-full bg-white/10 ring-1 ring-white/15 text-[14px] font-medium backdrop-blur active:scale-95 transition">${icon("volume-2", "size-4")}Kavach ko suniye</button>` : ""}
+  </section>`;
 }
 function home(v) {
   const nx = new Date(v.today.next_payout);
-  return `<section class="hero ok"><div class="row"><div class="shield">${SHIELD}</div><span class="pill">Shield on</span></div>
-      <h1>${esc(v.shield.title)}</h1><p>${esc(v.shield.sub)}</p>
-      <div class="kv"><div>Aaj ki sale<b>${rs(v.today.sales)}</b></div><div>Payments<b>${v.today.count}</b></div><div>Agla payout<b>${nx.toLocaleDateString("en-IN", { day: "numeric", month: "short" })}, ${tm(v.today.next_payout)}</b></div></div></section>
-    <section class="card"><h2>Kavach ne kya kiya</h2>${v.feed.length ? `<div class="feed">${v.feed.map((f) => `<div class="fi"><span class="ok">✓</span><div><b>${esc(f.title)}</b><small>${esc(f.text)}</small></div></div>`).join("")}</div>`
-      : `<p class="empty">Abhi kuch karna nahi pada. Kavach payout, refund aur har payment par nazar rakh raha hai.</p>`}</section>`;
-}
-const left = (secs) => secs >= 86400 ? `${Math.floor(secs / 86400)} din` : secs >= 3600 ? `${Math.floor(secs / 3600)} ghante` : `${Math.max(1, Math.round(secs / 60))} min`;
-function clocksHtml(c) {
-  if (!c || !c.length) return "";
-  const R = 18, C = 2 * Math.PI * R;
-  return `<section class="card clk-wrap"><h2>Kavach in ghadiyon par nazar rakh raha hai</h2><div class="clks">${c.map((k) => {
-    const frac = Math.min(1, k.secs_left / (k.key === "payout" ? 86400 : k.key.startsWith("CB") ? 86400 : 7 * 86400));
-    return `<div class="clk ${k.tone}"><svg class="ring" viewBox="0 0 44 44"><circle class="bg" cx="22" cy="22" r="${R}"/><circle class="fg" cx="22" cy="22" r="${R}" stroke-dasharray="${C}" stroke-dashoffset="${C * (1 - frac)}"/></svg>
-      <div><b>${esc(k.label)}</b><span class="t">${left(k.secs_left)}</span></div><small>${k.amount != null ? rs(k.amount) + " · " : ""}${esc(k.note)}</small></div>`;
-  }).join("")}</div></section>`;
-}
-function stake(v) {
-  if (!v.stake) return "";
-  return `<section class="card"><h2>Daav par</h2><div class="stake"><div class="amt">${rs(v.stake.amount)}</div><div class="left">${v.stake.replied ? `<b style="color:var(--good)">✓ Jawab gaya</b><small>deadline se ${left(v.stake.secs_left)} pehle</small>` : `<b>${left(v.stake.secs_left)}</b><small>jawab ki deadline</small>`}</div></div>
-    <ul class="proof">${v.proof.map((p) => `<li class="${p.ok ? "" : "no"}"><span class="m">${p.ok ? "✓" : "?"}</span><span>${esc(p.label)}</span><span class="tier">${esc(p.tier)}</span></li>`).join("")}</ul></section>`;
-}
-function money(v) {
-  if (!v.money.length) return "";
-  const L = v.money.find((m) => m.key === "locked"), D = v.money.find((m) => m.key === "disputed");
-  const pct = L && D ? Math.max(1.2, (D.amount / L.amount) * 100) : 100;
-  return `<section class="card money"><h2>Aapka paisa kahan hai</h2>
-    ${L ? `<div class="top"><div><div class="amt">${rs(L.amount)}</div><small style="color:var(--ink-3)">bank mein ruka hua · aapka bataya hua</small></div>${v.ratio ? `<span class="ratio">${v.ratio}× zyada</span>` : ""}</div>
-    ${D ? `<div class="bar2" role="img" aria-label="${rs(D.amount)} disputed of ${rs(L.amount)} frozen"><i style="width:${pct}%"></i></div>` : ""}` : ""}
-    ${v.money.map((m) => `<div class="mrow"><span class="dot ${m.tone}"></span><div><b>${esc(m.label)}</b><small>${esc(m.source)}</small></div><span class="v ${m.tone}">${rs(m.amount)}</span></div>`).join("")}
-  </section>`;
+  const kv = `<div class="relative mt-5 grid grid-cols-3 gap-2">${[["Aaj ki sale", `<span class="num" data-count="${v.today.sales}">${rs(v.today.sales)}</span>`], ["Payments", `<span class="num">${v.today.count}</span>`],
+    ["Agla payout", `${nx.toLocaleDateString("en-IN", { day: "numeric", month: "short" })}, ${tm(v.today.next_payout)}`]].map(([a, b]) =>
+    `<div class="rounded-2xl bg-white/10 ring-1 ring-white/10 p-3"><p class="text-[11px] text-white/60">${a}</p><p class="mt-1 text-[15px] font-semibold">${b}</p></div>`).join("")}</div>`;
+  const feed = v.feed.length ? v.feed.map((f) => `<div class="flex gap-3 py-3 first:pt-0 border-t first:border-0 border-line"><div class="size-9 shrink-0 rounded-xl bg-ok-50 text-ok grid place-items-center">${icon("check", "size-4")}</div>
+      <div class="min-w-0"><p class="text-[14.5px] font-semibold leading-snug">${esc(f.title)}</p><p class="text-[13px] text-ink-2 leading-snug mt-0.5">${esc(f.text)}</p></div></div>`).join("")
+    : `<div class="flex items-center gap-3 text-ink-2 text-[14px]"><div class="size-9 shrink-0 rounded-xl bg-sky-50 text-sky grid place-items-center">${icon("radar", "size-4")}</div>Abhi kuch karna nahi pada. Kavach nazar rakh raha hai.</div>`;
+  return hero("home", "ok", "Shield on", v.shield.title, v.shield.sub, { extra: kv })
+    + `<section data-k="feed" class="card p-5"><p class="eyebrow mb-3">Kavach ne kya kiya</p>${feed}</section>` + clocks(v.clocks);
 }
 function action(a) {
   if (!a) return "";
-  if (a.kind === "done") return `<section class="card act done"><div class="eyebrow">Ho gaya</div><h3>${esc(a.title)}</h3><p>${esc(a.body)}</p></section>`;
-  if (a.kind === "info") return `<section class="card act wait"><div class="eyebrow">Kavach kaam par</div><h3>${esc(a.title)}</h3><p>${esc(a.body)}</p></section>`;
-  if (a.kind === "wait") return `<section class="card act wait"><div class="eyebrow">Kavach dekh raha hai</div><div class="count">${Math.max(a.days_left, 0)} din</div><h3>${esc(a.title)}</h3><p>${esc(a.body)}</p></section>`;
-  const btns = a.kind === "approve" ? `<button class="cta" data-yes="${esc(a.incident)}">${esc(a.cta)}</button><button class="cta alt" data-no="${esc(a.incident)}">${esc(a.secondary)}</button>`
-    : a.kind === "notice" ? `${S.drafts.find((d) => d.next_doc) ? `<button class="cta" data-fwd>Bank ka SMS + notice bhejo</button>` : ""}<button class="cta ${S.drafts.find((d) => d.next_doc) ? "alt" : ""}" data-cam>📷 Photo kheecho</button>`
-    : a.kind === "branch" ? `<button class="cta" data-branch>${esc(a.cta)}</button>` : "";
-  return `<section class="card act"><div class="eyebrow">Aapka agla kadam</div><h3>${esc(a.title)}</h3><p>${esc(a.body)}</p>${btns}</section>`;
+  const k = `act-${a.kind}-${a.title}`;
+  if (a.kind === "wait") return `<section data-k="${k}" class="act wait card p-5"><div class="flex items-center gap-2 eyebrow">${icon("hourglass", "size-3.5")}Kavach dekh raha hai</div>
+    <div class="mt-3 flex items-end gap-3"><p class="num text-[48px] leading-none font-bold text-navy-2">${Math.max(a.days_left, 0)}</p><p class="pb-1.5 text-[15px] font-semibold text-ink-2">din bache</p></div>
+    <h3 class="mt-3 text-[18px] font-semibold tracking-tight">${esc(a.title)}</h3><p class="mt-1.5 text-[14.5px] leading-relaxed text-ink-2">${esc(a.body)}</p></section>`;
+  if (a.kind === "done" || a.kind === "info") {
+    const ok = a.kind === "done";
+    return `<section data-k="${k}" class="act ${ok ? "done" : "wait"} card p-5 ${ok ? "ring-2 !ring-ok/30" : ""}"><div class="flex items-center gap-2 eyebrow ${ok ? "!text-ok" : ""}">${icon(ok ? "circle-check-big" : "loader", "size-3.5")}${ok ? "Ho gaya" : "Kavach kaam par"}</div>
+      <h3 class="mt-2.5 text-[20px] font-semibold tracking-tight">${esc(a.title)}</h3><p class="mt-1.5 text-[14.5px] leading-relaxed text-ink-2">${esc(a.body)}</p></section>`;
+  }
+  const fwd = S.drafts.find((d) => d.next_doc);
+  const btns = a.kind === "approve" ? `<button class="btn-primary" data-yes="${esc(a.incident)}">${icon("check", "size-5")}${esc(a.cta)}</button><button class="btn-ghost mt-2" data-no="${esc(a.incident)}">${esc(a.secondary)}</button>`
+    : a.kind === "notice" ? `${fwd ? `<button class="btn-primary" data-fwd>${icon("forward", "size-5")}Bank ka SMS + notice bhejo</button>` : ""}<button class="${fwd ? "btn-ghost mt-2" : "btn-primary"}" data-cam>${icon("camera", "size-5")}Photo kheecho</button>`
+    : a.kind === "branch" ? `<button class="btn-primary" data-branch>${icon("building-2", "size-5")}${esc(a.cta)}</button>` : "";
+  return `<section data-k="${k}" class="act card p-5 ring-2 !ring-sky/40 relative overflow-hidden">
+    <div class="absolute inset-x-0 top-0 h-24 bg-gradient-to-b from-sky-50 to-transparent pointer-events-none"></div>
+    <div class="relative flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.12em] text-[#0083B8]"><span class="pulse-dot size-1.5 rounded-full bg-sky text-sky"></span>Aapka agla kadam</div>
+    <h3 class="relative mt-2.5 text-[21px] leading-tight font-semibold tracking-tight">${esc(a.title)}</h3>
+    <p class="relative mt-2 mb-4 text-[14.5px] leading-relaxed text-ink-2">${esc(a.body)}</p>${btns}</section>`;
+}
+function money(v) {
+  if (!v.money || !v.money.length) return "";
+  const L = v.money.find((m) => m.key === "locked"), D = v.money.find((m) => m.key === "disputed");
+  const pct = L && D ? Math.max(1.4, (D.amount / L.amount) * 100) : 0;
+  const ICON = { locked: "lock", disputed: "triangle-alert", safe: "shield-check", back: "banknote", still: "lock-keyhole", was: "history" };
+  const TC = { bad: "bg-bad-50 text-bad", warn: "bg-warn-50 text-warn", good: "bg-ok-50 text-ok", muted: "bg-page text-ink-3" };
+  return `<section data-k="money" class="card p-5"><p class="eyebrow">Aapka paisa kahan hai</p>
+    ${L ? `<div class="mt-3 flex items-end justify-between gap-3"><div><p class="num text-[34px] leading-none font-bold" data-count="${L.amount}">${rs(L.amount)}</p><p class="mt-1.5 text-[12.5px] text-ink-3">bank mein ruka hua · aapka bataya hua</p></div>
+      ${v.ratio ? `<span class="ratio shrink-0 inline-flex items-center gap-1 h-8 px-3 rounded-full bg-bad-50 text-bad text-[13px] font-bold">${icon("trending-up", "size-3.5")}${v.ratio}× zyada</span>` : ""}</div>
+      ${D ? `<div class="mt-4 h-3 rounded-full bg-bad-50 overflow-hidden" role="img" aria-label="${rs(D.amount)} disputed of ${rs(L.amount)} frozen"><div class="bar h-full rounded-full bg-warn" data-w="${pct}"></div></div>
+        <div class="mt-1.5 flex justify-between text-[11.5px] text-ink-3"><span>vivadit ${rs(D.amount)}</span><span>ruka ${rs(L.amount)}</span></div>` : ""}` : ""}
+    <div class="mt-3">${v.money.map((m) => `<div class="flex items-center gap-3 py-3 border-t border-line"><div class="size-9 shrink-0 rounded-xl grid place-items-center ${TC[m.tone] || TC.muted}">${icon(ICON[m.key] || "circle", "size-4")}</div>
+      <div class="flex-1 min-w-0"><p class="text-[14.5px] font-semibold leading-tight">${esc(m.label)}</p><p class="text-[12px] text-ink-3 mt-0.5">${esc(m.source)}</p></div>
+      <p class="num text-[17px] font-bold ${m.tone === "good" ? "text-ok" : m.tone === "muted" ? "text-ink-3 line-through font-medium" : ""}" data-count="${m.amount}">${rs(m.amount)}</p></div>`).join("")}</div></section>`;
+}
+function clocks(c) {
+  if (!c || !c.length) return "";
+  const R = 20, C = 2 * Math.PI * R;
+  const COL = { ok: "#00B9F1", bad: "#E11D48", wait: "#D97706" };
+  return `<section data-k="clocks" class="card p-5 pr-0"><p class="eyebrow pr-5">Kavach in ghadiyon par nazar rakh raha hai</p>
+    <div class="clks no-scrollbar mt-3 flex gap-2.5 overflow-x-auto pr-5 snap-x">${c.map((k) => {
+      const span = k.key === "payout" || String(k.key).startsWith("CB") ? 86400 : String(k.key).includes("90") ? 90 * 86400 : 15 * 86400;
+      const frac = Math.min(1, k.secs_left / span);
+      return `<div class="snap-start shrink-0 w-[172px] rounded-2xl ring-1 ${k.tone === "bad" ? "ring-bad/25 bg-bad-50/60" : "ring-line bg-white"} p-3.5">
+        <div class="flex items-center gap-3"><svg viewBox="0 0 48 48" class="size-12 -rotate-90 shrink-0"><circle class="ring-track" cx="24" cy="24" r="${R}" fill="none" stroke-width="5"/>
+          <circle class="ring-fill" cx="24" cy="24" r="${R}" fill="none" stroke="${COL[k.tone] || COL.ok}" stroke-width="5" stroke-linecap="round" stroke-dasharray="${C}" stroke-dashoffset="${C * (1 - frac)}"/></svg>
+          <div class="min-w-0"><p class="text-[12.5px] font-semibold leading-tight text-ink-2">${esc(k.label)}</p><p class="num text-[17px] font-bold ${k.tone === "bad" ? "text-bad" : "text-navy-2"}">${left(k.secs_left)}</p></div></div>
+        <p class="mt-2.5 text-[11.5px] leading-snug text-ink-3">${k.amount != null ? `<b class="text-ink-2">${rs(k.amount)}</b> · ` : ""}${esc(k.note)}</p></div>`;
+    }).join("")}</div></section>`;
 }
 function tracker(steps) {
-  return `<section class="card"><h2>Case kahan tak pahuncha</h2><ol class="trk">${steps.map((s) => `<li class="${s.state}"><span class="k">${CHECK}</span><div><b>${esc(s.label)}</b><small>${esc(s.sub)}</small></div></li>`).join("")}</ol></section>`;
+  const done = steps.filter((s) => s.state === "done").length;
+  return `<section data-k="trk" class="card p-5"><div class="flex items-center justify-between"><p class="eyebrow">Case kahan tak pahuncha</p><p class="num text-[12px] font-semibold text-ink-3">${done}/${steps.length}</p></div>
+    <div class="mt-3 h-1.5 rounded-full bg-page overflow-hidden"><div class="bar h-full rounded-full bg-gradient-to-r from-sky to-ok" data-w="${(done / steps.length) * 100}"></div></div>
+    <ol class="trk mt-4">${steps.map((s, i) => {
+      const dot = s.state === "done" ? `<div class="size-7 rounded-full bg-ok text-white grid place-items-center">${icon("check", "size-4")}</div>`
+        : s.state === "now" ? `<div class="size-7 rounded-full bg-sky-50 ring-2 ring-sky grid place-items-center"><span class="pulse-dot size-2 rounded-full bg-sky text-sky"></span></div>`
+        : s.state === "blocked" ? `<div class="size-7 rounded-full bg-bad text-white grid place-items-center">${icon("x", "size-4")}</div>`
+        : `<div class="size-7 rounded-full ring-2 ring-line bg-white"></div>`;
+      return `<li class="${s.state} relative grid grid-cols-[28px_1fr] gap-3 ${i < steps.length - 1 ? "pb-4" : ""}">
+        ${i < steps.length - 1 ? `<span class="absolute left-[13px] top-8 bottom-0 w-0.5 rounded ${s.state === "done" ? "bg-ok" : "bg-line"}"></span>` : ""}${dot}
+        <div class="pt-0.5"><p class="text-[15px] leading-tight ${s.state === "todo" ? "text-ink-3 font-medium" : "font-semibold"}">${esc(s.label)}</p>
+          <p class="mt-0.5 text-[13px] leading-snug ${s.state === "blocked" ? "text-bad" : s.state === "todo" ? "text-ink-3" : "text-ink-2"}">${esc(s.sub)}</p></div></li>`;
+    }).join("")}</ol></section>`;
 }
 function docs(d) {
-  if (!d.length) return "";
-  return `<section class="card"><h2>Aapke documents</h2><div class="docs">${d.map((x) => x.kind === "pack"
-    ? `<a class="doc" href="${esc(x.verify)}" target="_blank" rel="noopener"><span class="ic">PDF</span><div><b>${esc(x.label)}</b><small>${esc(x.sub)}</small></div><span class="go">Verify ›</span></a>`
-    : `<button class="doc" type="button" data-letter><span class="ic letter">✉</span><div><b>${esc(x.label)}</b><small>${esc(x.sub)}</small></div><span class="go">Padhiye ›</span></button>`).join("")}</div></section>`;
+  if (!d || !d.length) return "";
+  return `<section data-k="docs" class="card p-5"><p class="eyebrow mb-3">Aapke documents</p><div class="grid gap-2.5">${d.map((x) => x.kind === "pack"
+    ? `<a class="doc flex items-center gap-3 rounded-2xl ring-1 ring-line p-3.5 active:scale-[.99] transition" href="${esc(x.verify)}" target="_blank" rel="noopener"><div class="size-11 shrink-0 rounded-xl bg-sky-50 text-navy-2 grid place-items-center">${icon("file-check-2", "size-5")}</div>
+        <div class="flex-1 min-w-0"><p class="text-[14.5px] font-semibold">${esc(x.label)}</p><p class="text-[12.5px] text-ink-3">${esc(x.sub)}</p></div><span class="flex items-center gap-0.5 text-[13px] font-semibold text-navy-2">Verify${icon("chevron-right", "size-4")}</span></a>`
+    : `<button class="doc flex items-center gap-3 rounded-2xl ring-1 ring-line p-3.5 text-left active:scale-[.99] transition" type="button" data-letter><div class="size-11 shrink-0 rounded-xl bg-warn-50 text-warn grid place-items-center">${icon("file-signature", "size-5")}</div>
+        <div class="flex-1 min-w-0"><p class="text-[14.5px] font-semibold">${esc(x.label)}</p><p class="text-[12.5px] text-ink-3">${esc(x.sub)}</p></div><span class="flex items-center gap-0.5 text-[13px] font-semibold text-navy-2">Padhiye${icon("chevron-right", "size-4")}</span></button>`).join("")}</div></section>`;
+}
+function stake(v) {
+  if (!v.stake) return "";
+  const s = v.stake;
+  return `<section data-k="stake" class="card p-5"><p class="eyebrow">Daav par</p>
+    <div class="mt-3 flex items-end justify-between gap-3"><p class="num text-[34px] leading-none font-bold" data-count="${s.amount}">${rs(s.amount)}</p>
+      ${s.replied ? `<div class="text-right"><p class="flex items-center gap-1 justify-end text-[17px] font-bold text-ok">${icon("circle-check", "size-4")}Jawab gaya</p><p class="text-[12px] text-ink-3">deadline se ${left(s.secs_left)} pehle</p></div>`
+        : `<div class="text-right"><p class="num text-[26px] leading-none font-bold text-bad">${left(s.secs_left)}</p><p class="mt-1 text-[12px] text-ink-3">jawab ki deadline</p></div>`}</div>
+    <ul class="mt-4 grid gap-2.5">${v.proof.map((p) => `<li class="flex items-start gap-3"><div class="size-7 shrink-0 rounded-full grid place-items-center ${p.ok ? "bg-ok-50 text-ok" : "bg-warn-50 text-warn"}">${icon(p.ok ? "check" : "circle-help", "size-4")}</div>
+      <p class="flex-1 text-[13.5px] leading-snug pt-1">${esc(p.label)}</p><span class="shrink-0 mt-0.5 text-[10.5px] font-semibold text-ink-3 ring-1 ring-line rounded-full px-2 py-0.5">${esc(p.tier)}</span></li>`).join("")}</ul></section>`;
+}
+
+function render() {
+  const v = S.view; if (!v) return;
+  let html;
+  if (v.mode === "home") html = home(v);
+  else if (v.mode === "neutral") html = hero("neutral", "wait", "Paytm team", v.shield.title, v.shield.sub);
+  else if (v.case === "chargeback") html = hero("cb", v.shield.tone, v.shield.account, v.shield.title, v.shield.sub, { listen: true }) + action(v.action) + stake(v) + clocks(v.clocks) + tracker(v.steps);
+  else html = hero(v.released ? "freeze-ok" : "freeze", v.shield.tone, "Account " + v.shield.account, v.shield.title, v.shield.sub, { listen: true, trust: v.shield.trust })
+    + action(v.action) + money(v) + clocks(v.clocks) + tracker(v.steps) + docs(v.docs);
+  const app = $("#app");
+  app.innerHTML = html;
+  if (window.lucide) lucide.createIcons();
+  animateIn(app);
+  bind();
+}
+function animateIn(root) {
+  const M = window.Motion;
+  const all = [...root.querySelectorAll("[data-k]")];
+  const fresh = all.filter((el) => !S.keys.has(el.dataset.k));
+  S.keys = new Set(all.map((el) => el.dataset.k));
+  root.querySelectorAll(".bar[data-w]").forEach((b) => {
+    const prev = S.nums["bar:" + b.closest("[data-k]").dataset.k], to = Number(b.dataset.w);
+    S.nums["bar:" + b.closest("[data-k]").dataset.k] = to;
+    if (!M || prev === to) { b.style.width = to + "%"; return; }
+    b.style.width = (prev || 0) + "%";
+    M.animate(b, { width: [(prev || 0) + "%", to + "%"] }, { duration: 0.9, delay: 0.1, easing: [0.2, 0.8, 0.2, 1] });
+  });
+  if (!M) return;
+  if (fresh.length) M.animate(fresh, { opacity: [0, 1], transform: ["translateY(14px)", "translateY(0px)"] }, { duration: 0.45, delay: M.stagger(0.06), easing: [0.2, 0.8, 0.2, 1] });
+  root.querySelectorAll("[data-count]").forEach((el, i) => {
+    const to = Number(el.dataset.count), key = el.closest("[data-k]").dataset.k + ":" + i, from = S.nums[key];
+    S.nums[key] = to;
+    if (from === undefined || from === to || !isFinite(to)) return;
+    M.animate(from, to, { duration: 0.8, easing: [0.2, 0.8, 0.2, 1], onUpdate: (x) => { el.textContent = rs(Math.round(x)); } });
+  });
 }
 function bind() {
-  document.querySelectorAll("[data-yes]").forEach((b) => b.onclick = () => { b.disabled = true; post("/api/approve", { incident_id: b.dataset.yes, approver: "merchant", yes: true }); });
+  document.querySelectorAll("[data-yes]").forEach((b) => b.onclick = () => { b.disabled = true; haptic(); post("/api/approve", { incident_id: b.dataset.yes, approver: "merchant", yes: true }); });
   document.querySelectorAll("[data-no]").forEach((b) => b.onclick = () => { b.disabled = true; post("/api/approve", { incident_id: b.dataset.no, approver: "merchant", yes: false }); });
-  document.querySelectorAll("[data-fwd]").forEach((b) => b.onclick = () => { const d = S.drafts.find((x) => x.next_doc); if (!d) return; b.disabled = true; send("Bank ka SMS aur police ka notice yeh hai. Account mein 3.1 lakh atak gaye.", d.next_doc); S.drafts = []; });
+  document.querySelectorAll("[data-fwd]").forEach((b) => b.onclick = () => { const d = S.drafts.find((x) => x.next_doc); if (!d) return; b.disabled = true; haptic(); send("Bank ka SMS aur police ka notice yeh hai. Account mein 3.1 lakh atak gaye.", d.next_doc); S.drafts = []; });
   document.querySelectorAll("[data-cam]").forEach((b) => b.onclick = () => $("#cam").click());
-  document.querySelectorAll("[data-branch]").forEach((b) => b.onclick = () => { b.disabled = true; send("Bank ne complaint le li, acknowledgement mil gaya."); });
+  document.querySelectorAll("[data-branch]").forEach((b) => b.onclick = () => { b.disabled = true; haptic(); send("Bank ne complaint le li, acknowledgement mil gaya."); });
   document.querySelectorAll("[data-listen]").forEach((b) => b.onclick = () => { S.audio = true; speak(S.lastSay); });
-  document.querySelectorAll("[data-letter]").forEach((b) => b.onclick = () => { const d = S.view.docs.find((x) => x.kind === "letter"); $("#lettertext").textContent = d ? d.text : ""; $("#letter").classList.add("on"); });
+  document.querySelectorAll("[data-letter]").forEach((b) => b.onclick = () => { const d = S.view.docs.find((x) => x.kind === "letter"); $("#lettertext").textContent = d ? d.text : ""; openSheet("#letter"); });
 }
+const haptic = () => { if (navigator.vibrate) navigator.vibrate(12); };
 
 // ---------------------------------------------------------------- chat sheet (secondary)
 function renderChat() {
   const items = S.chat.filter((m) => m.who === "kavach" || m.who === "merchant");
-  $("#chat").innerHTML = items.length ? items.map((m) => `<div class="msg ${m.who === "merchant" ? "m" : "k"}">${esc(m.text)}<small>${tm(m.at)}</small></div>`).join("")
-    : `<p class="empty" style="text-align:center;margin-top:30px">Kuch bhi poochiye: payout, refund, freeze, SOP.</p>`;
+  $("#chat").innerHTML = items.length ? items.map((m) => m.who === "merchant"
+    ? `<div class="self-end max-w-[84%] rounded-[20px] rounded-br-md bg-navy-2 text-white px-3.5 py-2.5 text-[15px] leading-snug whitespace-pre-wrap">${esc(m.text)}<p class="mt-1 text-[10.5px] text-white/60 text-right">${tm(m.at)}</p></div>`
+    : `<div class="self-start max-w-[86%] rounded-[20px] rounded-bl-md bg-white ring-1 ring-line px-3.5 py-2.5 text-[15px] leading-snug whitespace-pre-wrap">${esc(m.text)}<p class="mt-1 text-[10.5px] text-ink-3">${tm(m.at)}</p></div>`).join("")
+    : `<div class="m-auto text-center text-ink-3 text-[14px]">${icon("message-circle", "size-8 mx-auto mb-2 text-ink-3")}Payout, refund, freeze, SOP: kuch bhi poochiye.</div>`;
   $("#chat").scrollTop = 1e9;
   const v = S.view, out = [];
   if (v && v.case === "chargeback") out.push("Chargeback kya hota hai?", "Kal ka paisa kab aayega?");
   else if (v && v.mode === "case") out.push("Bank ko kitne din milte hain?", "Payout doosre account mein bhej do", "Ek aadmi 20 hazaar maang raha hai complaint wapas lene ke liye");
   else out.push("Kal ka paisa kab aayega?");
-  $("#chips").innerHTML = ""; out.forEach((t) => { const b = document.createElement("button"); b.type = "button"; b.textContent = t; b.onclick = () => send(t); $("#chips").appendChild(b); });
+  $("#chips").innerHTML = ""; out.forEach((t) => { const b = document.createElement("button"); b.type = "button"; b.className = "chip"; b.textContent = t; b.onclick = () => send(t); $("#chips").appendChild(b); });
   const n = $("#unread"); n.hidden = !S.unread; n.textContent = S.unread;
+  if (window.lucide) lucide.createIcons();
 }
 function send(text, doc_id) { if (text) post("/api/merchant/message", { text, shot_id: null, doc_id: doc_id || null }); }
 function push(text) {
@@ -335,11 +325,14 @@ function push(text) {
   $("#pushtext").textContent = text.replace(/^[^\w₹]+/u, ""); const p = $("#push"); p.classList.add("on"); clearTimeout(p._t); p._t = setTimeout(() => p.classList.remove("on"), 4200);
   if (navigator.vibrate) navigator.vibrate([80, 60, 80]);
 }
+function openSheet(sel) { $(sel).classList.add("on"); $("#scrim").classList.add("on"); }
+function closeAll() { document.querySelectorAll(".sheet").forEach((s) => s.classList.remove("on")); $("#scrim").classList.remove("on"); }
 
 // ---------------------------------------------------------------- live
 let vt = null;
-function refresh() { clearTimeout(vt); vt = setTimeout(async () => { S.view = await fetch("/api/merchant/view").then((r) => r.json()).catch(() => S.view); render(); renderChat(); }, 180); }
+function refresh() { clearTimeout(vt); vt = setTimeout(async () => { S.view = await fetch("/api/merchant/view").then((r) => r.json()).catch(() => S.view); render(); renderChat(); }, 160); }
 async function boot() {
+  if (window.lucide) lucide.createIcons();
   const st = await fetch("/api/state").then((r) => r.json());
   S.chat = st.chat || []; S.drafts = st.drafts || [];
   const lastK = [...S.chat].reverse().find((m) => m.who === "kavach" && m.speak); S.lastSay = lastK ? lastK.speak : null;
@@ -355,15 +348,16 @@ async function boot() {
       renderChat(); refresh();
     } else if (ev.type === "incident" || ev.type === "world" || ev.type === "step") refresh();
     else if (ev.type === "draft") { S.drafts = [ev.draft]; refresh(); }
-    else if (ev.type === "reset") { S.chat = []; S.drafts = []; S.unread = 0; S.lastSay = null; refresh(); }
+    else if (ev.type === "reset") { S.chat = []; S.drafts = []; S.unread = 0; S.lastSay = null; S.keys = new Set(); S.nums = {}; refresh(); }
   };
 }
-$("#start").onclick = () => { S.audio = true; $("#gate").remove(); if ("speechSynthesis" in window) speechSynthesis.speak(new SpeechSynthesisUtterance(" ")); };
+$("#start").onclick = () => { S.audio = true; const g = $("#gate"); g.remove(); if ("speechSynthesis" in window) speechSynthesis.speak(new SpeechSynthesisUtterance(" ")); };
 if (EMBED) $("#gate").remove();
-$("#ask").onclick = () => { $("#sheet").classList.add("on"); S.unread = 0; renderChat(); };
-$("#push").onclick = () => { $("#push").classList.remove("on"); $("#ask").click(); };
-document.querySelectorAll("[data-close]").forEach((b) => b.onclick = () => b.closest(".sheet").classList.remove("on"));
-document.querySelectorAll(".sheet").forEach((s) => s.onclick = (e) => { if (e.target === s) s.classList.remove("on"); });
+const openChat = () => { openSheet("#sheet"); S.unread = 0; renderChat(); };
+$("#ask").onclick = openChat; $("#bell").onclick = openChat;
+$("#push").onclick = () => { $("#push").classList.remove("on"); openChat(); };
+$("#scrim").onclick = closeAll;
+document.querySelectorAll("[data-close]").forEach((b) => b.onclick = closeAll);
 $("#compose").onsubmit = (e) => { e.preventDefault(); const v = $("#t").value.trim(); if (!v) return; $("#t").value = ""; send(v); };
 document.querySelectorAll(".camin").forEach((inp) => inp.onchange = async (e) => {
   const file = e.target.files[0]; if (!file) return;

@@ -38,7 +38,7 @@ Hand over the QR. The judge taps **Main Meena hoon · Shuru karo**. They're hold
 **Beat 5 · 2:25 · What's live on Paytm today, every clock, and the business** (10–15 s each)
 - Run a scenario → **LIVE: check a real Paytm order** → paste your staging Order ID. Kavach calls **Paytm's real Transaction Status API** twice, the UPI tile flips from SIMULATED to **LIVE · Paytm API**, and it signs a pack from Paytm's actual response. "Every tile says whether it's live or simulated. This one is Paytm, right now."
 - Run a scenario → **Chargeback: a reply clock nobody is watching**. The phone shows what's proven (payment, bill) and **what isn't** ("no record can show the goods were handed over"). One question; the judge taps **Haan**; the reply goes in before the deadline. "It owns every clock that silently costs her money."
-- Top bar → **Business** (opens on *This problem exists today*, with sources): "Priced per verified resolution, sold through Paytm Intelligence. 6.6 verified actions per incident, zero model calls in offline mode, and a shadow-mode rollout that proves it on Paytm's own history before any merchant hears from it."
+- Say it (no screen): "Priced per verified resolution, sold through Paytm Intelligence. 6.6 verified actions per incident, zero model calls in offline mode, and a shadow-mode rollout that proves it on Paytm's own history before any merchant hears from it."
 
 **Close · 2:50**
 > "The Soundbox tells a shop it got paid. Kavach makes sure it keeps the money."
@@ -52,9 +52,7 @@ Hand over the QR. The judge taps **Main Meena hoon · Shuru karo**. They're hold
 | "What about a debit freeze?" | **Debit freeze: her payment to a supplier is refused**: caught from UPI code `YE` on her own payment |
 | "How do you know it works?" | **Results**: 240 money-clock scenarios plus the break-the-guard test |
 | "Couldn't it just lie to win a chargeback?" | P18: the phone's proof list shows the gap; tap **Nahi diya** → honest accept |
-| "Can Paytm actually build this?" | **Business** → feasibility column and rollout |
 | "Is any of this real?" | **LIVE: check a real Paytm order**; the SIMULATED/LIVE tag under every tile |
-| "Is this a real problem?" | **Business** → *This problem exists today*: court orders, I4C data, the RBI draft, Paytm's own docs |
 
 ### If something breaks
 * **The phone can't connect:** the laptop's left phone is the same app; drive it there.

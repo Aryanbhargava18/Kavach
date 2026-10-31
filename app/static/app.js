@@ -725,7 +725,7 @@ async function refreshAutomation() {
 // ===================================================================== misc
 function openImg(src) { const d = $("#img-dialog"); d.querySelector("img").src = src; d.showModal(); }
 $("#reset").onclick = () => post("/api/reset");
-$("#sound").onclick = (e) => { S.sound = !S.sound; e.target.textContent = S.sound ? "🔊" : "🔇"; e.target.setAttribute("aria-pressed", S.sound); if (!S.sound && "speechSynthesis" in window) speechSynthesis.cancel(); };
+$("#sound").onclick = (e) => { S.sound = !S.sound; const b = $("#sound"); b.innerHTML = `<i data-lucide="${S.sound ? "volume-2" : "volume-x"}"></i>`; if (window.lucide) lucide.createIcons(); b.setAttribute("aria-pressed", S.sound); if (!S.sound && "speechSynthesis" in window) speechSynthesis.cancel(); };
 $("#open-eval").onclick = async () => {
   const r = await fetch("/api/eval").then((x) => x.json());
   const body = $("#eval-body");
@@ -768,21 +768,3 @@ $("#open-phone").onclick = async () => {
   $("#phone-dialog").showModal();
 };
 
-// ===================================================================== business case (judge-facing)
-$("#open-biz").onclick = async () => {
-  const b = await fetch("/api/business").then((r) => r.json());
-  const F = { high: "k", medium: "", "low (near term)": "b" };
-  $("#biz-body").innerHTML = `<h2>This problem exists today</h2>
-    <table><tbody>${b.evidence.map((x) => `<tr><td>${esc(x.claim)}<br><small class="dim">${x.url ? `<a href="${esc(x.url)}" target="_blank" rel="noopener">${esc(x.source)}</a>` : esc(x.source)}</small></td></tr>`).join("")}</tbody></table>
-    <h2 style="margin-top:22px">Why Paytm would ship this</h2>
-    <p class="sub">${esc(b.pricing.model)}. ${esc(b.pricing.unit)}. Merchants pay ${esc(b.pricing.merchant_price)}.</p>
-    <h3>Measured in this repo</h3><table><tbody>${b.measured.map((m) => `<tr><td>${esc(m.label)}<br><small class="dim">${esc(m.note)}</small></td><td class="k">${esc(m.value ?? "—")}</td></tr>`).join("")}</tbody></table>
-    <h3>What Paytm already has, and what it would take</h3><table><thead><tr><th>Part</th><th>Paytm has</th><th>Needs</th><th>Feasibility</th></tr></thead><tbody>
-    ${b.components.map((c) => `<tr><td><b>${esc(c.part)}</b><br><small class="dim">${esc(c.signal)}</small></td><td>${esc(c.paytm_has)}</td><td>${esc(c.needs)}</td><td class="${F[c.feasibility] || ""}">${esc(c.feasibility)}<br><small class="dim">${esc(c.demo || "")}</small></td></tr>`).join("")}</tbody></table>
-    <h3>Rollout, safest first</h3><table><thead><tr><th>Phase</th><th>What</th><th>Proves</th><th>Risk</th></tr></thead><tbody>
-    ${b.rollout.map((r) => `<tr><td><b>${esc(r.phase)}</b></td><td>${esc(r.what)}</td><td>${esc(r.proves)}</td><td>${esc(r.risk)}</td></tr>`).join("")}</tbody></table>
-    <h3>Numbers only Paytm has (we won't invent them)</h3><ul class="biz-list">${b.paytm_only_inputs.map((x) => `<li>${esc(x)}</li>`).join("")}</ul>
-    <p class="caveat">${esc(b.label)}</p>`;
-  $("#biz-dialog").showModal();
-  requestAnimationFrame(() => { $("#biz-dialog").scrollTop = 0; $("#biz-body").firstElementChild.scrollIntoView({ block: "start" }); });
-};

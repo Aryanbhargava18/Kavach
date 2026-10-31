@@ -154,7 +154,7 @@ SOP 10.1 gives it 7 days to check and file each grievance, and I4C's own table s
 Shadow mode first: run the watchers on 90 days of Paytm history with no merchant contact, and count what would have been caught, and how early. Then alerts only, then actions with approvals, then one bank. The guard rails are on from day one.
 
 **What does it cost to run?**
-In offline mode there are no model calls. The decisions are rules, and we measured a median of 4 tool calls per money-clock case. A model is used only for Hindi language, so a small Indic model is enough. The human cost is two Paytm Risk taps per freeze case. The benefit side needs Paytm's own rates (freezes, chargebacks deemed valid, nodal minutes), and the Business case panel lists exactly which ones.
+In offline mode there are no model calls. The decisions are rules, and we measured a median of 4 tool calls per money-clock case. A model is used only for Hindi language, so a small Indic model is enough. The human cost is two Paytm Risk taps per freeze case. The benefit side needs Paytm's own rates (freezes, chargebacks deemed valid, nodal minutes); docs/STRATEGY.md lists exactly which ones.
 
 ## What's live
 
@@ -165,5 +165,5 @@ The read path. Kavach calls Paytm's real Transaction Status API (v3/order/status
 Payout return files, PSP decline codes for a merchant's own payments, and the dispute desk aren't exposed to outside developers. Inside Paytm, they're feeds Paytm already has. The engine doesn't change; only the adapter behind each tool does. We showed that swap with the Transaction Status API.
 
 **Is the problem real or invented?**
-Real, and current. A High Court released a shop's ₹8.26 lakh account frozen over one ₹1,000 sale. I4C's own table shows about ₹303 crore frozen against ₹29 crore disputed. The Supreme Court told the RBI to write an SOP for debit holds in August 2026, and the RBI published a draft in September. Paytm's own docs net chargebacks from settlements. The sources are linked in the app under **Business**.
+Real, and current. A High Court released a shop's ₹8.26 lakh account frozen over one ₹1,000 sale. I4C's own table shows about ₹303 crore frozen against ₹29 crore disputed. The Supreme Court told the RBI to write an SOP for debit holds in August 2026, and the RBI published a draft in September. Paytm's own docs net chargebacks from settlements. The sources are listed in docs/STRATEGY.md.
 
