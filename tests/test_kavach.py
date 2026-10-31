@@ -594,3 +594,55 @@ def test_full_arc_detect_protect_prove_release():
         assert not [b for b in w.settlements if b["status"] in ("HELD", "RETURNED")]
         assert inc.status == "watching" and "2,400" in inc.headline
     run(go())
+
+
+def test_paytm_live_client_signs_like_paytm_and_maps_the_response():
+    import json as _json, httpx
+    from paytmchecksum import verifySignature
+    from app import paytm_live
+    os.environ.update({"PAYTM_MID": "TESTMID12345", "PAYTM_MERCHANT_KEY": "abcd1234EFGH5678", "PAYTM_ENV": "staging"})
+    seen = {}
+
+    def handler(req: httpx.Request):
+        p = _json.loads(req.content)
+        seen["url"] = str(req.url)
+        seen["sig_ok"] = verifySignature(_json.dumps(p["body"]), "abcd1234EFGH5678", p["head"]["signature"])
+        seen["body"] = p["body"]
+        return httpx.Response(200, json={"head": {"signature": "x"}, "body": {"resultInfo": {"resultStatus": "TXN_SUCCESS", "resultCode": "01", "resultMsg": "Txn Success"},
+            "txnId": "20261031111212800110168123456789", "bankTxnId": "777001234567", "orderId": "KVH-ORD-1", "txnAmount": "1.00",
+            "txnDate": "2026-10-31 10:12:33.0", "paymentMode": "UPI", "mid": "TESTMID12345", "gatewayName": "PPBLC"}})
+    try:
+        r = run(paytm_live.order_status("KVH-ORD-1", transport=httpx.MockTransport(handler)))
+        assert seen["url"] == "https://securestage.paytmpayments.com/v3/order/status"
+        assert seen["sig_ok"] and seen["body"] == {"mid": "TESTMID12345", "orderId": "KVH-ORD-1"}
+        assert r["status"] == "SUCCESS" and r["amount"] == 1 and r["bank_txn_id"] == "777001234567" and r["provenance"] == "PAYTM_STAGING"
+    finally:
+        for k in ("PAYTM_MID", "PAYTM_MERCHANT_KEY", "PAYTM_ENV"):
+            os.environ.pop(k, None)
+
+
+def test_live_check_flow_signs_only_what_paytm_said(monkeypatch):
+    from app import paytm_live
+    async def go(status):
+        calls = []
+        async def fake(order_id, transport=None):
+            calls.append(order_id)
+            return {"found": True, "status": status, "result_msg": "x", "order_id": order_id, "txn_id": "T1", "bank_txn_id": "B1", "amount": 1,
+                    "amount_text": "1.00", "txn_date": "2026-10-31 10:12:33", "payment_mode": "UPI", "mid": "TESTMID", "provenance": "PAYTM_STAGING",
+                    "fetched_at": "2026-10-31T10:12:40", "endpoint": "mock", "response_signed": True}
+        monkeypatch.setattr(paytm_live, "configured", lambda: True)
+        monkeypatch.setattr(paytm_live, "order_status", fake)
+        w = World(); e = Engine(w)
+        inc = await e.live_check("ORD-9")
+        return w, inc, calls
+    w, inc, calls = run(go("SUCCESS"))
+    assert len(calls) == 2 and "pack" in inc.facts and inc.status == "resolved"                 # asked twice, then signed
+    assert proof.verify(inc.facts["pack"]["token"], None, w.now, inc.id)["result"] == "VALID"
+    w2, inc2, _ = run(go("PENDING"))
+    assert "pack" not in inc2.facts and inc2.status == "with_human"
+    assert policy.evaluate(w2, "issue_live_pack", {"order_id": "ORD-9"}, {}).verdict == "DENY"   # P20
+    monkeypatch.setattr(paytm_live, "configured", lambda: False)
+    async def nokeys():
+        w3 = World(); e3 = Engine(w3); return await e3.live_check("ORD-1")
+    inc3 = run(nokeys())
+    assert "pack" not in inc3.facts and "not set" in inc3.headline

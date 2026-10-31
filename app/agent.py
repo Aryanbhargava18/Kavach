@@ -149,6 +149,9 @@ class Engine:
             pd = next(x for x in r["payments"] if x["code"] == "YE")
             self._col(inc, "own", label="Her own payment", tier="T1", ref=pd["code"], amount=pd["amount"], status="DECLINED", when=t12(pd["at"]),
                       note=pd["payee"])
+        elif name == "paytm_order_status" and r.get("configured") and not r.get("error"):
+            self._col(inc, "switch", label="Paytm · LIVE", tier="T1", ref=r.get("txn_id"), amount=r.get("amount"), status=r.get("status"),
+                      when=str(r.get("txn_date") or "")[11:16], note=f"{r['provenance']} · {r.get('result_msg') or ''}", live=True)
         elif name == "get_bank_signal":
             lr = r.get("last_return") or {}
             self._col(inc, "bank", label="Her bank, as Paytm sees it", tier="T1", ref=lr.get("batch_id"), amount=None,
@@ -336,6 +339,22 @@ class Engine:
             m = w.send_message("merchant", "app", letter["en"], inc.id)
             self._phone("kavach", "✉️ Bank ke grievance officer ke liye chitthi taiyaar hai (aapke naam se). Neeche padh lijiye:\n\n" + letter["en"], inc.id)
             return {"msg_id": m["msg_id"], "summary": f"Escalation letter to {a['to']} approved by Meena; ready to hand in or email"}
+        if action == "issue_live_pack":
+            r = w.live_checks[a["order_id"]]
+            src = "Paytm Transaction Status API (" + ("production" if r["provenance"] == "PAYTM_PRODUCTION" else "staging") + ", live)"
+            facts = [{"label": "Order ID", "value": r["order_id"], "source": src, "tier": "T1"},
+                     {"label": "Status", "value": r["status"], "source": src, "tier": "T1"},
+                     {"label": "Amount", "value": f"₹{r['amount_text']}", "source": src, "tier": "T1"},
+                     {"label": "Paytm txnId", "value": r.get("txn_id") or "—", "source": src, "tier": "T1"},
+                     {"label": "Bank txn ID", "value": r.get("bank_txn_id") or "—", "source": src, "tier": "T1"},
+                     {"label": "Time", "value": r.get("txn_date") or "—", "source": src, "tier": "T1"},
+                     {"label": "Paid by", "value": r.get("payment_mode") or "—", "source": src, "tier": "T1"},
+                     {"label": "Fetched", "value": r["fetched_at"], "source": "Kavach, at the moment of the API call", "tier": "T1"}]
+            case = {"case_id": inc.id, "merchant": f"MID {r.get('mid') or os.environ.get('PAYTM_MID', '')}", "issued_at": w.now.strftime("%d %b %Y %I:%M %p"),
+                    "issued_at_iso": w.now.isoformat(), "facts": facts, "route": [], "disputed_amount_text": f"₹{r['amount_text']}"}
+            iss = proof.issue(case, self.base_url)
+            inc.facts["pack"] = iss
+            return {"token": iss["token"], "verify_url": iss["verify_url"], "summary": f"Signed pack {iss['token']} from Paytm's live response"}
         if action == "validate_settlement_account":
             r = w.penny_drop()
             inc.facts["validation"] = r
@@ -416,6 +435,9 @@ class Engine:
                 return a["event"] in inc.facts.get("case_events", {}), "Case event is on the incident record"
             if action == "draft_escalation":
                 return bool(inc.facts.get("escalation_letter")), "Letter stored on the case"
+            if action == "issue_live_pack":
+                v = proof.verify(res["token"], None, w.now, inc.id)
+                return v["result"] == "VALID", f"Independent verifier: {v['result']}"
             if action == "validate_settlement_account":
                 return bool(w.validations), f"Settlement engine shows the ₹1 credit {w.validations[-1]['status']}"
             if action == "release_settlement_hold":
@@ -705,6 +727,19 @@ class Engine:
         inc.facts.update({"proactive": True, "returned_batch": batch_id})
         async with self.locks[inc.id]:
             await self.planner.proactive_payout(inc, b)
+        self._emit("incident", {"incident": inc.summary()})
+        return inc
+
+    async def live_check(self, order_id: str) -> Incident:
+        """A real Paytm order, checked against Paytm's own Transaction Status API."""
+        self._msg_ctx = {"channel": "merchant", "customer": {}}
+        try:
+            inc = self.new_incident("live_check", f"Live Paytm order {order_id}")
+        finally:
+            self._msg_ctx = {}
+        inc.facts["order_id"] = order_id
+        async with self.locks[inc.id]:
+            await self.planner.live_check(inc, order_id)
         self._emit("incident", {"incident": inc.summary()})
         return inc
 

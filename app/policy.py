@@ -40,6 +40,7 @@ RULES = {
     "P16": "A ledger entry is posted only for a switch-confirmed payment that fits the amount still due on that bill.",
     "P18": "A chargeback reply carries only evidence that exists in Paytm's records, says goods were handed over only if Meena says so (labelled as her statement), goes out only with her approval, and never after the deadline.",
     "P19": "Held payouts go back only to the merchant's own registered account, only after the bank desk records the officer's decision and Paytm's ₹1 validation credit lands, and only with Paytm Risk's approval.",
+    "P20": "A pack from live Paytm data is signed only when Paytm's own Transaction Status API said SUCCESS for that order, and only with the fields Paytm returned.",
     "P17": "When Paytm Risk holds two or more independent signals on a merchant, Kavach does not tell them about a freeze, notice or report. Only Legal's neutral template goes out, and Paytm Risk decides.",
 }
 
@@ -301,6 +302,13 @@ def _release(world, args, ctx):
     return allow("Decision on the bank desk, ₹1 validation credited, Risk approved; paying her own registered account only.", "P19")
 
 
+def _live_pack(world, args, ctx):
+    r = world.live_checks.get(str(args.get("order_id", "")))
+    if not r or r.get("status") != "SUCCESS":
+        return deny("P20", "Paytm's Transaction Status API has not confirmed SUCCESS for this order. Kavach does not sign what Paytm didn't say.")
+    return allow("Paytm's own API confirmed SUCCESS; the pack carries only the fields Paytm returned.", "P20")
+
+
 def _pa_upload(world, args, ctx):
     t = world.txn_by_id(args.get("txn_id", ""))
     if not t or t["payee_vpa"] != MERCHANT["vpa"] or not t.get("settlement_batch"):
@@ -342,6 +350,7 @@ _CHECKS = {
     "draft_lien_request": _draft,
     "prepare_pa_upload": _pa_upload,
     "validate_settlement_account": _validate,
+    "issue_live_pack": _live_pack,
     "release_settlement_hold": _release,
     "submit_dispute_response": _dispute_reply,
     "accept_chargeback": _accept_cb,

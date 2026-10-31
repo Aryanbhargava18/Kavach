@@ -2,7 +2,7 @@ PY ?= python3
 VENV := .venv
 BIN := $(VENV)/bin
 
-.PHONY: install demo test eval lan clean llm-check sarvam-check cognee-load
+.PHONY: install demo test eval lan clean llm-check sarvam-check cognee-load paytm-check
 
 install:
 	test -x $(BIN)/python || $(PY) -m venv $(VENV)
@@ -34,3 +34,6 @@ sarvam-check: install
 
 cognee-load: install
 	$(BIN)/python -m app.cognee_load
+
+paytm-check: install
+	$(BIN)/python -m app.paytm_check $(ORDER)

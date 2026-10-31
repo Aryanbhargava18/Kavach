@@ -16,11 +16,11 @@
   };
   const T2N = { read_screenshot: "customer", lookup_transaction: "switch", get_payment_status: "switch", find_duplicate_payments: "switch", check_sale_pattern: "switch",
     get_merchant_ledger: "ledger", get_refund_status: "refund", get_settlement_status: "payout", get_bank_signal: "payout", get_incident_policy: "policy",
-    get_own_payment_declines: "switch", get_risk_signals: "policy", get_disputes: "refund",
+    get_own_payment_declines: "switch", get_risk_signals: "policy", get_disputes: "refund", paytm_order_status: "switch",
     route_sop: "policy", get_sop_clocks: "policy", ask_sop: "policy", read_document: "policy", parse_notice: "policy" };
   const A2N = { reconcile_payment: "ledger", initiate_refund: "refund", request_settlement_hold: "payout", change_settlement_account: "payout",
     send_customer_update_simulated: "customer", issue_verified_receipt: "customer", request_payment: "customer", generate_evidence_pack: "policy",
-    create_support_case: "policy", record_case_event: "policy", draft_escalation: "policy", draft_lien_request: "policy", prepare_pa_upload: "payout", submit_dispute_response: "refund", accept_chargeback: "refund", validate_settlement_account: "payout", release_settlement_hold: "payout", escalate_to_human: "policy", replay_soundbox: null };
+    create_support_case: "policy", record_case_event: "policy", draft_escalation: "policy", draft_lien_request: "policy", prepare_pa_upload: "payout", issue_live_pack: "policy", submit_dispute_response: "refund", accept_chargeback: "refund", validate_settlement_account: "payout", release_settlement_hold: "payout", escalate_to_human: "policy", replay_soundbox: null };
   const COL2N = { switch: "switch", ledger: "ledger", refund: "refund", settlement: "payout", claim: "customer" };
   const TVERB = { read_screenshot: "Reading the customer's screenshot", lookup_transaction: "Finding the payment at the UPI switch",
     get_payment_status: "Asking the UPI switch what really happened", get_merchant_ledger: "Checking Meena's billing app",
@@ -29,8 +29,8 @@
     find_duplicate_payments: "Looking for a double charge", get_bank_signal: "Checking what Paytm can see of her bank",
     read_document: "Reading the bank notice", parse_notice: "Pulling the facts out of the notice", route_sop: "Finding the right step in the cyber-fraud SOP",
     get_sop_clocks: "Working out the deadlines", ask_sop: "Looking it up in the SOP", check_sale_pattern: "Comparing with her usual sales",
-    get_own_payment_declines: "Checking her own payments through the Paytm app", get_disputes: "Reading the dispute desk", get_risk_signals: "Checking with Paytm Risk before saying anything" };
-  const FIXES = new Set(["release_settlement_hold", "submit_dispute_response", "accept_chargeback", "prepare_pa_upload", "draft_lien_request", "reconcile_payment", "issue_verified_receipt", "initiate_refund", "request_settlement_hold", "request_payment", "generate_evidence_pack", "send_customer_update_simulated"]);
+    get_own_payment_declines: "Checking her own payments through the Paytm app", get_disputes: "Reading the dispute desk", paytm_order_status: "Asking Paytm's real Transaction Status API", get_risk_signals: "Checking with Paytm Risk before saying anything" };
+  const FIXES = new Set(["issue_live_pack", "release_settlement_hold", "submit_dispute_response", "accept_chargeback", "prepare_pa_upload", "draft_lien_request", "reconcile_payment", "issue_verified_receipt", "initiate_refund", "request_settlement_hold", "request_payment", "generate_evidence_pack", "send_customer_update_simulated"]);
 
   const ST = { nodeState: {}, activeNode: null, seenM: new Set(), billStatus: {}, sig: "", boxTimer: null, q: [], qBusy: false };
 
@@ -39,7 +39,7 @@
     const map = $("#map");
     $("#wires").innerHTML = NODES.map((n) => `<line id="w-${n.id}" x1="50" y1="50" x2="${n.x}" y2="${n.y}"/>`).join("");
     NODES.forEach((n) => {
-      const d = el("div", "node", `<div class="nd"><svg viewBox="0 0 24 24"><path d="${IC[n.icon]}"/></svg></div><b>${esc(n.label)}</b><span></span>`);
+      const d = el("div", "node", `<div class="nd"><svg viewBox="0 0 24 24"><path d="${IC[n.icon]}"/></svg></div><b>${esc(n.label)}</b><span></span>${n.id === "policy" ? "" : '<i class="prov">SIMULATED</i>'}`);
       d.id = `n-${n.id}`; d.style.left = n.x + "%"; d.style.top = n.y + "%";
       map.appendChild(d);
     });
@@ -62,13 +62,15 @@
   function nodeText(key, c) {
     if (!c || c.status == null) return "";
     if (key === "claim") return `${/notice/i.test(c.label || "") ? "notice" : "screenshot"} says ${rs(c.amount)}`;
-    if (key === "switch") return c.amount != null ? `${c.status.toLowerCase()} · ${rs(c.amount)}` : c.status.toLowerCase();
+    if (key === "switch") return (c.live ? "LIVE · " : "") + (c.amount != null ? `${c.status.toLowerCase()} · ${rs(c.amount)}` : c.status.toLowerCase());
     if (key === "ledger") return c.repaired ? `${(c.status.split("· ")[1] || "bill")} paid ✓` : c.status.replace("MISSING", "no entry").toLowerCase();
     if (key === "settlement") return c.status === "NOT YET" ? (c.note || "not yet").replace("next payout ", "next payout ") : `${c.status.toLowerCase()} · ${rs(c.amount)}`;
     return `${c.status.toLowerCase()}${c.amount ? " · " + rs(c.amount) : ""}`;
   }
   function paintNodes(inc) {
     const rec = (inc && inc.recon) || {};
+    const pv = $("#n-switch .prov");
+    if (pv) { const live = rec.switch && rec.switch.live; pv.textContent = live ? "LIVE · Paytm API" : "SIMULATED"; pv.classList.toggle("live", !!live); }
     NODES.forEach((n) => { if (n.id !== "policy") setNode(n.id, "", ""); });
     $("#n-customer b").textContent = inc && inc.kind === "freeze" ? "Police notice" : inc && inc.customer && inc.customer.name ? inc.customer.name : "Customer";
     Object.entries(COL2N).forEach(([k, id]) => {

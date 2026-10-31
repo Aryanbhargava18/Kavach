@@ -10,3 +10,5 @@ cryptography>=44.0
 qrcode[pil]>=8.0
 pypdf>=5.0
 pytest>=8.0
+paytmchecksum>=1.7.0
+pycryptodome>=3.20

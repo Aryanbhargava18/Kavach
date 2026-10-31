@@ -17,12 +17,12 @@ const S = { incidents: {}, steps: {}, sel: null, follow: true, filter: "all", as
 const STATUS = { investigating: "Investigating", watching: "Watching", waiting_approval: "Needs your OK", waiting_merchant: "Waiting for Meena",
   waiting_customer: "Waiting for customer", with_human: "With a human", resolved: "Resolved", refused: "Refused" };
 const KIND = { payment_claim: "Payment claim", duplicate: "Charged twice", settlement: "Missing payout", freeze: "Account hold · high risk",
-  scam: "Scam call", account_change: "Payout account", question: "SOP question", chargeback: "Chargeback", unknown: "Message" };
+  scam: "Scam call", account_change: "Payout account", question: "SOP question", chargeback: "Chargeback", live_check: "Live Paytm order", unknown: "Message" };
 const APPROVER = { merchant: "Meena", paytm_ops: "Paytm Risk" };
 const ACTION_NAMES = { create_support_case: "Opened a support case", reconcile_payment: "Repaired the shop's ledger", replay_soundbox: "Replayed it on the Soundbox",
   initiate_refund: "Refunded the duplicate", schedule_followup: "Scheduled a follow-up", request_settlement_hold: "Held payouts with Paytm",
   change_settlement_account: "Change payout account", generate_evidence_pack: "Built a signed evidence pack", escalate_to_human: "Handed to a human",
-  resolve_incident: "Closed the case", draft_escalation: "Escalation letter (Meena signed)", draft_lien_request: "Lien-limiting request (Meena signed)", prepare_pa_upload: "Paytm's SOP 9.5(ii) upload, drafted", validate_settlement_account: "₹1 validation credit", release_settlement_hold: "Released held payouts to her account", submit_dispute_response: "Chargeback reply filed (Meena approved)", accept_chargeback: "Chargeback accepted (Meena's word)", record_case_event: "Started the bank's 7-day clock",
+  resolve_incident: "Closed the case", draft_escalation: "Escalation letter (Meena signed)", draft_lien_request: "Lien-limiting request (Meena signed)", prepare_pa_upload: "Paytm's SOP 9.5(ii) upload, drafted", issue_live_pack: "Signed pack from Paytm's live response", validate_settlement_account: "₹1 validation credit", release_settlement_hold: "Released held payouts to her account", submit_dispute_response: "Chargeback reply filed (Meena approved)", accept_chargeback: "Chargeback accepted (Meena's word)", record_case_event: "Started the bank's 7-day clock",
   issue_verified_receipt: "Verified receipt", request_payment: "QR for the exact amount due", send_customer_update_simulated: "Customer update", notify_merchant: "Told Meena" };
 const DENY_NAMES = { request_payment: "asking the customer to pay again", issue_verified_receipt: "issuing a receipt", reconcile_payment: "recording this payment in the ledger",
   initiate_refund: "refunding", change_settlement_account: "sending payouts to another account", generate_evidence_pack: "building an evidence pack",
@@ -108,7 +108,7 @@ function setClock(iso) { $("#clock").textContent = tm(iso, true); }
 function renderIntegrations(i) {
   S.intg = i;
   const chip = (name, on, title) => `<span class="ichip ${on ? "on" : ""}" title="${esc(title)}">${name}</span>`;
-  $("#intg").innerHTML = chip("Sarvam", i.sarvam, i.sarvam ? `live: ${i.models.chat}, ${i.models.stt}, ${i.models.tts}` : "offline: set SARVAM_API_KEY")
+  $("#intg").innerHTML = chip("Paytm " + (i.paytm_env === "production" ? "prod" : "staging"), i.paytm, i.paytm ? "live: Paytm Transaction Status API on your MID" : "offline: set PAYTM_MID and PAYTM_MERCHANT_KEY") + chip("Sarvam", i.sarvam, i.sarvam ? `live: ${i.models.chat}, ${i.models.stt}, ${i.models.tts}` : "offline: set SARVAM_API_KEY")
     + chip("n8n", i.n8n, i.n8n ? "events posted to your n8n webhook" : "offline: events kept in a local log")
     + chip("Cognee", i.cognee, i.cognee ? "SOP retrieval via Cognee" : "offline: local SOP retrieval")
     + chip("OCR", i.ocr, i.ocr ? "Tesseract reads images" : "install tesseract")
@@ -633,6 +633,7 @@ $("#empty-sim").onclick = (e) => { e.stopPropagation(); simMenu.hidden = false; 
 document.addEventListener("click", (e) => { if (!simMenu.contains(e.target) && e.target.id !== "sim-open") simMenu.hidden = true; if (!$("#clip-menu").contains(e.target) && e.target.closest("#clip") == null) $("#clip-menu").hidden = true; });
 async function scenario(ds) {
   simMenu.hidden = true; S.follow = true; unlockAudio();
+  if (ds.scn === "live_check") { const oid = prompt("Paytm order ID (a real order on your staging MID):"); if (oid) await post("/api/live/check", { order_id: oid }); return; }
   if (ds.scn === "skip_days") { await post("/api/clock/skip-days", { days: Number(ds.days || 13) }); return; }
   const body = {};
   if (ds.mode) body.mode = ds.mode;
@@ -771,11 +772,13 @@ $("#open-phone").onclick = async () => {
 $("#open-biz").onclick = async () => {
   const b = await fetch("/api/business").then((r) => r.json());
   const F = { high: "k", medium: "", "low (near term)": "b" };
-  $("#biz-body").innerHTML = `<h2>Why Paytm would ship this</h2>
+  $("#biz-body").innerHTML = `<h2>This problem exists today</h2>
+    <table><tbody>${b.evidence.map((x) => `<tr><td>${esc(x.claim)}<br><small class="dim">${x.url ? `<a href="${esc(x.url)}" target="_blank" rel="noopener">${esc(x.source)}</a>` : esc(x.source)}</small></td></tr>`).join("")}</tbody></table>
+    <h2 style="margin-top:22px">Why Paytm would ship this</h2>
     <p class="sub">${esc(b.pricing.model)}. ${esc(b.pricing.unit)}. Merchants pay ${esc(b.pricing.merchant_price)}.</p>
     <h3>Measured in this repo</h3><table><tbody>${b.measured.map((m) => `<tr><td>${esc(m.label)}<br><small class="dim">${esc(m.note)}</small></td><td class="k">${esc(m.value ?? "—")}</td></tr>`).join("")}</tbody></table>
     <h3>What Paytm already has, and what it would take</h3><table><thead><tr><th>Part</th><th>Paytm has</th><th>Needs</th><th>Feasibility</th></tr></thead><tbody>
-    ${b.components.map((c) => `<tr><td><b>${esc(c.part)}</b><br><small class="dim">${esc(c.signal)}</small></td><td>${esc(c.paytm_has)}</td><td>${esc(c.needs)}</td><td class="${F[c.feasibility] || ""}">${esc(c.feasibility)}</td></tr>`).join("")}</tbody></table>
+    ${b.components.map((c) => `<tr><td><b>${esc(c.part)}</b><br><small class="dim">${esc(c.signal)}</small></td><td>${esc(c.paytm_has)}</td><td>${esc(c.needs)}</td><td class="${F[c.feasibility] || ""}">${esc(c.feasibility)}<br><small class="dim">${esc(c.demo || "")}</small></td></tr>`).join("")}</tbody></table>
     <h3>Rollout, safest first</h3><table><thead><tr><th>Phase</th><th>What</th><th>Proves</th><th>Risk</th></tr></thead><tbody>
     ${b.rollout.map((r) => `<tr><td><b>${esc(r.phase)}</b></td><td>${esc(r.what)}</td><td>${esc(r.proves)}</td><td>${esc(r.risk)}</td></tr>`).join("")}</tbody></table>
     <h3>Numbers only Paytm has (we won't invent them)</h3><ul class="biz-list">${b.paytm_only_inputs.map((x) => `<li>${esc(x)}</li>`).join("")}</ul>

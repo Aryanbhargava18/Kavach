@@ -49,6 +49,24 @@ PRICING = {"model": "Per verified resolution, not per seat",
            "buyers": ["Paytm itself first (merchant base, nodal ops)", "Banks and acquirers through Paytm Intelligence"],
            "merchant_price": "₹0"}
 
+# Why this is a problem today, not one we invented. Each line says what the source shows, and nothing more.
+EVIDENCE = [
+    {"claim": "One ₹1,000 UPI sale froze a shop's whole ₹8.26 lakh account for about ten months; the High Court ordered it released.",
+     "source": "Sri Sai Wines v. Union of India, AP HC, WP 969/2026 (22 Jun 2026)", "url": None},
+    {"claim": "I4C's own grievance table: about ₹303 crore frozen against ₹29 crore disputed (our sum of its rows; contested cases only).",
+     "source": "I4C letter and Annexure I, 3 Jul 2026 (court-hosted)", "url": "https://cdnbbsr.s3waas.gov.in/s3ec0292a08bf918f44ccd961477be3002/uploads/2026/08/2026081767.pdf"},
+    {"claim": "Courts keep saying: hold the disputed amount, not the whole account.",
+     "source": "Allahabad HC, Aug 2026 (also Karnataka HC 27 Mar, Kerala HC 21 May 2026)", "url": "https://www.livelaw.in/high-court/allahabad-high-court/cyber-fraud-allahabad-hc-bank-lien-disputed-amount-mha-sop-545790"},
+    {"claim": "The Supreme Court told the RBI to frame an SOP for mule accounts and debit holds.",
+     "source": "Supreme Court, 4 Aug 2026 (suo motu, digital-arrest case)", "url": "https://www.thestatesman.com/india/freeze-faster-restore-money-sooner-sc-tightens-digital-arrest-scam-response-gives-rbi-4-weeks-for-mule-account-sop-1503624478.html"},
+    {"claim": "The RBI's draft would make holds on the suspected amount the default and require telling the customer why and how to get it removed. Draft, not yet in force.",
+     "source": "RBI draft KYC (Amendment) Directions, 2026 (11 Sep 2026)", "url": "https://www.dsci.in/resource/content/brief-draft-rbi-kyc-amendment-directions-2026"},
+    {"claim": "The government SOP sets the route: the merchant complains at the branch; the bank files within 7 days; payment aggregators upload settlement details (9.5(ii)).",
+     "source": "MHA/I4C SOP for NCRP-CFCFRMS, 02.01.2026", "url": "https://cdnbbsr.s3waas.gov.in/s3ec03936824c0191953647ec609b4f49b/uploads/2026/06/2026061955.pdf"},
+    {"claim": "Paytm nets refunds and chargebacks from settlements, and leaves merchants to match bank credits to their records.",
+     "source": "Paytm Payments docs: settlement processing", "url": "https://paytmpayments.com/docs/settlement-processing-in-paytm"},
+]
+
 PAYTM_ONLY_INPUTS = [
     "Freezes per 10,000 merchants per month, and how many show a payout return or a YE decline",
     "Chargebacks per merchant, and the share deemed valid for no reply",
@@ -74,5 +92,9 @@ def build() -> dict[str, Any]:
         {"label": "Human taps per freeze case", "value": "3 + 2", "note": "Meena: hold, request, branch. Paytm Risk: hold, release."},
         {"label": "Caught when Paytm has a signal", "value": fw.get("detected_when_paytm_has_a_signal"), "note": "False alarms: " + str(fw.get("false_alarms_on_healthy_or_blind"))},
     ]
-    return {"measured": measured, "components": COMPONENTS, "rollout": ROLLOUT, "pricing": PRICING, "paytm_only_inputs": PAYTM_ONLY_INPUTS,
+    from . import paytm_live
+    live = {"part": "Paytm Transaction Status API (live read path)", "signal": "v3/order/status, signed with Paytm's checksum library",
+            "paytm_has": "Public API; staging keys from the Paytm dashboard", "needs": "PAYTM_MID + PAYTM_MERCHANT_KEY in .env",
+            "feasibility": "high", "demo": "LIVE" if paytm_live.configured() else "ready; keys not set on this machine"}
+    return {"evidence": EVIDENCE, "live": live, "measured": measured, "components": [live] + COMPONENTS, "rollout": ROLLOUT, "pricing": PRICING, "paytm_only_inputs": PAYTM_ONLY_INPUTS,
             "label": "Measured numbers are from synthetic runs in this repo. Paytm capabilities are as publicly described; integrations are targets, not live."}

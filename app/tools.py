@@ -38,6 +38,8 @@ READ_TOOLS: dict[str, dict[str, Any]] = {
                            "params": {"txn_id": "string"}},
     "get_own_payment_declines": {"desc": "The merchant's own outgoing UPI payments made through the Paytm app (Paytm is her PSP), with her bank's response codes. YE = remitting account blocked/frozen.",
                                  "params": {}},
+    "paytm_order_status": {"desc": "LIVE: Paytm's real Transaction Status API (v3/order/status) for an order on this merchant's MID. Staging by default.",
+                           "params": {"order_id": "string"}},
     "get_disputes": {"desc": "Paytm dispute desk: chargebacks on this merchant's payments, with reason, amount and the reply deadline (silence = deemed valid).",
                      "params": {}},
     "get_risk_signals": {"desc": "Paytm Risk's review signals on this merchant (repeat CFCFRMS reports, fan-in, shared accounts). Review signals only, never a verdict.",
@@ -74,6 +76,7 @@ WRITE_TOOLS: dict[str, dict[str, Any]] = {
                                     "params": {}},
     "release_settlement_hold": {"desc": "Pay the held and bounced payouts to the merchant's own registered account. Needs Paytm Risk; only after a bank-desk decision and a successful ₹1 validation.",
                                 "params": {"reason": "string?"}},
+    "issue_live_pack": {"desc": "Sign an evidence pack built only from a live Paytm Transaction Status response that said SUCCESS.", "params": {"order_id": "string"}},
     "draft_lien_request": {"desc": "Draft a request, in Meena's name, asking her bank to limit the hold to the disputed amount and to tell her the reason, officer and removal process. Never sent without her approval.",
                            "params": {"reason": "string?"}},
     "escalate_to_human": {"desc": "Hand the incident to a Paytm human (Support/Risk).", "params": {"queue": "string", "summary": "string"}},
@@ -88,6 +91,18 @@ async def run_read_async(world: World, name: str, args: dict[str, Any]) -> tuple
         return await _read_screenshot_async(world, args)
     if name in ("read_document", "parse_notice"):
         return await _read_notice_async(world, name, args)
+    if name == "paytm_order_status":
+        from . import paytm_live
+        if not paytm_live.configured():
+            return {"configured": False}, "Paytm keys not set (PAYTM_MID, PAYTM_MERCHANT_KEY)"
+        try:
+            r = await paytm_live.order_status(str(args.get("order_id", "")).strip())
+        except Exception as ex:
+            return {"configured": True, "error": f"{type(ex).__name__}: {ex}"[:200]}, f"Paytm API unreachable ({type(ex).__name__})"
+        with world.lock:
+            world.live_checks[r["order_id"]] = r
+        tag = "LIVE · Paytm " + ("production" if r["provenance"] == "PAYTM_PRODUCTION" else "staging")
+        return {"configured": True, **r}, f"{tag} · {r['status']}" + (f" ₹{r['amount']:,}" if r.get("amount") is not None else "") + (f" · txnId …{str(r['txn_id'])[-6:]}" if r.get("txn_id") else "") + (f" · {r['result_msg']}" if r.get("result_msg") and r["status"] != "SUCCESS" else "")
     if name == "ask_sop":
         from . import sop_kb
         r = await sop_kb.ask(args.get("question", ""))

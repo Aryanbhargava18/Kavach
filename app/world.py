@@ -85,6 +85,7 @@ class World:
     risk_signals: list[dict[str, Any]] = field(default_factory=list)  # Paytm Risk's review signals on this merchant (never a verdict)
     disputes: list[dict[str, Any]] = field(default_factory=list)      # Paytm dispute desk: chargebacks raised by payers' banks
     validations: list[dict[str, Any]] = field(default_factory=list)   # ₹1 account-validation credits
+    live_checks: dict[str, dict[str, Any]] = field(default_factory=dict)   # REAL Paytm Transaction Status responses, by order id
     authority: dict[str, Any] | None = None   # SIMULATED bank grievance officer + investigating officer, acting through the bank desk
     lock: threading.RLock = field(default_factory=threading.RLock, repr=False)
 

@@ -627,6 +627,54 @@ class OfflinePlanner:
         inc.money = {"amount": b["amount"], "label": "payout bounced, safe with Paytm"}
         await self._propose_hold(inc)
 
+    # ------------------------------------------------------- live Paytm check
+    async def live_check(self, inc, order_id):
+        """The read path on Paytm's real API: ask, re-ask before acting, sign only what Paytm said."""
+        e = self.e
+        plan = ["Ask Paytm's Transaction Status API", "Re-check before acting", "Sign only what Paytm returned", "Tell Meena"]
+        e.set_plan(inc, plan)
+        await e.step(inc, "intake", text=f"Order {order_id}: checking with Paytm's real Transaction Status API", intent="live_check",
+                     amount=None, utrs=[], language="system", engine="paytm-live", sender="monitor")
+        r = await e.call(inc, "paytm_order_status", {"order_id": order_id})
+        if not r.get("configured"):
+            await self.think(inc, "No Paytm keys on this machine (PAYTM_MID, PAYTM_MERCHANT_KEY). I won't fake a live answer.", "warn")
+            inc.status, inc.headline = "with_human", "Paytm keys not set. Nothing faked."
+            return
+        if r.get("error"):
+            await self.think(inc, f"Paytm's API didn't answer ({r['error']}). I won't guess the status.", "warn")
+            inc.status, inc.headline = "with_human", "Paytm API unreachable. Nothing guessed."
+            return
+        e.tick_plan(inc, plan[0])
+        if r["status"] != "SUCCESS":
+            await e.step(inc, "evidence", stamp=r["status"], title="Paytm, live", tone="bad" if r["status"] == "FAILED" else "warn",
+                         verdict=f"Paytm says {r['status']}: {r.get('result_msg') or ''}", rows=[{"field": "Status", "claim": "—", "truth": r["status"], "match": False}])
+            await e.act(inc, "notify_merchant", {"text": f"Paytm ke record mein order {order_id}: {r['status']} ({r.get('result_msg') or ''}). Saman dene se pehle ruk jaiye."})
+            inc.status, inc.headline = "with_human", f"Paytm says {r['status']}. Nothing receipted."
+            return
+        again = await e.call(inc, "paytm_order_status", {"order_id": order_id})
+        e.tick_plan(inc, plan[1])
+        same = again.get("status") == "SUCCESS" and again.get("txn_id") == r.get("txn_id") and again.get("amount") == r.get("amount")
+        await e.step(inc, "evidence", stamp="PAYTM CONFIRMS" if same else "CHANGED", title="Paytm, live (asked twice)", tone="good" if same else "bad",
+                     verdict=f"Paytm's own API: SUCCESS ₹{r['amount_text']}, asked twice" if same else "Paytm's answer changed between calls",
+                     rows=[{"field": "Status", "claim": "—", "truth": f"{r['status']} → {again.get('status')}", "match": same},
+                           {"field": "Amount", "claim": "—", "truth": f"₹{r['amount_text']}", "match": same},
+                           {"field": "Paytm txnId", "claim": "—", "truth": str(r.get("txn_id")), "match": same},
+                           {"field": "Bank txn ID", "claim": "—", "truth": str(r.get("bank_txn_id")), "match": True}])
+        if not same:
+            inc.status, inc.headline = "with_human", "Paytm's answer changed. Not signing."
+            return
+        inc.decisive = {"label": "Decisive evidence", "text": f"Paytm Transaction Status API (live): SUCCESS ₹{r['amount_text']} · txnId {r.get('txn_id')}"}
+        res = await e.act(inc, "issue_live_pack", {"order_id": order_id})
+        e.tick_plan(inc, plan[2])
+        pack = (res.get("result") or {})
+        await e.act(inc, "notify_merchant", {"text": f"✅ Paytm ne khud confirm kiya: order {order_id}, ₹{r['amount_text']} SUCCESS (bank ref {r.get('bank_txn_id') or '—'}). Signed pack taiyaar.",
+                                            "speak": "पेटीएम ने पुष्टि की, भुगतान सफल है।", "extra": {"pack": pack.get("token"), "verify_url": pack.get("verify_url")}})
+        e.tick_plan(inc, plan[3])
+        inc.outcome_verified = True
+        inc.money = {"amount": r.get("amount"), "label": "confirmed by Paytm's live API"}
+        inc.headline = "Confirmed live by Paytm's own API, asked twice, and signed."
+        await e.act(inc, "resolve_incident", {"outcome": f"Order {order_id} confirmed SUCCESS by Paytm's Transaction Status API; signed pack {pack.get('token')}"})
+
     # ------------------------------------------------------- chargeback clock
     async def proactive_dispute(self, inc, d):
         """A chargeback landed. If nobody replies by the deadline, it is deemed valid and netted from her payout."""

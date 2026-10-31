@@ -130,6 +130,20 @@ async def skip_to_payout():
     return {"now": W().now.isoformat()}
 
 
+class Live(BaseModel):
+    order_id: str
+
+
+@app.post("/api/live/check")
+async def live_check(l: Live):
+    """A real Paytm order id on the configured MID: Kavach asks Paytm's Transaction Status API (staging by default)."""
+    oid = l.order_id.strip()
+    if not oid or len(oid) > 64:
+        raise HTTPException(400, "order id")
+    run_bg(E().live_check(oid))
+    return {"ok": True}
+
+
 class Skip(BaseModel):
     days: int = 13
 
@@ -155,7 +169,9 @@ def business_case():
 @app.get("/api/integrations")
 def integrations():
     from . import automation, sop_kb
+    from . import paytm_live
     return {"planner": planner_mode(), "sarvam": sarvam.available(), "ocr": shots.ocr_available(), "public_url": PUBLIC_URL,
+            "paytm": paytm_live.configured(), "paytm_env": paytm_live.env(),
             "n8n": automation.n8n_configured(), "cognee": sop_kb.cognee_configured(),
             "models": {"chat": sarvam.CHAT_MODEL, "stt": sarvam.STT_MODEL, "tts": sarvam.TTS_MODEL}}
 

@@ -217,3 +217,6 @@ body:not(.view-stage) #stage { display: none; }
 .shield-phone > :not(.shield-app) { display: none !important; }
 .shield-phone + .chips-in, .shield-phone .chips-in { display: none !important; }
 .shield-app { border: 0; width: 100%; height: 100%; display: block; background: #F3F6FA; }
+/* where the boundary is: every Paytm system tile says whether its data is live or simulated */
+.node .prov { display: block; font-style: normal; font-size: 9.5px; letter-spacing: .08em; font-weight: 700; color: rgba(169,195,234,.55); margin-top: 2px; }
+.node .prov.live { color: #26D49A; }
