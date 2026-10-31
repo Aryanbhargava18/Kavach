@@ -29,8 +29,10 @@ if __name__ == "__main__":
   Meena's app (judge's phone)    {base}/m
   Her Soundbox (spare phone)     {base}/soundbox     tap once to switch on sound
   Paytm's staff website          {base}/desk         and {base}/ops
+  The world (simulator)          {base}/world        a teammate plays customer, bank and police
+  One case, end to end           {base}/case
 
-  Phones must be on the same Wi-Fi (or the laptop's hotspot). Keys on the main screen: 1, 2, 3, then the right arrow; R starts over.
+  Phones must be on the same Wi-Fi (or the laptop's hotspot). Drive it from /world (or keys 1, 2, 3, right arrow, R on the main screen).
 """)
     import uvicorn
     uvicorn.run("app.main:app", host="0.0.0.0", port=port, log_level="warning")

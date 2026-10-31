@@ -36,6 +36,8 @@ It prints four addresses. Kavach is three products on one engine:
 | **Merchant app** | Kavach Shield inside Paytm for Business | `/m` on the judge's phone |
 | **Paytm staff website** | Risk & Ops approve anything that moves money; Ops triage the day's return file | `/desk` and `/ops` |
 
+`/world` is the simulator: a teammate or judge plays the customer (pays, disputes), the bank (freezes) and the police (decides) from their own phone. `/case` shows one case end to end. To put it online, see `docs/DEPLOY.md`.
+
 `http://localhost:8000/` shows all three side by side for the projector. Keys: **1** bank freeze, **2** chargeback, **3** missed bill, **→** skip ahead, **R** start over. Phones need the same Wi-Fi (or the laptop's hotspot).
 
 * `docs/STRATEGY.md`: what this is, who at Paytm pays for it, where it plugs in, and what's still simulated.
