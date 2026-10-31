@@ -46,6 +46,7 @@ INTENTS: list[tuple[str, list[str]]] = [
     ("duplicate_charge", [r"do\s*baar|2\s*baar|twice|double|duplicate|दो\s*बार|dobara\s*kat|dubara\s*kat|charged\s*two"]),
     ("account_freeze", [r"freez|frozen|फ्रीज|hold|lien|cyber|साइबर|account\s*(band|block)|(account|khata)\s+(\w+\s+){0,3}(block|seiz|band)|khata\s*band|खाता\s*बंद|debit\s*band|ब्लॉक"]),
     ("settlement_missing", [r"settlement|सेटलमेंट|payout|पेआउट|yesterday'?s?\s*money|when will (my|the)?\s*(money|payment|payout)|kal\s*ka\s*paisa|कल\s*का\s*पैसा|bank\s*(mein|me|में)\s*(nahi|nahin|नहीं)\s*(aaya|aya|आया)|account\s*(mein|me)\s*(nahi|nahin)\s*(aaya|aya)|paise\s*nahi\s*aaye|(payment|money|paisa|payout|settlement)\S*\s+(\w+\s+){0,2}(nahi|not)\s*(aaya|received|credited|come|came|arrived)|not\s*(credited|received)"]),
+    ("money_question", [r"\bwhen\b.{0,30}\b(come|coming|arrive|reach|get|credit|credited|paid|receive|land)|kab\s*(aayega|aaega|ayega|aega|milega|aayenge|aaenge|tak\s*aa)|where('?s|\s+is)\s+(my\s+)?(money|payment|payout|paisa|settlement)|is\s+my\s+money\s+safe|paisa\s*(kaha|kahan|kab)|my\s+money|कब\s*(आएगा|मिलेगा|आएँगे)|पैसा\s*(कहाँ|कब)|मेरा\s*पैसा"]),
     ("payment_claim", [r"bhej\s*diya|bheja|paid|pay\s*kar\s*diya|kar\s*diya|भेज\s*दिया|पे\s*कर|screenshot|स्क्रीनशॉट|soundbox|साउंडबॉक्स|nahi\s*bola|नहीं\s*बोला|payment\s*(aaya|aya|hua)"]),
     ("status_query", [r"kya\s*hua|status|update|what\s*(happened|now|next)|any\s*news|क्या\s*हुआ|aage\s*kya"]),
 ]
@@ -67,7 +68,7 @@ def interpret(text: str, has_screenshot: bool = False) -> dict[str, Any]:
     if has_screenshot and "payment_claim" not in scores and not scores:
         scores.append("payment_claim")
     # precedence: specific > generic
-    order = ["scam_call", "bank_ack", "sop_question", "change_settlement_account", "duplicate_charge", "account_freeze", "settlement_missing", "payment_claim", "status_query"]
+    order = ["scam_call", "bank_ack", "sop_question", "change_settlement_account", "duplicate_charge", "account_freeze", "settlement_missing", "money_question", "payment_claim", "status_query"]
     intent = next((i for i in order if i in scores), "unknown")
     utrs = UTR.findall(t)
     amount = None

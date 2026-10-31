@@ -42,6 +42,7 @@
 .scrim { opacity: 0; pointer-events: none; transition: opacity .25s; } .scrim.on { opacity: 1; pointer-events: auto; }
 .push { transform: translate(-50%, -150%); transition: transform .4s cubic-bezier(.2,.8,.2,1); } .push.on { transform: translate(-50%, 0); }
 html[lang="hi"] .eyebrow, html[lang="hi"] [class*="tracking-"] { letter-spacing: 0 !important; text-transform: none !important; }
+.live-dot { position: relative; } .live-dot::after { content: ""; position: absolute; inset: -3px; border-radius: 9999px; border: 1.5px solid currentColor; opacity: .5; animation: ping 2s cubic-bezier(0,0,.2,1) infinite; }
 .no-scrollbar { scrollbar-width: none; } .no-scrollbar::-webkit-scrollbar { display: none; }
 html.embed #gate, html.embed .sim-tag, html.embed #ask { display: none !important; }
 @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition: none !important; } }
@@ -68,10 +69,10 @@ html.embed #gate, html.embed .sim-tag, html.embed #ask { display: none !importan
   </div>
 
   <header class="sticky top-0 z-30 bg-page/80 backdrop-blur-xl px-4 pt-[calc(10px+env(safe-area-inset-top))] pb-3 flex items-center gap-3">
-    <div class="size-10 rounded-2xl bg-gradient-to-br from-sky to-navy-2 grid place-items-center text-white shadow-lg shadow-sky/20"><i data-lucide="shield-check" class="size-5"></i></div>
+    <div class="size-10 shrink-0 rounded-full bg-navy-2 text-white grid place-items-center text-[16px] font-bold">M</div>
     <div class="flex-1 min-w-0">
-      <p class="text-[11.5px] text-ink-3 truncate">Meena Kirana Store <span class="sim-tag">· Simulated</span></p>
-      <p class="text-[17px] font-semibold tracking-tight leading-tight truncate">Kavach Shield</p>
+      <p class="text-[16px] font-semibold tracking-tight leading-tight truncate">Meena Kirana Store</p>
+      <p class="mt-0.5 text-[12px] font-medium text-ok flex items-center gap-1 truncate"><i data-lucide="shield-check" class="size-3.5 shrink-0"></i><span data-t="protected"></span></p>
     </div>
     <button id="lang" type="button" class="h-9 px-1 rounded-full bg-white ring-1 ring-line flex items-center text-[12px] font-semibold" aria-label="Language"><span data-l="en" class="px-2.5 h-7 rounded-full grid place-items-center">EN</span><span data-l="hi" class="px-2.5 h-7 rounded-full grid place-items-center">हि</span></button>
     <button id="bell" type="button" class="relative size-10 rounded-full bg-white ring-1 ring-line grid place-items-center" aria-label="Messages">
@@ -82,15 +83,16 @@ html.embed #gate, html.embed .sim-tag, html.embed #ask { display: none !importan
   <main id="app" class="px-4 flex flex-col gap-3"></main>
 </div>
 
-<button id="ask" type="button" aria-label="Ask Kavach" class="fixed z-30 right-4 bottom-[calc(18px+env(safe-area-inset-bottom))] size-14 rounded-full bg-navy text-white grid place-items-center shadow-[0_12px_30px_-8px_rgba(0,27,68,.6)] active:scale-95 transition">
-  <i data-lucide="sparkles" class="size-6 text-sky"></i>
+<button id="ask" type="button" aria-label="Ask Kavach" class="fixed z-30 inset-x-0 mx-auto w-[calc(100%-32px)] max-w-[448px] bottom-[calc(14px+env(safe-area-inset-bottom))] h-14 rounded-2xl bg-white/95 backdrop-blur-xl ring-1 ring-black/[0.06] shadow-[0_12px_32px_-12px_rgba(10,22,40,.35)] flex items-center gap-3 pl-2.5 pr-4 text-left active:scale-[.99] transition">
+  <span class="size-9 shrink-0 rounded-xl bg-navy-2 text-white grid place-items-center"><i data-lucide="shield-check" class="size-[18px]"></i></span>
+  <span class="flex-1 text-[15px] text-ink-3" data-t="askBar"></span><i data-lucide="arrow-up-right" class="size-5 text-ink-3"></i>
 </button>
 
 <div id="scrim" class="scrim fixed inset-0 z-40 bg-ink/40 backdrop-blur-[2px]"></div>
 <section id="sheet" class="sheet fixed z-50 inset-x-0 bottom-0 mx-auto max-w-[480px] h-[84dvh] bg-page rounded-t-[28px] flex flex-col overflow-hidden">
   <div class="pt-2.5 pb-3 px-4 bg-white border-b border-line">
     <div class="mx-auto mb-2.5 h-1 w-10 rounded-full bg-line"></div>
-    <div class="flex items-center gap-3"><div class="size-9 rounded-xl bg-gradient-to-br from-sky to-navy-2 grid place-items-center text-white"><i data-lucide="sparkles" class="size-4"></i></div>
+    <div class="flex items-center gap-3"><div class="size-9 rounded-xl bg-navy-2 grid place-items-center text-white"><i data-lucide="shield-check" class="size-4"></i></div>
       <div class="flex-1"><p class="font-semibold leading-tight">Kavach</p><p class="text-[12px] text-ink-3" data-t="askSub"></p></div>
       <button type="button" data-close class="size-9 rounded-full bg-page grid place-items-center" aria-label="Close"><i data-lucide="x" class="size-4"></i></button></div>
   </div>
@@ -111,7 +113,7 @@ html.embed #gate, html.embed .sim-tag, html.embed #ask { display: none !importan
 </section>
 
 <div id="push" class="push fixed z-[60] left-1/2 top-2 w-[calc(100%-16px)] max-w-[464px] rounded-[22px] bg-white/90 backdrop-blur-xl ring-1 ring-black/5 shadow-2xl px-3.5 py-3 flex gap-3 cursor-pointer">
-  <div class="size-9 shrink-0 rounded-xl bg-gradient-to-br from-sky to-navy-2 grid place-items-center text-white"><i data-lucide="shield-check" class="size-[18px]"></i></div>
+  <div class="size-9 shrink-0 rounded-xl bg-navy-2 grid place-items-center text-white"><i data-lucide="shield-check" class="size-[18px]"></i></div>
   <div class="min-w-0"><p class="text-[12.5px] font-semibold">Kavach <span class="text-ink-3 font-normal" data-t="now"></span></p><p id="pushtext" class="text-[14px] text-ink-2 line-clamp-2"></p></div>
 </div>
 <input id="cam" class="camin" type="file" accept="image/*" capture="environment" hidden>
@@ -129,14 +131,22 @@ const L = {
     clocks: "Deadlines Kavach is watching", progress: "Case progress", docs: "Your documents", verify: "Verify", read: "Read", stake: "At stake", replied: "Reply sent", before: "before the deadline",
     deadline: "reply deadline", listen: "Listen to Kavach", team: "Paytm team", account: "Account", chatEmpty: "Ask anything: payouts, refunds, freezes, the SOP.",
     d: "days", h: "hours", m: "min", fwdMsg: "Here is the bank SMS and police notice. 3.1 lakh is stuck.", branchMsg: "The bank took my complaint, I have the acknowledgement.", photoMsg: "This notice came, please check.",
-    chips: { cb: ["What is a chargeback?", "When will yesterday's money come?"], case: ["How many days does the bank get?", "Send the payout to another account", "Someone is asking for 20,000 to withdraw the complaint"], home: ["When will yesterday's money come?"] } },
+    chips: { cb: ["What is a chargeback?", "Is my money safe?"], case: ["Is my money safe?", "How many days does the bank get?", "Send the payout to another account", "Someone is asking for 20,000 to withdraw the complaint"], home: ["When will my money reach the bank?", "Is my money safe?", "When did yesterday's payout land?"] },
+    protected: "Protected by Kavach", askBar: "Ask about your money…", nextPay: "Next payout", onTrack: "On track", reaches: "reaches bank", collected: "Collected", withPaytm: "With Paytm", yourBank: "Your bank", confirmed: "Confirmed",
+    pays: "payments", now2: "now", byKavach: "by Kavach", landNote: "Kavach checks it actually lands, and tells you at once if your bank sends it back.", lastPay: "Last payout", reached: "reached your bank",
+    nothingWait: "Nothing waiting", watchT: "Kavach is watching", wPay: "Payments", wPaySub: "today, each checked with the bank", wOut: "Payouts", wOutSub: "confirms it lands", wDis: "Disputes", wDisNone: "None open", wDisOpen: "reply due", live: "Live",
+    recent: "Recently fixed", todayPays: "Today's payments", bankOk: "Bank confirmed", allSteps: "Show all steps", hi2: "Ask me about your money", hiSub: "I check Paytm's own records before I answer, in English or Hindi.", tomorrow: "Tomorrow", today2: "Today", returned: "sent it back", safeNow: "Safe with Paytm", worksAgain: "works again", inAccount: "In your account" },
   hi: { askSub: "हिन्दी या English में पूछिए", letterTitle: "बैंक के लिए अनुरोध", now: "· अभी", shieldOn: "शील्ड चालू", todaySales: "आज की बिक्री", payments: "भुगतान", nextPayout: "अगला पेआउट",
     whatDid: "कवच ने क्या किया", nothingYet: "अभी कुछ करना नहीं पड़ा। कवच नज़र रख रहा है।", nextStep: "आपका अगला कदम", watching: "कवच देख रहा है", daysLeft: "दिन बचे", done: "हो गया", working: "कवच काम पर",
     fwd: "बैंक का SMS + नोटिस भेजो", photo: "फ़ोटो खींचो", whereMoney: "आपका पैसा कहाँ है", frozenSub: "बैंक में रुका हुआ · आपका बताया हुआ", more: "× ज़्यादा", disputed: "विवादित", frozen: "रुका",
     clocks: "कवच इन समय-सीमाओं पर नज़र रख रहा है", progress: "केस कहाँ तक पहुँचा", docs: "आपके दस्तावेज़", verify: "जाँचें", read: "पढ़ें", stake: "दाँव पर", replied: "जवाब गया", before: "समय-सीमा से पहले",
     deadline: "जवाब की समय-सीमा", listen: "कवच को सुनिए", team: "पेटीएम टीम", account: "खाता", chatEmpty: "कुछ भी पूछिए: पेआउट, रिफंड, फ्रीज़, SOP।",
     d: "दिन", h: "घंटे", m: "मिनट", fwdMsg: "बैंक का SMS और पुलिस का नोटिस यह है। 3.1 लाख अटके हैं।", branchMsg: "बैंक ने शिकायत ले ली, पावती मिल गई।", photoMsg: "यह नोटिस आया है, देखिए।",
-    chips: { cb: ["चार्जबैक क्या होता है?", "कल का पैसा कब आएगा?"], case: ["बैंक को कितने दिन मिलते हैं?", "पेआउट दूसरे खाते में भेज दो", "कोई 20 हज़ार माँग रहा है शिकायत वापस लेने के लिए"], home: ["कल का पैसा कब आएगा?"] } },
+    chips: { cb: ["चार्जबैक क्या होता है?", "क्या मेरा पैसा सुरक्षित है?"], case: ["क्या मेरा पैसा सुरक्षित है?", "बैंक को कितने दिन मिलते हैं?", "पेआउट दूसरे खाते में भेज दो", "कोई 20 हज़ार माँग रहा है शिकायत वापस लेने के लिए"], home: ["मेरा पैसा बैंक में कब आएगा?", "क्या मेरा पैसा सुरक्षित है?", "कल का पेआउट कब पहुँचा?"] },
+    protected: "कवच से सुरक्षित", askBar: "अपने पैसे के बारे में पूछिए…", nextPay: "अगला पेआउट", onTrack: "समय पर", reaches: "बैंक पहुँचेगा", collected: "जमा हुआ", withPaytm: "पेटीएम के पास", yourBank: "आपका बैंक", confirmed: "पक्का",
+    pays: "भुगतान", now2: "अभी", byKavach: "कवच ने जाँचा", landNote: "कवच देखेगा कि पैसा सच में पहुँचा, और बैंक ने लौटाया तो तुरंत बताएगा।", lastPay: "पिछला पेआउट", reached: "बैंक पहुँचा",
+    nothingWait: "कुछ बाकी नहीं", watchT: "कवच नज़र रख रहा है", wPay: "भुगतान", wPaySub: "आज के, हर एक बैंक से जाँचा", wOut: "पेआउट", wOutSub: "पहुँचना पक्का करेगा", wDis: "विवाद", wDisNone: "कोई नहीं", wDisOpen: "जवाब बाकी", live: "चालू",
+    recent: "हाल में ठीक किया", todayPays: "आज के भुगतान", bankOk: "बैंक ने पक्का किया", allSteps: "सारे कदम देखें", hi2: "अपने पैसे के बारे में पूछिए", hiSub: "जवाब देने से पहले मैं पेटीएम के अपने रिकॉर्ड देखता हूँ।", tomorrow: "कल", today2: "आज", returned: "लौटा दिया", safeNow: "पेटीएम के पास सुरक्षित", worksAgain: "फिर चालू", inAccount: "आपके खाते में" },
 };
 let LANG = (() => { const q = new URLSearchParams(location.search).get("lang"); if (q === "hi" || q === "en") return q; try { return localStorage.getItem("kavach.lang") || "en"; } catch { return "en"; } })();
 const T = (k) => (L[LANG] || L.en)[k];
@@ -146,7 +156,7 @@ function applyLang() {
   document.documentElement.lang = LANG;
   document.querySelectorAll("[data-t]").forEach((el) => { el.textContent = T(el.dataset.t); });
   document.querySelectorAll("#lang [data-l]").forEach((el) => { const on = el.dataset.l === LANG; el.classList.toggle("bg-navy-2", on); el.classList.toggle("text-white", on); el.classList.toggle("text-ink-3", !on); });
-  $("#t").placeholder = LANG === "hi" ? "लिखिए…" : "Type…";
+  $("#t").placeholder = LANG === "hi" ? "लिखिए…" : "Ask about your money…";
 }
 function setLang(l, fromServer) {
   LANG = l === "hi" ? "hi" : "en"; try { localStorage.setItem("kavach.lang", LANG); } catch { /* private mode */ }
@@ -179,35 +189,65 @@ function say(t) {
 
 // ---------------------------------------------------------------- views (state, not chat)
 const TONE = {
-  ok: { bg: "from-[#0091D5] via-[#0062B0] to-navy", glow: "bg-sky", pill: "bg-white/15 text-white", icon: "shield-check" },
-  bad: { bg: "from-[#0B1F45] via-navy to-[#2A0E2E]", glow: "bg-bad", pill: "bg-bad text-white", icon: "shield-alert" },
-  wait: { bg: "from-[#334155] to-[#0F172A]", glow: "bg-ink-3", pill: "bg-white/15 text-white", icon: "shield" },
+  ok: { band: "bg-ok", chip: "bg-ok-50 text-ok", pill: "bg-ok-50 text-ok", icon: "shield-check" },
+  bad: { band: "bg-bad", chip: "bg-bad-50 text-bad", pill: "bg-bad-50 text-bad", icon: "shield-alert" },
+  wait: { band: "bg-ink-3", chip: "bg-page text-ink-2", pill: "bg-page text-ink-2", icon: "shield" },
 };
 function hero(k, tone, pill, title, sub, opts = {}) {
   const t = TONE[tone] || TONE.ok;
-  return `<section data-k="${k}" class="hero relative overflow-hidden rounded-[28px] bg-gradient-to-br ${t.bg} text-white p-5 shadow-[0_20px_40px_-20px_rgba(0,27,68,.7)]">
-    <div class="glow ${t.glow}"></div>
-    <div class="relative flex items-center gap-2.5">
-      <div class="size-11 rounded-2xl bg-white/10 ring-1 ring-white/15 grid place-items-center backdrop-blur">${icon(t.icon, "size-6")}</div>
-      <span class="inline-flex items-center gap-1.5 h-7 px-3 rounded-full text-[12px] font-semibold ${t.pill}">${tone === "bad" ? '<span class="pulse-dot size-1.5 rounded-full bg-white text-white"></span>' : ""}${esc(pill)}</span>
+  return `<section data-k="${k}" class="hero card relative overflow-hidden p-5 pt-6">
+    <div class="absolute inset-x-0 top-0 h-1.5 ${t.band}"></div>
+    <div class="flex items-center gap-2.5">
+      <div class="size-10 rounded-2xl grid place-items-center ${t.chip}">${icon(t.icon, "size-5")}</div>
+      <span class="inline-flex items-center gap-1.5 h-7 px-3 rounded-full text-[12px] font-semibold ${t.pill}">${tone === "bad" ? '<span class="pulse-dot size-1.5 rounded-full bg-bad text-bad"></span>' : ""}${esc(pill)}</span>
     </div>
-    <h1 class="relative mt-5 text-[30px] leading-[1.05] font-bold tracking-tight">${esc(title)}</h1>
-    <p class="relative mt-2.5 text-[15px] leading-relaxed text-white/80">${esc(sub)}</p>
-    ${opts.trust ? `<p class="relative mt-3 flex items-start gap-1.5 text-[12px] text-white/60">${icon("lock", "size-3.5 mt-0.5 shrink-0")}<span>${esc(opts.trust)}</span></p>` : ""}
+    <h1 class="mt-4 text-[26px] leading-[1.1] font-bold tracking-tight text-ink">${esc(title)}</h1>
+    <p class="mt-2 text-[15px] leading-relaxed text-ink-2">${esc(sub)}</p>
+    ${opts.trust ? `<p class="mt-3 flex items-start gap-1.5 text-[12px] text-ink-3">${icon("lock", "size-3.5 mt-0.5 shrink-0")}<span>${esc(opts.trust)}</span></p>` : ""}
     ${opts.extra || ""}
-    ${opts.listen && S.lastSay ? `<button data-listen type="button" class="relative mt-4 inline-flex items-center gap-2 h-10 px-4 rounded-full bg-white/10 ring-1 ring-white/15 text-[14px] font-medium backdrop-blur active:scale-95 transition">${icon("volume-2", "size-4")}${T("listen")}</button>` : ""}
+    ${opts.listen && S.lastSay ? `<button data-listen type="button" class="mt-4 inline-flex items-center gap-2 h-10 px-4 rounded-full bg-page text-navy-2 text-[14px] font-semibold active:scale-95 transition">${icon("volume-2", "size-4")}${T("listen")}</button>` : ""}
   </section>`;
 }
+const dayWord = (iso) => { const d = new Date(iso), n = new Date(S.now || Date.now()); const diff = Math.round((new Date(d.toDateString()) - new Date(n.toDateString())) / 864e5);
+  return diff === 0 ? T("today2") : diff === 1 ? T("tomorrow") : d.toLocaleDateString("en-IN", { day: "numeric", month: "short" }); };
+function moneyTrack(p, opts = {}) {
+  const steps = opts.steps || [[T("collected"), `${p.count} ${T("pays")}`, "done"], [T("withPaytm"), T("now2"), "now"], [T("yourBank"), tm(p.at), "todo"], [T("confirmed"), T("byKavach"), "todo"]];
+  const dot = (st) => st === "done" ? `<span class="relative z-[1] size-7 rounded-full bg-ok text-white grid place-items-center">${icon("check", "size-4")}</span>`
+    : st === "now" ? `<span class="relative z-[1] size-7 rounded-full bg-white ring-2 ring-sky grid place-items-center"><span class="pulse-dot size-2.5 rounded-full bg-sky text-sky"></span></span>`
+    : st === "bad" ? `<span class="relative z-[1] size-7 rounded-full bg-bad text-white grid place-items-center">${icon("x", "size-4")}</span>`
+    : st === "safe" ? `<span class="relative z-[1] size-7 rounded-full bg-navy-2 text-white grid place-items-center">${icon("shield-check", "size-4")}</span>`
+    : `<span class="relative z-[1] size-7 rounded-full bg-white ring-2 ring-line"></span>`;
+  const reached = steps.filter((x) => x[2] !== "todo").length;
+  return `<div class="relative mt-5 grid grid-cols-4">
+      <span class="absolute left-[12.5%] right-[12.5%] top-[13px] h-0.5 bg-line"></span>
+      <span class="bar absolute left-[12.5%] top-[13px] h-0.5 bg-gradient-to-r from-ok to-sky" data-w="${Math.max(0, (reached - 1) / (steps.length - 1)) * 75}"></span>
+      ${steps.map(([a, b, st]) => `<div class="flex flex-col items-center text-center">${dot(st)}<p class="mt-2 text-[12.5px] font-semibold leading-tight ${st === "todo" ? "text-ink-3" : st === "bad" ? "text-bad" : "text-ink"}">${esc(a)}</p><p class="mt-0.5 text-[11.5px] leading-tight ${st === "bad" ? "text-bad" : "text-ink-3"}">${esc(b)}</p></div>`).join("")}
+    </div>`;
+}
 function home(v) {
-  const nx = new Date(v.today.next_payout);
-  const kv = `<div class="relative mt-5 grid grid-cols-3 gap-2">${[[T("todaySales"), `<span class="num" data-count="${v.today.sales}">${rs(v.today.sales)}</span>`], [T("payments"), `<span class="num">${v.today.count}</span>`],
-    [T("nextPayout"), `${esc(v.today.next_payout_day || nx.toLocaleDateString("en-IN", { day: "numeric", month: "short" }))}<br><span class="text-white/70 font-medium text-[13px]">${tm(v.today.next_payout)}</span>`]].map(([a, b]) =>
-    `<div class="rounded-2xl bg-white/10 ring-1 ring-white/10 p-3"><p class="text-[11px] text-white/60">${a}</p><p class="mt-1 text-[15px] font-semibold">${b}</p></div>`).join("")}</div>`;
-  const feed = v.feed.length ? v.feed.map((f) => `<div class="flex gap-3 py-3 first:pt-0 border-t first:border-0 border-line"><div class="size-9 shrink-0 rounded-xl bg-ok-50 text-ok grid place-items-center">${icon("check", "size-4")}</div>
-      <div class="min-w-0"><p class="text-[14.5px] font-semibold leading-snug">${esc(f.title)}</p><p class="text-[13px] text-ink-2 leading-snug mt-0.5">${esc(f.text)}</p></div></div>`).join("")
-    : `<div class="flex items-center gap-3 text-ink-2 text-[14px]"><div class="size-9 shrink-0 rounded-xl bg-sky-50 text-sky grid place-items-center">${icon("radar", "size-4")}</div>${T("nothingYet")}</div>`;
-  return hero("home", "ok", T("shieldOn"), v.shield.title, v.shield.sub, { extra: kv })
-    + `<section data-k="feed" class="card p-5"><p class="eyebrow mb-3">${T("whatDid")}</p>${feed}</section>` + clocks(v.clocks.filter((k) => k.key !== "payout"));   // next payout is already in the card above
+  const p = v.payout || { amount: 0 };
+  const track = p.amount ? `<section data-k="track" class="card p-5">
+      <div class="flex items-center justify-between"><p class="eyebrow">${T("nextPay")}</p><span class="inline-flex items-center gap-1.5 h-6 px-2.5 rounded-full bg-ok-50 text-ok text-[11.5px] font-semibold"><span class="size-1.5 rounded-full bg-ok"></span>${T("onTrack")}</span></div>
+      <p class="mt-2 num text-[42px] leading-none font-bold tracking-tight" data-count="${p.amount}">${rs(p.amount)}</p>
+      <p class="mt-2 text-[14.5px] text-ink-2">${T("reaches")} ${esc(p.account)} · <b class="text-ink font-semibold">${esc(dayWord(p.at))}, ${tm(p.at)}</b></p>
+      ${moneyTrack(p)}
+      <p class="mt-5 flex items-start gap-2 text-[12.5px] leading-snug text-ink-2 bg-page rounded-2xl px-3 py-2.5">${icon("shield-check", "size-4 shrink-0 text-navy-2 mt-px")}<span>${T("landNote")}</span></p>
+      ${p.last && p.last.status === "SETTLED" ? `<p class="mt-3 text-[12.5px] text-ink-3 flex items-center gap-1.5">${icon("circle-check", "size-3.5 text-ok")}${T("lastPay")} ${rs(p.last.amount)} ${T("reached")}${p.last.at ? " · " + esc(dayWord(p.last.at.replace(" ", "T"))) : ""}</p>` : ""}
+    </section>` : `<section data-k="track" class="card p-5"><p class="eyebrow">${T("nextPay")}</p><p class="mt-2 text-[22px] font-bold">${T("nothingWait")}</p></section>`;
+  const row = (ic, a, b, tone = "ok") => `<div class="flex items-center gap-3 py-3 border-t first:border-0 first:pt-0 border-line"><div class="size-9 shrink-0 rounded-xl grid place-items-center ${tone === "bad" ? "bg-bad-50 text-bad" : "bg-sky-50 text-navy-2"}">${icon(ic, "size-[18px]")}</div>
+      <div class="flex-1 min-w-0"><p class="text-[14.5px] font-semibold leading-tight">${a}</p><p class="mt-0.5 text-[12.5px] text-ink-3 leading-snug">${b}</p></div>
+      <span class="shrink-0 inline-flex items-center gap-1.5 text-[11.5px] font-semibold ${tone === "bad" ? "text-bad" : "text-ok"}"><span class="size-1.5 rounded-full ${tone === "bad" ? "bg-bad" : "bg-ok"} live-dot"></span>${T("live")}</span></div>`;
+  const recent = v.feed.length ? `<div class="mt-4 pt-3 border-t border-line"><p class="text-[11.5px] font-semibold text-ink-3 mb-1">${T("recent")}</p>${v.feed.map((f) => `<div class="flex gap-2.5 py-1.5"><span class="mt-0.5 size-5 shrink-0 rounded-full bg-ok-50 text-ok grid place-items-center">${icon("check", "size-3")}</span><p class="text-[13.5px] leading-snug"><b class="font-semibold">${esc(f.title)}</b><span class="text-ink-2"> · ${esc(f.text)}</span></p></div>`).join("")}</div>` : "";
+  const watch = `<section data-k="watch" class="card p-5"><p class="eyebrow mb-3">${T("watchT")}</p>
+      ${row("badge-check", T("wPay"), `${v.today.count} ${T("wPaySub")}`)}
+      ${row("landmark", T("wOut"), p.amount ? `${rs(p.amount)} · ${esc(dayWord(p.at))} ${tm(p.at)} · ${T("wOutSub")}` : T("wOutSub"))}
+      ${row("scale", T("wDis"), v.disputes_open ? `${v.disputes_open} ${T("wDisOpen")}` : T("wDisNone"), v.disputes_open ? "bad" : "ok")}
+      ${recent}</section>`;
+  const pays = (v.payments || []).length ? `<section data-k="pays" class="card p-5"><div class="flex items-baseline justify-between mb-2"><p class="eyebrow">${T("todayPays")}</p><p class="num text-[13px] font-semibold text-ink-2">${rs(v.today.sales)} · ${v.today.count}</p></div>
+      ${v.payments.map((x) => `<div class="flex items-center gap-3 py-2.5 border-t first:border-0 border-line"><div class="size-9 shrink-0 rounded-full bg-page text-navy-2 grid place-items-center text-[14px] font-bold">${esc(x.name[0])}</div>
+        <div class="flex-1 min-w-0"><p class="text-[14.5px] font-semibold leading-tight">${esc(x.name)}</p><p class="text-[12px] text-ink-3">${esc(x.vpa)} · ${tm(x.at)}</p></div>
+        <div class="text-right"><p class="num text-[15.5px] font-bold">+${rs(x.amount)}</p><p class="text-[11px] text-ok font-medium flex items-center gap-1 justify-end">${icon("check", "size-3")}${T("bankOk")}</p></div></div>`).join("")}</section>` : "";
+  return track + watch + pays;
 }
 function action(a) {
   if (!a) return "";
@@ -236,7 +276,10 @@ function money(v) {
   const pct = L && D ? Math.max(1.4, (D.amount / L.amount) * 100) : 0;
   const ICON = { locked: "lock", disputed: "triangle-alert", safe: "shield-check", back: "banknote", still: "lock-keyhole", was: "history" };
   const TC = { bad: "bg-bad-50 text-bad", warn: "bg-warn-50 text-warn", good: "bg-ok-50 text-ok", muted: "bg-page text-ink-3" };
-  return `<section data-k="money" class="card p-5"><p class="eyebrow">${T("whereMoney")}</p>
+  const safe = v.money.find((m) => m.key === "safe"), back = v.money.find((m) => m.key === "back");
+  const trk = back ? moneyTrack({}, { steps: [[T("collected"), "", "done"], [T("withPaytm"), "", "done"], [T("yourBank"), T("worksAgain"), "done"], [T("inAccount"), rs(back.amount), "done"]] })
+    : safe ? moneyTrack({}, { steps: [[T("collected"), "", "done"], [T("withPaytm"), "", "done"], [T("yourBank"), T("returned"), "bad"], [T("safeNow"), rs(safe.amount), "safe"]] }) : "";
+  return `<section data-k="money" class="card p-5"><p class="eyebrow">${T("whereMoney")}</p>${trk ? `<div class="mb-2">${trk}</div>` : ""}
     ${L ? `<div class="mt-3 flex items-end justify-between gap-3"><div><p class="num text-[34px] leading-none font-bold" data-count="${L.amount}">${rs(L.amount)}</p><p class="mt-1.5 text-[12.5px] text-ink-3">${T("frozenSub")}</p></div>
       ${v.ratio ? `<span class="ratio shrink-0 inline-flex items-center gap-1 h-8 px-3 rounded-full bg-bad-50 text-bad text-[13px] font-bold">${icon("trending-up", "size-3.5")}${v.ratio}${T("more")}</span>` : ""}</div>
       ${D ? `<div class="mt-4 h-3 rounded-full bg-bad-50 overflow-hidden" role="img" aria-label="${rs(D.amount)} disputed of ${rs(L.amount)} frozen"><div class="bar h-full rounded-full bg-warn" data-w="${pct}"></div></div>
@@ -264,16 +307,16 @@ function tracker(steps) {
   const done = steps.filter((s) => s.state === "done").length;
   return `<section data-k="trk" class="card p-5"><div class="flex items-center justify-between"><p class="eyebrow">${T("progress")}</p><p class="num text-[12px] font-semibold text-ink-3">${done}/${steps.length}</p></div>
     <div class="mt-3 h-1.5 rounded-full bg-page overflow-hidden"><div class="bar h-full rounded-full bg-gradient-to-r from-sky to-ok" data-w="${(done / steps.length) * 100}"></div></div>
-    <ol class="trk mt-4">${steps.map((s, i) => {
+    <ol class="trk mt-4">${(() => { const cut = Math.min(steps.length, Math.max(steps.findIndex((x) => x.state === "todo") + 1, 3)); S.trkCut = cut; return steps.slice(0, S.trkAll ? steps.length : cut); })().map((s, i, shown) => {
       const dot = s.state === "done" ? `<div class="size-7 rounded-full bg-ok text-white grid place-items-center">${icon("check", "size-4")}</div>`
         : s.state === "now" ? `<div class="size-7 rounded-full bg-sky-50 ring-2 ring-sky grid place-items-center"><span class="pulse-dot size-2 rounded-full bg-sky text-sky"></span></div>`
         : s.state === "blocked" ? `<div class="size-7 rounded-full bg-bad text-white grid place-items-center">${icon("x", "size-4")}</div>`
         : `<div class="size-7 rounded-full ring-2 ring-line bg-white"></div>`;
-      return `<li class="${s.state} relative grid grid-cols-[28px_1fr] gap-3 ${i < steps.length - 1 ? "pb-4" : ""}">
-        ${i < steps.length - 1 ? `<span class="absolute left-[13px] top-8 bottom-0 w-0.5 rounded ${s.state === "done" ? "bg-ok" : "bg-line"}"></span>` : ""}${dot}
+      return `<li class="${s.state} relative grid grid-cols-[28px_1fr] gap-3 ${i < shown.length - 1 ? "pb-4" : ""}">
+        ${i < shown.length - 1 ? `<span class="absolute left-[13px] top-8 bottom-0 w-0.5 rounded ${s.state === "done" ? "bg-ok" : "bg-line"}"></span>` : ""}${dot}
         <div class="pt-0.5"><p class="text-[15px] leading-tight ${s.state === "todo" ? "text-ink-3 font-medium" : "font-semibold"}">${esc(s.label)}</p>
           <p class="mt-0.5 text-[13px] leading-snug ${s.state === "blocked" ? "text-bad" : s.state === "todo" ? "text-ink-3" : "text-ink-2"}">${esc(s.sub)}</p></div></li>`;
-    }).join("")}</ol></section>`;
+    }).join("")}</ol>${!S.trkAll && S.trkCut < steps.length ? `<button type="button" data-allsteps class="mt-3 text-[13px] font-semibold text-navy-2 flex items-center gap-1">${T("allSteps")} (${steps.length})${icon("chevron-down", "size-4")}</button>` : ""}</section>`;
 }
 function docs(d) {
   if (!d || !d.length) return "";
@@ -335,6 +378,7 @@ function bind() {
   document.querySelectorAll("[data-fwd]").forEach((b) => b.onclick = () => { const d = S.drafts.find((x) => x.next_doc); if (!d) return; b.disabled = true; haptic(); send(T("fwdMsg"), d.next_doc); S.drafts = []; });
   document.querySelectorAll("[data-cam]").forEach((b) => b.onclick = () => $("#cam").click());
   document.querySelectorAll("[data-branch]").forEach((b) => b.onclick = () => { b.disabled = true; haptic(); send(T("branchMsg")); });
+  document.querySelectorAll("[data-allsteps]").forEach((b) => b.onclick = () => { S.trkAll = true; render(); });
   document.querySelectorAll("[data-listen]").forEach((b) => b.onclick = () => { S.audio = true; speak(S.lastSay); });
   document.querySelectorAll("[data-letter]").forEach((b) => b.onclick = () => { const d = S.view.docs.find((x) => x.kind === "letter"); $("#lettertext").textContent = d ? d.text : ""; openSheet("#letter"); });
 }
@@ -345,14 +389,20 @@ function renderChat() {
   const items = S.chat.filter((m) => m.who === "kavach" || m.who === "merchant");
   $("#chat").innerHTML = items.length ? items.map((m) => m.who === "merchant"
     ? `<div class="self-end max-w-[84%] rounded-[20px] rounded-br-md bg-navy-2 text-white px-3.5 py-2.5 text-[15px] leading-snug whitespace-pre-wrap">${esc(msgText(m))}<p class="mt-1 text-[10.5px] text-white/60 text-right">${tm(m.at)}</p></div>`
-    : `<div class="self-start max-w-[86%] rounded-[20px] rounded-bl-md bg-white ring-1 ring-line px-3.5 py-2.5 text-[15px] leading-snug whitespace-pre-wrap">${esc(msgText(m))}<p class="mt-1 text-[10.5px] text-ink-3">${tm(m.at)}</p></div>`).join("")
-    : `<div class="m-auto text-center text-ink-3 text-[14px]">${icon("message-circle", "size-8 mx-auto mb-2 text-ink-3")}${T("chatEmpty")}</div>`;
+    : `<div class="self-start max-w-[88%] rounded-[20px] rounded-bl-md bg-white ring-1 ring-line px-3.5 py-2.5 text-[15px] leading-snug whitespace-pre-wrap">${esc(msgText(m))}${moneyCard(m)}<p class="mt-1 text-[10.5px] text-ink-3">${tm(m.at)}</p></div>`).join("")
+    : `<div class="m-auto text-center px-6"><div class="mx-auto size-14 rounded-2xl bg-navy-2 text-white grid place-items-center mb-4">${icon("shield-check", "size-7")}</div><p class="text-[18px] font-semibold">${T("hi2")}</p><p class="mt-1.5 text-[14px] text-ink-2 leading-relaxed">${T("hiSub")}</p></div>`;
   $("#chat").scrollTop = 1e9;
   const v = S.view, out = [];
   out.push(...T("chips")[v && v.case === "chargeback" ? "cb" : v && v.mode === "case" ? "case" : "home"]);
   $("#chips").innerHTML = ""; out.forEach((t) => { const b = document.createElement("button"); b.type = "button"; b.className = "chip"; b.textContent = t; b.onclick = () => send(t); $("#chips").appendChild(b); });
   const n = $("#unread"); n.hidden = !S.unread; n.textContent = S.unread;
   if (window.lucide) lucide.createIcons();
+}
+function moneyCard(m) {
+  const r = m.extra && m.extra.money; if (!r || (!r.pending_amount && !r.held_amount)) return "";
+  const held = r.paused || r.held_amount;
+  return `<div class="mt-2.5 rounded-2xl ${held ? "bg-navy-2 text-white" : "bg-page"} p-3 flex items-center gap-3 whitespace-normal">${icon(held ? "shield-check" : "landmark", `size-5 shrink-0 ${held ? "" : "text-navy-2"}`)}
+    <div class="flex-1"><p class="num text-[20px] font-bold leading-none">${rs(held ? r.held_amount + (r.paused ? r.pending_amount : 0) : r.pending_amount)}</p><p class="mt-1 text-[12px] ${held ? "text-white/70" : "text-ink-3"}">${held ? T("withPaytm") : `${T("reaches")} · ${esc(dayWord(r.next_payout))}, ${tm(r.next_payout)}`}</p></div></div>`;
 }
 function send(text, doc_id) { if (text) post("/api/merchant/message", { text, shot_id: null, doc_id: doc_id || null }); }
 function push(text) {
@@ -369,6 +419,7 @@ function refresh() { clearTimeout(vt); vt = setTimeout(async () => { S.view = aw
 async function boot() {
   if (window.lucide) lucide.createIcons();
   const st = await fetch("/api/state").then((r) => r.json());
+  S.now = st.world && st.world.now;
   if (EMBED && st.merchant_lang && st.merchant_lang !== LANG) { LANG = st.merchant_lang; applyLang(); }
   S.chat = st.chat || []; S.drafts = st.drafts || [];
   const lastK = [...S.chat].reverse().find((m) => m.who === "kavach" && msgSpeak(m)); S.lastSay = lastK ? msgSpeak(lastK) : null;
@@ -382,7 +433,7 @@ async function boot() {
       S.chat.push(msg);
       if (msg.who === "kavach") { const sp = msgSpeak(msg); if (sp) S.lastSay = sp; speak(sp); if (!$("#sheet").classList.contains("on")) { S.unread++; push(msgText(msg)); } }
       renderChat(); refresh();
-    } else if (ev.type === "incident" || ev.type === "world" || ev.type === "step") refresh();
+    } else if (ev.type === "incident" || ev.type === "world" || ev.type === "step") { if (ev.world && ev.world.now) S.now = ev.world.now; refresh(); }
     else if (ev.type === "draft") { S.drafts = [ev.draft]; refresh(); }
     else if (ev.type === "lang") { if (ev.lang !== LANG) setLang(ev.lang, true); }
     else if (ev.type === "reset") { S.chat = []; S.drafts = []; S.unread = 0; S.lastSay = null; S.keys = new Set(); S.nums = {}; refresh(); }

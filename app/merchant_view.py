@@ -122,6 +122,16 @@ def _chargeback(world, engine, inc) -> dict[str, Any]:
             "proof": proven, "money": [], "ratio": None, "steps": steps, "action": action, "docs": [], "clocks": clocks(world, engine), "headline": inc.headline}
 
 
+def _payout(world) -> dict[str, Any]:
+    """The money tracker: today's collections on their way to her bank, and the step Kavach adds (confirming it landed)."""
+    pend = [x for x in world.transactions if x["status"] == "SUCCESS" and x["payee_vpa"] == MERCHANT["vpa"] and not x.get("settlement_batch")
+            and x["created_at"] < world.next_settlement - timedelta(hours=9)]
+    last = max(world.settlements, key=lambda b: str(b.get("business_date")), default=None)
+    acct = str(world.settlement_config.get("account") or "").split("XX")[-1]
+    return {"amount": sum(x["amount"] for x in pend), "count": len(pend), "at": world.next_settlement.isoformat(), "account": f"••{acct}" if acct else "",
+            "last": {"amount": last["amount"], "status": last["status"], "at": str(last.get("credited_at") or last.get("due_at") or "")} if last else None}
+
+
 def _home(world, engine) -> dict[str, Any]:
     today = world.now.date()
     sales = [x for x in world.transactions if x["status"] == "SUCCESS" and x["payee_vpa"] == MERCHANT["vpa"] and x["created_at"].date() == today]
@@ -132,6 +142,11 @@ def _home(world, engine) -> dict[str, Any]:
         "shield": {"tone": "ok", "title": t("All good", "सब ठीक है"), "sub": t("Kavach is watching every payment, refund and payout for you.", "कवच आपके हर भुगतान, रिफंड और पेआउट पर नज़र रख रहा है।")},
         "today": {"sales": sum(x["amount"] for x in sales), "count": len(sales), "next_payout": world.next_settlement.isoformat(),
                   "next_payout_day": t("Tomorrow", "कल") if (world.next_settlement.date() - world.now.date()).days == 1 else (t("Today", "आज") if world.next_settlement.date() == world.now.date() else world.next_settlement.strftime("%-d %b"))},
+        "payout": _payout(world),
+        "payments": [{"amount": x["amount"], "name": x.get("payer_name") or "Customer", "at": x["created_at"].isoformat(),
+                      "vpa": (x.get("payer_vpa") or "")[:3] + "•••@" + (x.get("payer_vpa") or "@").split("@")[-1]}
+                     for x in sorted(sales, key=lambda x: x["created_at"], reverse=True)[:5]],
+        "disputes_open": sum(1 for d in world.disputes if d["status"] == "OPEN"),
         "clocks": clocks(world, engine),
         "feed": [{"title": i.title, "text": i.headline or "", "state": "done" if i.status == "resolved" else "working", "at": i.updated_at}
                  for i in sorted(fixes, key=lambda i: i.updated_at, reverse=True)[:4]],

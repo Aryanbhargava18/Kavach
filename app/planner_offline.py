@@ -81,6 +81,8 @@ class OfflinePlanner:
             return inc, intent
         if intent == "status_query":
             return (e.open_incident() or e.new_incident("unknown", KIND_TITLES["unknown"])), intent
+        if intent == "money_question":
+            return (e.open_incident("freeze") or e.open_incident("chargeback") or e.new_incident("question", "Where is my money?")), intent
         kind = {"payment_claim": "payment_claim", "duplicate_charge": "duplicate", "settlement_missing": "settlement"}.get(intent, "unknown")
         return e.new_incident(kind, KIND_TITLES[kind].format(amt=f"{u['amount']:,}" if u.get("amount") else "?")), intent
 
@@ -111,6 +113,8 @@ class OfflinePlanner:
             return await self.freeze_report(inc, u)
         if intent == "status_query":
             return await self.status(inc)
+        if intent == "money_question":
+            return await self.money(inc)
         if intent == "sop_question":
             return await self.sop_question(inc, u.get("_text", ""))
         if intent == "bank_ack":
@@ -121,8 +125,7 @@ class OfflinePlanner:
             return await self.duplicate(inc, u)
         if inc.kind == "settlement":
             return await self.settlement(inc)
-        await self.e.act(inc, "notify_merchant", {"text": "I didn't catch that. Is it about a customer's payment, a double charge, a payout, or an account freeze?", "hi": "मैं समझ नहीं पाया। ग्राहक का भुगतान, दोहरा कटना, पेआउट, या खाता फ्रीज़ — किस बारे में है?"})
-        inc.status = "waiting_merchant"
+        return await self.money(inc, unclear=True)   # never a menu: answer from what Kavach already knows, then invite the rest
 
     async def _intake(self, inc, text, u):
         await self.e.step(inc, "intake", text=text, intent=u["intent"], amount=u.get("amount"), utrs=u.get("utrs"),
@@ -981,6 +984,41 @@ class OfflinePlanner:
         else:
             await e.act(inc, "notify_merchant", {"text": "Paytm Ops will verify before any account change.", "hi": "खाता बदलने के लिए पेटीएम ऑप्स सत्यापन करेगा।"})
             inc.status = "waiting_approval"
+
+    async def money(self, inc, unclear: bool = False):
+        """'When will it come?' Answered from her real money position, not a menu."""
+        e = self.e
+        r = await e.call(inc, "get_money_position", {})
+        nxt = datetime.fromisoformat(r["next_payout"])
+        day_en = "today" if nxt.date() == e.world.now.date() else "tomorrow" if (nxt.date() - e.world.now.date()).days == 1 else nxt.strftime("%-d %b")
+        day_hi = "आज" if day_en == "today" else "कल" if day_en == "tomorrow" else nxt.strftime("%-d %b")
+        acct = (r.get("account") or "your bank account").replace("Bank account ", "bank account ")
+        if r["paused"] or r["held_amount"]:
+            amt = r["held_amount"] + (r["pending_amount"] if r["paused"] else 0)
+            text = (f"{rs(amt)} is safe with Paytm right now. Your bank is refusing payouts, so nothing is sent until the freeze is limited. "
+                    "Then it goes to your own account, after a ₹1 check. Nothing ever goes to any other account.")
+            hi = (f"{rs(amt)} अभी पेटीएम के पास सुरक्षित है। आपका बैंक पेआउट लौटा रहा है, इसलिए फ्रीज़ सीमित होने तक कुछ नहीं भेजा जाएगा। "
+                  "फिर ₹1 की जाँच के बाद यह आपके ही खाते में जाएगा। किसी और खाते में कभी नहीं।")
+            speak, speak_en = f"{amt} रुपये पेटीएम के पास सुरक्षित हैं।", f"{amt} rupees are safe with Paytm."
+        elif r["pending_amount"]:
+            text = (f"{rs(r['pending_amount'])} from today's {r['pending_count']} payments reaches your {acct} {day_en} at {hm(r['next_payout'])}. "
+                    "I'll check that it actually lands and tell you if the bank sends anything back.")
+            hi = (f"आज के {r['pending_count']} भुगतानों के {rs(r['pending_amount'])} {day_hi} {hm(r['next_payout'])} बजे आपके खाते में पहुँचेंगे। "
+                  "मैं देखूँगा कि पैसा सच में पहुँचा, और बैंक ने कुछ लौटाया तो बताऊँगा।")
+            speak = f"{r['pending_amount']} रुपये {day_hi} सुबह आपके खाते में पहुँचेंगे।"
+            speak_en = f"{r['pending_amount']} rupees reach your bank {day_en} at {hm(r['next_payout'])}."
+        else:
+            lb = r.get("last_batch") or {}
+            text = f"Nothing is waiting right now. Your last payout of {rs(lb.get('amount'))} was {str(lb.get('status', 'sent')).lower()}." if lb else "Nothing is waiting for a payout right now."
+            hi = f"अभी कोई पैसा बाकी नहीं है। पिछला पेआउट {rs(lb.get('amount'))} का था।" if lb else "अभी कोई पेआउट बाकी नहीं है।"
+            speak, speak_en = None, None
+        if unclear:
+            text += " You can also ask about a customer's payment, or send a screenshot."
+            hi += " आप किसी ग्राहक के भुगतान के बारे में भी पूछ सकते हैं, या स्क्रीनशॉट भेज सकते हैं।"
+        await e.act(inc, "notify_merchant", {"text": text, "hi": hi, "speak": speak, "speak_en": speak_en, "extra": {"money": r}})
+        if inc.kind in ("question", "unknown"):
+            inc.outcome_verified = True
+            await e.act(inc, "resolve_incident", {"outcome": "Told her where her money is, from Paytm's records"})
 
     async def status(self, inc):
         live = [i for i in self.e.incidents.values() if i.status not in ("resolved", "refused") and i.id != inc.id]

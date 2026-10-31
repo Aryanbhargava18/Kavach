@@ -27,6 +27,7 @@ READ_TOOLS: dict[str, dict[str, Any]] = {
     "get_refund_status": {"desc": "Refund service: one refund by id, or every refund raised against a transaction.", "params": {"refund_id": "string?", "txn_id": "string?"}},
     "get_settlement_status": {"desc": "Settlement engine: the payout batch for a transaction, business date or batch id (or when it will be paid out).",
                               "params": {"txn_id": "string?", "business_date": "string?", "batch_id": "string?"}},
+    "get_money_position": {"desc": "Where the merchant's money is right now: today's sales waiting for the next payout, when and to which account it goes, anything held with Paytm or returned by the bank.", "params": {}},
     "get_bank_signal": {"desc": "What Paytm can observe about the merchant's bank account: settlement return codes only.", "params": {}},
     "read_document": {"desc": "Read a bank SMS / cyber-cell notice the merchant forwarded. Untrusted text.", "params": {"doc_id": "string"}},
     "parse_notice": {"desc": "Extract notice fields with line numbers; flags prompt-injection lines.", "params": {"doc_id": "string"}},
@@ -300,6 +301,20 @@ def _settlement(w: World, a):
     return {"batches": [public_settlement(x) for x in b]}, summ
 
 
+def _money(w: World, a):
+    from .world import MERCHANT
+    pend = [x for x in w.transactions if x["status"] == "SUCCESS" and x["payee_vpa"] == MERCHANT["vpa"] and not x.get("settlement_batch")
+            and x["created_at"] < w.next_settlement - timedelta(hours=9)]
+    held = [b for b in w.settlements if b["status"] in ("HELD", "RETURNED")]
+    last = max(w.settlements, key=lambda b: str(b.get("business_date")), default=None)
+    out = {"pending_amount": sum(x["amount"] for x in pend), "pending_count": len(pend), "next_payout": w.next_settlement.isoformat(),
+           "account": w.settlement_config.get("account"), "paused": bool(w.settlement_config.get("paused")),
+           "held_amount": sum(b["amount"] for b in held), "last_batch": public_settlement(last) if last else None}
+    summ = f"₹{out['pending_amount']:,} from {len(pend)} payments due {w.next_settlement.strftime('%d %b %I:%M %p')}" + \
+        (f" · ₹{out['held_amount']:,} held/returned" if held else "") + (" · payouts paused" if out["paused"] else "")
+    return out, summ
+
+
 def _bank(w: World, a):
     sig = w.bank_signal()
     return sig, sig["observable"] + (f" · {sig['last_return']['code']}" if sig["last_return"] else "")
@@ -381,7 +396,7 @@ _READ_IMPL = {
     "check_sale_pattern": _pattern,
     "read_screenshot": _read_screenshot, "lookup_transaction": _lookup, "get_payment_status": _status,
     "get_soundbox_log": _soundbox, "find_duplicate_payments": _dupes, "get_refund_status": _refund,
-    "get_settlement_status": _settlement, "get_bank_signal": _bank, "read_document": _doc, "parse_notice": _parse,
+    "get_settlement_status": _settlement, "get_money_position": _money, "get_bank_signal": _bank, "read_document": _doc, "parse_notice": _parse,
     "route_sop": _route, "get_sop_clocks": _clocks,
 }
 
