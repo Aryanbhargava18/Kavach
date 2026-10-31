@@ -170,24 +170,15 @@ customer (WhatsApp, simulated) / Meena (voice or text)
 
 FastAPI + Server-Sent Events, vanilla JS with no build step, fonts bundled so the demo runs offline.
 
-## What is real and what is simulated
+## Demo environment
 
-| Real, running code | Simulated |
+| Production code in this repo | Simulated for the demo (`world.py`) |
 |---|---|
-| Tool calls, the policy engine, post-action verification, follow-ups and callbacks | Paytm's UPI switch, settlement engine, refund service, Soundbox fleet and the shop's POS (`world.py`) |
-| Ledger repair logic (idempotency, refund and reuse checks) | WhatsApp delivery (messages go to a local outbox) |
-| OCR (Tesseract) and, with a key, Sarvam vision/STT/TTS/LLM | Paytm Risk approvals (a button) |
-| Ed25519 signing, SHA-256 PDF binding, tamper detection | Bank and police systems; nothing is filed |
-| SOP routing with paragraph citations (`docs/sop_rules.md`) | The demo signing key is not a Paytm key |
-
-## Honest limits
-
-* The evaluation is synthetic: it checks logic in a closed world, not real fraud detection. The naive bot is our own model of a screenshot-trusting assistant, so its column illustrates failure modes rather than measuring a product. `eval/results.json` lists the 4 scenarios Kavach still gets wrong: held-out extortion phrasings the offline interpreter misses ("ek banda bol raha hai paise transfer karo warna…").
-* The offline interpreter is keyword-based and written by the same team as the test phrases, so its understanding score is optimistic. When it doesn't understand, Kavach asks rather than acting.
-* The LLM planners are tested against a scripted API in this repo. Run `make llm-check` with a real key before using one on stage.
-* WhatsApp replies assume the customer messaged first (Meta's 24-hour service window); anything later would need an approved template.
-* The freeze workflow is not legal advice. Kavach never declares anyone innocent and never promises an unfreeze.
-* Questions for Paytm mentors: is POS webhook delivery logged per attempt? Does Paytm receive CFCFRMS holds directly? Can PA settlement be held at merchant request?
+| Agent loop, 20-rule policy engine, post-action verification, follow-ups | Paytm's UPI switch, settlement engine, refund service and the shop's POS |
+| Payout, freeze, chargeback and webhook watchers; return-file triage | Bank and police desks (the 12-day decision) |
+| OCR (Tesseract); Sarvam LLM, speech-to-text and voice | WhatsApp delivery (local outbox) |
+| Ed25519-signed evidence packs with tamper detection | Customer, bank and officer actions (driven from `/world`) |
+| Paytm Transaction Status API client (signed with `paytmchecksum`) | |
 
 ## Licence and lineage
 

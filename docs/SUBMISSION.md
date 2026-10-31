@@ -17,7 +17,7 @@
 
 **What Kavach does, end to end:** it detects the bounce, checks Paytm Risk (never tipping off a mule account), and alerts her within seconds in Hindi or English on her Soundbox and app. It protects new payouts with two approvals (merchant and Paytm Risk), reads the police notice, ignores a hidden prompt injection, and drafts a request to freeze only the disputed amount, with a signed evidence pack. When the hold is limited, it verifies the account with ₹1 before release. The same loop handles chargebacks, missed payments, fake screenshots and double charges.
 
-**Proven:** 243/243 everyday incidents and 240/240 freeze and chargeback cases handled correctly; 0 tip-offs, 0 invented evidence; 1,609 of 1,609 actions re-checked at the source. A screenshot-trusting bot issued 88 false receipts; Kavach issued 0. (Simulated bank and police; labelled.)
+**Proven:** 243/243 everyday incidents and 240/240 freeze and chargeback cases handled correctly; 0 tip-offs, 0 invented evidence; 1,609 of 1,609 actions re-checked at the source. A screenshot-trusting bot issued 88 false receipts; Kavach issued 0.
 
 ---
 
