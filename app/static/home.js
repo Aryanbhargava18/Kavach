@@ -86,10 +86,10 @@ function factCard(title, value, body, tone = "") {
 }
 // ---------------------------------------------------------------- voice: the Soundbox speaks Meena's language
 let voices = []; if ("speechSynthesis" in window) { const lv = () => { voices = speechSynthesis.getVoices(); }; lv(); speechSynthesis.onvoiceschanged = lv; }
-function speak(s) {
+function speak(s, override) {
   if (!S.sound || !S.live || S.spoken.has(s.incident + ":" + s.n)) return;
   S.spoken.add(s.incident + ":" + s.n);
-  const hi = S.mlang === "hi", text = hi ? s.args.speak : (s.args.speak_en || s.args.speak);
+  const hi = S.mlang === "hi", text = override || (hi ? s.args.speak : (s.args.speak_en || s.args.speak));
   if (!text) return;
   if (S.intg.sarvam) { new Audio(`/api/tts?voice=kavach&lang=${hi ? "hi-IN" : "en-IN"}&text=${encodeURIComponent(text)}`).play().catch(() => {}); return; }
   if (!("speechSynthesis" in window)) return;
@@ -126,9 +126,10 @@ function sla(inc, st) {
     ["Merchant informed", told && intake ? `+${dur(secs(intake.at, told.at))}` : "—"],
     [inc.kind === "freeze" && (inc.facts || {}).disputed_txn ? "Disputed" : "Amount", inc.money && inc.money.amount ? rs(inc.money.amount) : "—"],
     ["Checked at source", String(st.filter((s) => s.kind === "tool").length)],
-    ["Unsafe steps blocked", String(st.filter((s) => s.kind === "policy" && s.verdict === "DENY").length)],
   ];
-  return `<dl class="grid grid-cols-5 border-y border-line divide-x divide-line">${cells.map(([k, v]) => `<div class="px-4 py-3"><dt class="text-[11px] text-ink-3">${esc(k)}</dt><dd class="mt-0.5 text-[14px] font-semibold num truncate">${esc(v)}</dd></div>`).join("")}</dl>`;
+  const blocked = st.filter((s) => s.kind === "policy" && s.verdict === "DENY").length;
+  if (blocked) cells.push(["Unsafe steps blocked", String(blocked)]);
+  return `<dl class="grid ${cells.length === 5 ? "grid-cols-5" : "grid-cols-4"} border-y border-line divide-x divide-line">${cells.map(([k, v]) => `<div class="px-4 py-3"><dt class="text-[11px] text-ink-3">${esc(k)}</dt><dd class="mt-0.5 text-[14px] font-semibold num truncate">${esc(v)}</dd></div>`).join("")}</dl>`;
 }
 function decision(inc) {
   const p = inc.pending;
@@ -231,13 +232,21 @@ function heard(text, hi) {
   const ol = $("#heard"); ol.prepend(li); while (ol.children.length > 3) ol.lastChild.remove();
   $("#heard-t").hidden = false;
 }
+// The Soundbox is a loudspeaker on the shop counter: customers hear it. Private trouble (a freeze, a dispute, a Risk review)
+// is never announced there; the counter says only that a message is waiting, and the details stay on her phone.
+const PRIVATE = new Set(["freeze", "chargeback", "scam", "account_change"]);
+const DISCREET = { en: "Meena ji, an important message from Paytm is waiting in your app.", hi: "मीना जी, पेटीएम का एक ज़रूरी संदेश आपके ऐप में है।" };
 function soundbox(s) {
-  const hi = S.mlang === "hi", text = hi ? s.args.speak : (s.args.speak_en || s.args.speak);
+  const hi = S.mlang === "hi", inc = S.incidents[s.incident] || {};
+  const priv = PRIVATE.has(inc.kind);
+  const text = priv ? DISCREET[hi ? "hi" : "en"] : (hi ? s.args.speak : (s.args.speak_en || s.args.speak));
   if (!text) return;
+  if (priv && S.lastPrivate === s.incident && Date.now() - (S.lastPrivateAt || 0) < 20000) { speak(s, " "); return; }   // one discreet chime per burst, not one per message
+  if (priv) { S.lastPrivate = s.incident; S.lastPrivateAt = Date.now(); }
   heard(text, hi);
-  const sb = $("#sbx"); sb.classList.add("speaking"); lcd("KAVACH ALERT", true);
+  const sb = $("#sbx"); sb.classList.add("speaking"); lcd(priv ? "CHECK APP" : "KAVACH", true);
   clearTimeout(S.st); S.st = setTimeout(() => { sb.classList.remove("speaking"); idleLcd(); }, Math.min(9000, 1800 + text.length * 55));
-  speak(s);
+  speak(s, text);
 }
 
 // ---------------------------------------------------------------- events

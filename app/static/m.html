@@ -135,7 +135,7 @@ const L = {
     protected: "Protected by Kavach", askBar: "Ask about your money…", nextPay: "Next payout", onTrack: "On track", reaches: "reaches bank", collected: "Collected", withPaytm: "With Paytm", yourBank: "Your bank", confirmed: "Confirmed",
     pays: "payments", now2: "now", byKavach: "by Kavach", landNote: "Kavach checks it actually lands, and tells you at once if your bank sends it back.", lastPay: "Last payout", reached: "reached your bank",
     nothingWait: "Nothing waiting", watchT: "Kavach is watching", wPay: "Payments", wPaySub: "today, each checked with the bank", wOut: "Payouts", wOutSub: "confirms it lands", wDis: "Disputes", wDisNone: "None open", wDisOpen: "reply due", live: "Live",
-    recent: "Recently fixed", todayPays: "Today's payments", bankOk: "Bank confirmed", allSteps: "Show all steps", hi2: "Ask me about your money", hiSub: "I check Paytm's own records before I answer, in English or Hindi.", tomorrow: "Tomorrow", today2: "Today", returned: "sent it back", safeNow: "Safe with Paytm", worksAgain: "works again", inAccount: "In your account" },
+    recent: "Recently fixed", todayPays: "Today's payments", bankOk: "Bank confirmed", allSteps: "Show all steps", hi2: "Ask me about your money", hiSub: "I check Paytm's own records before I answer, in English or Hindi.", tomorrow: "Tomorrow", today2: "Today", pushPrivate: "Important update about your money. Open to see.", returned: "sent it back", safeNow: "Safe with Paytm", worksAgain: "works again", inAccount: "In your account" },
   hi: { askSub: "हिन्दी या English में पूछिए", letterTitle: "बैंक के लिए अनुरोध", now: "· अभी", shieldOn: "शील्ड चालू", todaySales: "आज की बिक्री", payments: "भुगतान", nextPayout: "अगला पेआउट",
     whatDid: "कवच ने क्या किया", nothingYet: "अभी कुछ करना नहीं पड़ा। कवच नज़र रख रहा है।", nextStep: "आपका अगला कदम", watching: "कवच देख रहा है", daysLeft: "दिन बचे", done: "हो गया", working: "कवच काम पर",
     fwd: "बैंक का SMS + नोटिस भेजो", photo: "फ़ोटो खींचो", whereMoney: "आपका पैसा कहाँ है", frozenSub: "बैंक में रुका हुआ · आपका बताया हुआ", more: "× ज़्यादा", disputed: "विवादित", frozen: "रुका",
@@ -146,7 +146,7 @@ const L = {
     protected: "कवच से सुरक्षित", askBar: "अपने पैसे के बारे में पूछिए…", nextPay: "अगला पेआउट", onTrack: "समय पर", reaches: "बैंक पहुँचेगा", collected: "जमा हुआ", withPaytm: "पेटीएम के पास", yourBank: "आपका बैंक", confirmed: "पक्का",
     pays: "भुगतान", now2: "अभी", byKavach: "कवच ने जाँचा", landNote: "कवच देखेगा कि पैसा सच में पहुँचा, और बैंक ने लौटाया तो तुरंत बताएगा।", lastPay: "पिछला पेआउट", reached: "बैंक पहुँचा",
     nothingWait: "कुछ बाकी नहीं", watchT: "कवच नज़र रख रहा है", wPay: "भुगतान", wPaySub: "आज के, हर एक बैंक से जाँचा", wOut: "पेआउट", wOutSub: "पहुँचना पक्का करेगा", wDis: "विवाद", wDisNone: "कोई नहीं", wDisOpen: "जवाब बाकी", live: "चालू",
-    recent: "हाल में ठीक किया", todayPays: "आज के भुगतान", bankOk: "बैंक ने पक्का किया", allSteps: "सारे कदम देखें", hi2: "अपने पैसे के बारे में पूछिए", hiSub: "जवाब देने से पहले मैं पेटीएम के अपने रिकॉर्ड देखता हूँ।", tomorrow: "कल", today2: "आज", returned: "लौटा दिया", safeNow: "पेटीएम के पास सुरक्षित", worksAgain: "फिर चालू", inAccount: "आपके खाते में" },
+    recent: "हाल में ठीक किया", todayPays: "आज के भुगतान", bankOk: "बैंक ने पक्का किया", allSteps: "सारे कदम देखें", hi2: "अपने पैसे के बारे में पूछिए", hiSub: "जवाब देने से पहले मैं पेटीएम के अपने रिकॉर्ड देखता हूँ।", tomorrow: "कल", today2: "आज", pushPrivate: "आपके पैसे से जुड़ा ज़रूरी अपडेट। खोलकर देखिए।", returned: "लौटा दिया", safeNow: "पेटीएम के पास सुरक्षित", worksAgain: "फिर चालू", inAccount: "आपके खाते में" },
 };
 let LANG = (() => { const q = new URLSearchParams(location.search).get("lang"); if (q === "hi" || q === "en") return q; try { return localStorage.getItem("kavach.lang") || "en"; } catch { return "en"; } })();
 const T = (k) => (L[LANG] || L.en)[k];
@@ -407,7 +407,8 @@ function moneyCard(m) {
 function send(text, doc_id) { if (text) post("/api/merchant/message", { text, shot_id: null, doc_id: doc_id || null }); }
 function push(text) {
   if (EMBED) return;
-  $("#pushtext").textContent = text.replace(/^[^\w₹]+/u, ""); const p = $("#push"); p.classList.add("on"); clearTimeout(p._t); p._t = setTimeout(() => p.classList.remove("on"), 4200);
+  const sensitive = /frozen|freeze|chargeback|dispute|police|fraud|hold|Risk|फ्रीज़|विवाद|पुलिस|चार्जबैक/i.test(text);   // lock screens are seen by family and helpers
+  $("#pushtext").textContent = sensitive ? T("pushPrivate") : text.replace(/^[^\w₹]+/u, ""); const p = $("#push"); p.classList.add("on"); clearTimeout(p._t); p._t = setTimeout(() => p.classList.remove("on"), 4200);
   if (navigator.vibrate) navigator.vibrate([80, 60, 80]);
 }
 function openSheet(sel) { $(sel).classList.add("on"); $("#scrim").classList.add("on"); }
