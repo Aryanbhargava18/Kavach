@@ -9,15 +9,19 @@
 
 ## Description
 
-**Kavach is an autonomous AI teammate for Paytm's merchant service. It acts before the merchant complains.**
+**Kavach is an autonomous AI teammate for Paytm's merchant service. Most support starts when a merchant complains; Kavach starts when Paytm's own systems show something is wrong, resolves it across those systems, and brings in a person only when money moves.**
 
-**Problem:** when a bank freezes a small merchant's account over a cyber-fraud report, nobody tells her. Often the whole balance is locked for a small dispute: a High Court freed ₹8.26 lakh frozen for ten months over one ₹1,000 UPI payment, and I4C data shows about ₹303 crore frozen against ₹29 crore disputed.
+**The problem.** A small merchant's money gets stuck in ways she can't see. A customer says "I paid" but nothing arrived. She's charged twice. A bill stays unpaid after the money came. A chargeback deadline passes, and the amount is deducted automatically. Worst of all, her bank freezes her whole account over a cyber-fraud report, often for a tiny dispute: a High Court freed ₹8.26 lakh frozen for ten months over one ₹1,000 UPI payment, and I4C data shows about ₹303 crore frozen against ₹29 crore disputed. Each one becomes a support ticket after the damage is done.
 
-**Insight:** Paytm knows first, when her payout bounces or her own payment is declined (UPI code YE). Today nobody acts on it.
+**The insight.** Paytm sees almost all of these first: the UPI switch, the settlement return file, the dispute desk, failed billing-app messages, UPI decline codes. Nobody acts on them for the merchant.
 
-**What Kavach does, end to end:** it detects the bounce, checks Paytm Risk (never tipping off a mule account), and alerts her within seconds in Hindi or English on her Soundbox and app. It protects new payouts with two approvals (merchant and Paytm Risk), reads the police notice, ignores a hidden prompt injection, and drafts a request to freeze only the disputed amount, with a signed evidence pack. When the hold is limited, it verifies the account with ₹1 before release. The same loop handles chargebacks, missed payments, fake screenshots and double charges.
+**What Kavach does.** It runs one loop: notice → investigate at the source → decide under 20 safety rules → act across about 12 systems → re-check → follow up until it's resolved. It resolves payment claims (trusting the bank, not the screenshot), repairs missed bills, refunds true duplicates, answers chargebacks before the deadline without inventing proof, and stops extortion calls. In a freeze, it alerts her within seconds in Hindi or English, holds new payouts with her and Paytm Risk's approval, drafts a request to freeze only the disputed amount with a signed evidence pack, and checks her account with ₹1 before release.
 
-**Proven:** 243/243 everyday incidents and 240/240 freeze and chargeback cases handled correctly; 0 tip-offs, 0 invented evidence; 1,609 of 1,609 actions re-checked at the source. A screenshot-trusting bot issued 88 false receipts; Kavach issued 0.
+**Why it's a teammate, not a chatbot.** It acts first, explains every decision, asks a person only for money moves or what only she knows, and its own rules blocked 98 unsafe steps its planner proposed.
+
+**Measured.** 483 test cases across 31 scenario types, zero safety failures. Against a screenshot-trusting bot: false receipts 0 vs 88, customers asked to pay twice 0 vs 15, wrong refunds 0 vs 16, payouts rerouted during a freeze 0 vs 6. Every one of 1,609 actions was re-checked at the source.
+
+**Built for Paytm.** It's live as three surfaces: the Soundbox, a Kavach layer in Paytm for Business, and a Risk & Ops desk. It plugs into existing data and calls Paytm's Transaction Status API. Free to merchants, it protects retention, loan collections, support cost, and a bank-facing Paytm Intelligence product.
 
 ---
 
