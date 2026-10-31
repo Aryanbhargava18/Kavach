@@ -17,8 +17,25 @@ Then in the Railway dashboard → your service → **Variables**, add:
 
 Railway tells Kavach its own address automatically, so QR codes and links point to the right place.
 
-## Render (if you prefer)
-New → Web Service → deploy from a Git repo or a Docker image → it detects the Dockerfile. Add the same variables. Render also tells Kavach its address automatically.
+## Render: free, no card, from the GitHub repo (recommended)
+1. Go to **dashboard.render.com** → sign in **with GitHub**.
+2. **New +** → **Blueprint** → pick the repo **Aryanbhargava18/Kavach** → **Apply**. Render reads `render.yaml` and builds the Dockerfile.
+3. When it asks for `SARVAM_API_KEY`, paste your key (or leave it empty to use the browser's voice).
+4. Wait for **Live** (first build about 5 minutes). Your link is `https://kavach-xxxx.onrender.com`.
+
+Free Render services sleep after 15 minutes idle and take about a minute to wake: open the link before you present.
+
+## Hugging Face Spaces: free, no card, by git push
+1. On **huggingface.co** → **New Space** → name `kavach` → SDK **Docker** → **Blank** → **Create**.
+2. Under **Settings → Variables and secrets** add a secret `SARVAM_API_KEY` (optional).
+3. On your laptop:
+```
+cd ~/Downloads && git clone https://github.com/Aryanbhargava18/Kavach.git kavach-hf && cd kavach-hf
+printf -- '---\ntitle: Kavach\nsdk: docker\napp_port: 8000\n---\n\n' | cat - README.md > README.tmp && mv README.tmp README.md
+git commit -am "Hugging Face Space config"
+git push https://huggingface.co/spaces/<your-hf-username>/kavach main --force
+```
+When git asks for a password, paste a Hugging Face **write** token (huggingface.co/settings/tokens). Your link is `https://<your-hf-username>-kavach.hf.space`.
 
 ## The addresses to share
 | Who | Open |

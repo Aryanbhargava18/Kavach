@@ -1,0 +1,12 @@
+# Render Blueprint: New → Blueprint → pick this repo. Builds the Dockerfile and runs one always-on web service.
+services:
+  - type: web
+    name: kavach
+    runtime: docker
+    plan: free
+    healthCheckPath: /api/integrations
+    envVars:
+      - key: KAVACH_PLANNER
+        value: offline
+      - key: SARVAM_API_KEY
+        sync: false          # Render asks you for it at deploy time; never stored in the repo

@@ -22,7 +22,8 @@ from .world import World
 ROOT = Path(__file__).resolve().parent.parent
 STATIC = Path(__file__).parent / "static"
 PUBLIC_URL = (os.environ.get("KAVACH_PUBLIC_URL") or (f"https://{os.environ['RAILWAY_PUBLIC_DOMAIN']}" if os.environ.get("RAILWAY_PUBLIC_DOMAIN") else "")
-              or os.environ.get("RENDER_EXTERNAL_URL") or "http://127.0.0.1:8000")      # hosted: the platform tells us our own address
+              or os.environ.get("RENDER_EXTERNAL_URL") or (f"https://{os.environ['SPACE_HOST']}" if os.environ.get("SPACE_HOST") else "")
+              or "http://127.0.0.1:8000")      # hosted: the platform tells us our own address
 PACE = float(os.environ.get("KAVACH_PACE", "0.55"))
 CLOCK_SPEED = float(os.environ.get("KAVACH_CLOCK_SPEED", "1"))
 
