@@ -333,6 +333,7 @@ class World:
                 "ops_queue": [_iso(o) for o in self.ops_queue][::-1],
                 "settlement_config": self.settlement_config,
                 "bank_signal": self.bank_signal(),
+                "disputes": [{"dispute_id": d["dispute_id"], "txn_id": d["txn_id"], "amount": d["amount"], "status": d["status"]} for d in self.disputes],
             }
 
     def bank_signal(self) -> dict[str, Any]:
@@ -494,7 +495,7 @@ class World:
             self._event("psp", f"Paytm app: Meena's ₹{amount:,} to {payee} {'DECLINED by her bank · YE' if frozen else 'paid'}", pay_id=p["pay_id"])
             return p
 
-    def inject_chargeback(self, *, reason: str = "Goods not received", hours: int = 22) -> dict[str, Any]:
+    def inject_chargeback(self, *, reason: str = "Goods not received", hours: int = 22, txn_id: str | None = None) -> dict[str, Any]:
         """A payer's bank raises a chargeback on one of today's counter sales. If the merchant does not reply by
         respond_by, the dispute is deemed valid and the amount is netted from her next payout (synthetic TAT)."""
         with self.lock:
@@ -509,7 +510,9 @@ class World:
                 self._deliver_webhook(t0, at=ts + timedelta(seconds=1))
                 self.soundbox_log.append({"device": MERCHANT["soundbox_id"], "txn_id": t0["txn_id"], "amount": 1450, "at": ts.isoformat(), "phrase": "Paytm par ₹1,450 prapt hue"})
                 recent = [t0]
-            t = max(sorted(recent, key=lambda x: x["created_at"])[-8:], key=lambda x: x["amount"])
+            pick = [x for x in self.transactions if txn_id and x["txn_id"] == txn_id and x["status"] == "SUCCESS" and x["payee_vpa"] == MERCHANT["vpa"]
+                    and not any(d["txn_id"] == x["txn_id"] for d in self.disputes)]      # a customer disputes the exact payment they made
+            t = pick[0] if pick else max(sorted(recent, key=lambda x: x["created_at"])[-8:], key=lambda x: x["amount"])
             d = {"dispute_id": f"CB-{77101 + len(self.disputes)}", "txn_id": t["txn_id"], "utr": t["utr"], "amount": t["amount"], "reason": reason,
                  "raised_at": self.now.isoformat(), "respond_by": (self.now + timedelta(hours=hours)).isoformat(), "status": "OPEN",
                  "watched": True, "response": None, "decided_at": None, "source": "Paytm dispute desk (synthetic)"}

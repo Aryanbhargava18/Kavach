@@ -21,7 +21,8 @@ from .world import World
 
 ROOT = Path(__file__).resolve().parent.parent
 STATIC = Path(__file__).parent / "static"
-PUBLIC_URL = os.environ.get("KAVACH_PUBLIC_URL", "http://127.0.0.1:8000")
+PUBLIC_URL = (os.environ.get("KAVACH_PUBLIC_URL") or (f"https://{os.environ['RAILWAY_PUBLIC_DOMAIN']}" if os.environ.get("RAILWAY_PUBLIC_DOMAIN") else "")
+              or os.environ.get("RENDER_EXTERNAL_URL") or "http://127.0.0.1:8000")      # hosted: the platform tells us our own address
 PACE = float(os.environ.get("KAVACH_PACE", "0.55"))
 CLOCK_SPEED = float(os.environ.get("KAVACH_CLOCK_SPEED", "1"))
 
@@ -102,6 +103,12 @@ def desk_page():
 def soundbox_page():
     """Meena's Soundbox on its own: open on a spare phone or tablet and it speaks like the device."""
     return FileResponse(STATIC / "home.html")
+
+
+@app.get("/world", response_class=HTMLResponse)
+def world_page():
+    """The simulated outside world, operated by people: a customer pays or disputes, the bank freezes, the officer decides. Not part of the product."""
+    return FileResponse(STATIC / "world.html")
 
 
 @app.get("/case", response_class=HTMLResponse)
@@ -348,6 +355,8 @@ async def approve(a: Approval):
 
 class Scenario(BaseModel):
     amount: int | None = None
+    txn_id: str | None = None
+    payer: str | None = None
     shown_amount: int | None = None
     mode: str | None = None
     notice_amount: int | None = None
@@ -395,7 +404,7 @@ async def scenario(name: str, s: Scenario):
         bus.publish({"type": "world", "world": w.snapshot()})
         return {"ok": True, "shot_id": shot["shot_id"], "customer": shot["customer"]}
     if name == "live_payment":
-        r = w.inject_live_payment(amount=s.amount or 4200, payer="Rahul")
+        r = w.inject_live_payment(amount=max(1, min(s.amount or 4200, 200000)), payer=(s.payer or "Rahul")[:24], webhook_fails=s.mode != "ok")
         bus.publish({"type": "world_event", "event": r["event"]})
         bus.publish({"type": "world", "world": w.snapshot()})
         return {"ok": True, **{k: v for k, v in r.items() if k != "event"}}
@@ -409,7 +418,7 @@ async def scenario(name: str, s: Scenario):
         return {"ok": True}
     elif name == "chargeback":
         # A payer's bank raises a chargeback on one of today's sales. Silence past the deadline = deemed valid, netted from the payout.
-        w.inject_chargeback(reason="Goods not received")
+        w.inject_chargeback(reason="Goods not received", txn_id=s.txn_id)
         bus.publish({"type": "world", "world": w.snapshot()})
         return {"ok": True}
     elif name == "supplier_declined":
