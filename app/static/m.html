@@ -172,12 +172,22 @@ const icon = (n, cls = "size-5") => `<i data-lucide="${n}" class="${cls}"></i>`;
 const left = (secs) => secs >= 86400 ? `${Math.floor(secs / 86400)} ${T("d")}` : secs >= 3600 ? `${Math.floor(secs / 3600)} ${T("h")}` : `${Math.max(1, Math.round(secs / 60))} ${T("m")}`;
 
 // ---------------------------------------------------------------- voice: Sarvam Bulbul when live, else the phone's own Hindi voice
-const voiceQ = []; let speaking = false;
+const voiceQ = []; let speaking = false, curAudio = null;
+function stopVoice() {   // everything that is playing stops: one voice at a time, never an echo
+  voiceQ.length = 0; speaking = false;
+  if (curAudio) { curAudio.onended = curAudio.onerror = null; curAudio.pause(); curAudio = null; }
+  if ("speechSynthesis" in window) speechSynthesis.cancel();
+}
 function speak(t, force) { if (!t || (!force && (!S.audio || EMBED))) return; voiceQ.push(t); if (!speaking) nextVoice(); }
 async function nextVoice() {
   const t = voiceQ.shift(); if (!t) { speaking = false; return; }
   speaking = true;
-  if (S.sarvam) { try { const a = new Audio(`/api/tts?text=${encodeURIComponent(t)}&lang=${LANG === "hi" ? "hi-IN" : "en-IN"}`); a.onended = nextVoice; a.onerror = () => say(t); await a.play(); return; } catch { /* fall back */ } }
+  if (S.sarvam) {
+    const a = new Audio(`/api/tts?text=${encodeURIComponent(t)}&lang=${LANG === "hi" ? "hi-IN" : "en-IN"}`); curAudio = a;
+    a.onended = () => { if (curAudio === a) curAudio = null; nextVoice(); };
+    a.onerror = () => { if (curAudio === a) { curAudio = null; say(t); } };
+    try { await a.play(); return; } catch { if (curAudio === a) { curAudio = null; say(t); } return; }
+  }
   say(t);
 }
 function say(t) {
@@ -380,7 +390,11 @@ function bind() {
   document.querySelectorAll("[data-cam]").forEach((b) => b.onclick = () => $("#cam").click());
   document.querySelectorAll("[data-branch]").forEach((b) => b.onclick = () => { b.disabled = true; haptic(); send(T("branchMsg")); });
   document.querySelectorAll("[data-allsteps]").forEach((b) => b.onclick = () => { S.trkAll = true; render(); });
-  document.querySelectorAll("[data-listen]").forEach((b) => b.onclick = () => { S.audio = true; if ("speechSynthesis" in window) speechSynthesis.cancel(); voiceQ.length = 0; speaking = false; speak(S.lastSay, true); });   // a tap always speaks, even if an earlier line got stuck
+  document.querySelectorAll("[data-listen]").forEach((b) => b.onclick = () => {   // one tap, one voice: stop whatever plays, ignore taps while it starts
+    if (S.listenAt && Date.now() - S.listenAt < 2500) return;
+    S.listenAt = Date.now(); S.audio = true; stopVoice(); speak(S.lastSay, true);
+    const lbl = b.lastChild; if (lbl && lbl.nodeType === 3) { const o = lbl.textContent; lbl.textContent = LANG === "hi" ? "चल रहा है…" : "Playing…"; setTimeout(() => { lbl.textContent = o; }, 2500); }
+  });
   document.querySelectorAll("[data-letter]").forEach((b) => b.onclick = () => { const d = S.view.docs.find((x) => x.kind === "letter"); $("#lettertext").textContent = d ? d.text : ""; openSheet("#letter"); });
 }
 const haptic = () => { if (navigator.vibrate) navigator.vibrate(12); };

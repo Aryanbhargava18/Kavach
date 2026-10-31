@@ -86,17 +86,22 @@ function factCard(title, value, body, tone = "") {
 }
 // ---------------------------------------------------------------- voice: the Soundbox speaks Meena's language
 let voices = []; if ("speechSynthesis" in window) { const lv = () => { voices = speechSynthesis.getVoices(); }; lv(); speechSynthesis.onvoiceschanged = lv; }
+const AQ = []; let aBusy = false;
+function playQ() {   // one line at a time, in order: never two voices over each other
+  if (aBusy || !AQ.length) return;
+  aBusy = true; const { text, hi } = AQ.shift(); const done = () => { aBusy = false; playQ(); };
+  if (S.intg.sarvam) { const a = new Audio(`/api/tts?voice=kavach&lang=${hi ? "hi-IN" : "en-IN"}&text=${encodeURIComponent(text)}`); a.onended = a.onerror = done; a.play().catch(done); return; }
+  if (!("speechSynthesis" in window)) return done();
+  const u = new SpeechSynthesisUtterance(text);
+  const v = hi ? voices.find((x) => x.lang.startsWith("hi")) : (voices.find((x) => x.lang === "en-IN") || voices.find((x) => x.lang.startsWith("en")));
+  if (v) u.voice = v; u.lang = hi ? "hi-IN" : "en-IN"; u.onend = u.onerror = done; speechSynthesis.speak(u);
+}
 function speak(s, override) {
   if (!S.sound || !S.live || S.spoken.has(s.incident + ":" + s.n)) return;
   S.spoken.add(s.incident + ":" + s.n);
   const hi = S.mlang === "hi", text = override || (hi ? s.args.speak : (s.args.speak_en || s.args.speak));
-  if (!text) return;
-  if (S.intg.sarvam) { new Audio(`/api/tts?voice=kavach&lang=${hi ? "hi-IN" : "en-IN"}&text=${encodeURIComponent(text)}`).play().catch(() => {}); return; }
-  if (!("speechSynthesis" in window)) return;
-  const u = new SpeechSynthesisUtterance(text);
-  const v = hi ? voices.find((x) => x.lang.startsWith("hi")) : (voices.find((x) => x.lang === "en-IN") || voices.find((x) => x.lang.startsWith("en")));
-  if (v) u.voice = v; u.lang = hi ? "hi-IN" : "en-IN";
-  speechSynthesis.speak(u);
+  if (!text || !text.trim()) return;
+  AQ.push({ text, hi }); playQ();
 }
 
 // ---------------------------------------------------------------- Paytm's desk: the case as Paytm's people would work it
@@ -229,7 +234,8 @@ function heard(text, hi) {
   const li = document.createElement("li");
   li.className = "row-in rounded-2xl bg-white ring-1 ring-black/[0.05] px-3.5 py-2.5 text-[13px] leading-snug text-ink shadow-sm";
   li.lang = hi ? "hi" : "en"; li.textContent = "“" + text + "”";
-  const ol = $("#heard"); ol.prepend(li); while (ol.children.length > 3) ol.lastChild.remove();
+  const ol = $("#heard"); if (ol.firstChild && ol.firstChild.textContent === li.textContent) return;   // the same line twice is noise
+  ol.prepend(li); while (ol.children.length > 3) ol.lastChild.remove();
   $("#heard-t").hidden = false;
 }
 // The Soundbox is a loudspeaker on the shop counter: customers hear it. Private trouble (a freeze, a dispute, a Risk review)
@@ -249,11 +255,9 @@ function soundbox(s) {
   speak(s, text);
 }
 
-function sayLine(text) {   // payment announcements: short, frequent, so the browser voice (no API credits)
-  if (!S.sound || !S.live || !("speechSynthesis" in window)) return;
-  const u = new SpeechSynthesisUtterance(text), hi = S.mlang === "hi";
-  const v = hi ? voices.find((x) => x.lang.startsWith("hi")) : (voices.find((x) => x.lang === "en-IN") || voices.find((x) => x.lang.startsWith("en")));
-  if (v) u.voice = v; u.lang = hi ? "hi-IN" : "en-IN"; speechSynthesis.speak(u);
+function sayLine(text) {   // payment announcements join the same queue
+  if (!S.sound || !S.live) return;
+  AQ.push({ text, hi: S.mlang === "hi" }); playQ();
 }
 
 // ---------------------------------------------------------------- events
@@ -347,5 +351,14 @@ if (ONLY === "only-sound") {   // a phone won't speak until someone taps it once
 }
 if (ONLY === "only-desk") document.title = "Paytm Risk & Ops desk · Kavach";
 if (ONLY === "only-sound") document.title = "Meena's Soundbox · Kavach";
+if (!ONLY || ONLY === "only-desk") {
+  const bar = document.createElement("button");
+  bar.id = "unlock"; bar.type = "button";
+  bar.className = "fixed top-4 left-1/2 -translate-x-1/2 z-50 h-11 px-5 rounded-full bg-navy-2 text-white text-[14px] font-semibold shadow-xl flex items-center gap-2";
+  bar.innerHTML = '<i data-lucide="volume-2" class="size-4"></i>Click to turn on sound';
+  document.body.appendChild(bar);
+  const unlock = () => { if ("speechSynthesis" in window) speechSynthesis.speak(new SpeechSynthesisUtterance(" ")); try { new Audio().play().catch(() => {}); } catch (_) {} bar.remove(); document.removeEventListener("click", unlock, true); };
+  document.addEventListener("click", unlock, true);
+}
 icons();
 boot();

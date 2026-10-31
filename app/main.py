@@ -271,14 +271,23 @@ async def voice(file: UploadFile = File(...), language: str = "unknown"):
         raise HTTPException(502, f"Sarvam STT failed: {type(ex).__name__}")
 
 
+_TTS_CACHE: dict[tuple, bytes] = {}
+
+
 @app.get("/api/tts")
 async def tts(text: str, voice: str = "kavach", lang: str = "hi-IN"):
     if not sarvam.available():
         raise HTTPException(503, "SARVAM_API_KEY not set")
-    try:
-        wav = await sarvam.tts(text[:600], lang, sarvam.SOUNDBOX_SPEAKER if voice == "soundbox" else sarvam.TTS_SPEAKER)
-    except Exception as ex:
-        raise HTTPException(502, f"Sarvam TTS failed: {type(ex).__name__}")
+    key = (text[:600], voice, lang)
+    wav = _TTS_CACHE.get(key)      # each line is synthesised once: replays are instant and cost no credits
+    if wav is None:
+        try:
+            wav = await sarvam.tts(text[:600], lang, sarvam.SOUNDBOX_SPEAKER if voice == "soundbox" else sarvam.TTS_SPEAKER)
+        except Exception as ex:
+            raise HTTPException(502, f"Sarvam TTS failed: {type(ex).__name__}")
+        if len(_TTS_CACHE) > 300:
+            _TTS_CACHE.pop(next(iter(_TTS_CACHE)))
+        _TTS_CACHE[key] = wav
     return Response(wav, media_type="audio/wav", headers={"Cache-Control": "max-age=86400"})
 
 
