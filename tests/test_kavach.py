@@ -564,3 +564,33 @@ def test_chargeback_after_the_clock_moved_to_a_new_day():
         await e.tick(1)
         assert any(i.kind == "chargeback" for i in e.incidents.values())
     run(go())
+
+
+def test_full_arc_detect_protect_prove_release():
+    """Total freeze -> bounced payout caught -> two-key hold -> notice -> pack + lien request -> branch complaint ->
+    (simulated) bank files via the bank desk -> (simulated) officer limits the hold -> ₹1 validation -> Risk releases."""
+    async def go():
+        w = World(); e = Engine(w)
+        r = w.inject_freeze(freeze_type="total", bounce_next=True)
+        await e.tick((w.next_settlement - w.now).total_seconds() + 60)
+        inc = next(iter(e.incidents.values()))
+        await e.approve(inc.id, "merchant"); await e.approve(inc.id, "paytm_ops")
+        await e.merchant_message("Bank ka SMS aur police ka notice yeh hai. Account mein 3.1 lakh atak gaye.", doc_id=r["doc_id"])
+        await e.approve(inc.id, "merchant")                                   # lien request
+        await e.merchant_message("Bank ne complaint le li, acknowledgement mil gaya.")
+        held = sum(b["amount"] for b in w.settlements if b["status"] in ("HELD", "RETURNED"))
+        assert held > 0
+        # P19 backstop: no release before a decision
+        assert policy.evaluate(w, "release_settlement_hold", {}, {"approvals": {"paytm_ops"}}).verdict == "DENY"
+        for _ in range(13):
+            await e.tick(86400)
+        ev = inc.facts["case_events"]
+        assert "bank_submission" in ev and "io_decision" in ev
+        assert not any(s["kind"] == "action" and s["action"] == "draft_escalation" for s in inc.steps)   # bank filed in time: no escalation letter
+        assert inc.facts["validation"]["status"] == "CREDITED"
+        assert inc.pending and inc.pending["action"] == "release_settlement_hold" and inc.pending["approvers"] == ["paytm_ops"]
+        await e.approve(inc.id, "paytm_ops")
+        assert not w.settlement_config["paused"] and inc.facts["released"]["released"] == held
+        assert not [b for b in w.settlements if b["status"] in ("HELD", "RETURNED")]
+        assert inc.status == "watching" and "2,400" in inc.headline
+    run(go())

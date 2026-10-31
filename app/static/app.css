@@ -406,3 +406,5 @@ dialog form button { border: 1px solid var(--line); background: #fff; border-rad
 .qr-hand h2 { margin: 4px 0 8px; } .qr-hand p { margin: 8px 0; line-height: 1.4; }
 .qr-hand img { background: #fff; padding: 10px; border-radius: 12px; }
 .qr-hand .mono { font-family: "Plex Mono", monospace; font-size: 13px; word-break: break-all; } .qr-hand .dim { opacity: .7; font-size: 13px; }
+#biz-body small.dim { color: var(--ink-3); font-size: 12px; } #biz-body h3 { margin: 18px 0 6px; }
+#biz-body .biz-list { margin: 6px 0 0 18px; line-height: 1.5; }

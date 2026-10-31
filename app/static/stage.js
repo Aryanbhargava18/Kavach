@@ -20,7 +20,7 @@
     route_sop: "policy", get_sop_clocks: "policy", ask_sop: "policy", read_document: "policy", parse_notice: "policy" };
   const A2N = { reconcile_payment: "ledger", initiate_refund: "refund", request_settlement_hold: "payout", change_settlement_account: "payout",
     send_customer_update_simulated: "customer", issue_verified_receipt: "customer", request_payment: "customer", generate_evidence_pack: "policy",
-    create_support_case: "policy", record_case_event: "policy", draft_escalation: "policy", draft_lien_request: "policy", prepare_pa_upload: "payout", submit_dispute_response: "refund", accept_chargeback: "refund", escalate_to_human: "policy", replay_soundbox: null };
+    create_support_case: "policy", record_case_event: "policy", draft_escalation: "policy", draft_lien_request: "policy", prepare_pa_upload: "payout", submit_dispute_response: "refund", accept_chargeback: "refund", validate_settlement_account: "payout", release_settlement_hold: "payout", escalate_to_human: "policy", replay_soundbox: null };
   const COL2N = { switch: "switch", ledger: "ledger", refund: "refund", settlement: "payout", claim: "customer" };
   const TVERB = { read_screenshot: "Reading the customer's screenshot", lookup_transaction: "Finding the payment at the UPI switch",
     get_payment_status: "Asking the UPI switch what really happened", get_merchant_ledger: "Checking Meena's billing app",
@@ -30,7 +30,7 @@
     read_document: "Reading the bank notice", parse_notice: "Pulling the facts out of the notice", route_sop: "Finding the right step in the cyber-fraud SOP",
     get_sop_clocks: "Working out the deadlines", ask_sop: "Looking it up in the SOP", check_sale_pattern: "Comparing with her usual sales",
     get_own_payment_declines: "Checking her own payments through the Paytm app", get_disputes: "Reading the dispute desk", get_risk_signals: "Checking with Paytm Risk before saying anything" };
-  const FIXES = new Set(["submit_dispute_response", "accept_chargeback", "prepare_pa_upload", "draft_lien_request", "reconcile_payment", "issue_verified_receipt", "initiate_refund", "request_settlement_hold", "request_payment", "generate_evidence_pack", "send_customer_update_simulated"]);
+  const FIXES = new Set(["release_settlement_hold", "submit_dispute_response", "accept_chargeback", "prepare_pa_upload", "draft_lien_request", "reconcile_payment", "issue_verified_receipt", "initiate_refund", "request_settlement_hold", "request_payment", "generate_evidence_pack", "send_customer_update_simulated"]);
 
   const ST = { nodeState: {}, activeNode: null, seenM: new Set(), billStatus: {}, sig: "", boxTimer: null, q: [], qBusy: false };
 
@@ -215,7 +215,10 @@
       const doc = (S.steps[inc.id] || []).find((s) => s.kind === "tool" && s.tool === "read_document");
       const parts = [];
       const back = inc.recon && inc.recon.settlement && inc.recon.settlement.status === "RETURNED" ? inc.recon.settlement : null;
-      if (back) {
+      if (f.released) parts.push(`<div class="bill focus"><div class="bill-top"><b>Hold released</b><span class="bill-amt">${rs(f.released.released)}</span></div>
+          <div class="bill-who">Paid to her own account XX4471 · ${esc(f.released.batches.join(", "))}</div><span class="bill-st PAID">Settled after ₹1 validation</span>
+          <div class="bill-note">Officer's decision arrived on the bank desk (simulated); Kavach checked with a ₹1 credit before Paytm Risk released. Only the disputed amount stays held.</div></div>`);
+      else if (back) {
         const held = S.world && S.world.settlement_config && S.world.settlement_config.paused;
         parts.push(`<div class="bill focus"><div class="bill-top"><b>Payout ${esc(back.ref || "")}</b><span class="bill-amt">${rs(back.amount)}</span></div>
           <div class="bill-who">Sent back by Meena's bank${f.proactive ? ", found by Kavach before anyone complained" : ""}</div><span class="bill-st UNPAID">Returned · account frozen</span>
@@ -290,6 +293,9 @@
         : `Meena warned in <b class="good">${dur(secs(inc.created_at, warned.at))}</b>, before her first supplier payment bounced.`;
       if (inc.money && inc.money.amount) h += ` <b class="amt-b">${rs(inc.money.amount)}</b> ${esc(inc.money.label)}.`;
       if (denies) h += ` Stopped <b class="bad">${denies}</b> unsafe step${denies > 1 ? "s" : ""}.`;
+    } else if (inc.kind === "freeze" && inc.facts && inc.facts.released) {
+      const days = Math.round((new Date(S.world ? S.world.now : inc.updated_at) - new Date(inc.created_at)) / 86400000);
+      h = `Account working again after <b class="good">${days} days</b> (bank and officer simulated). <b class="amt-b">${rs(inc.facts.released.released)}</b> paid back; only the disputed amount still held.`;
     } else if (inc.kind === "chargeback") {
       const intake = steps.find((x) => x.kind === "intake");
       const reply = steps.find((x) => x.kind === "verify" && x.ok && x.action === "submit_dispute_response");

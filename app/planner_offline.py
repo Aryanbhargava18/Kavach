@@ -967,6 +967,17 @@ class OfflinePlanner:
             await e.act(inc, "notify_merchant", {"text": "✅ Chitthi taiyaar. Branch mein de dijiye ya email kar dijiye; signed pack saath mein hai. Main aage bhi nazar rakhunga."})
             inc.headline = "Escalation letter signed off by Meena."
             inc.status = "with_human"
+        elif action == "release_settlement_hold":
+            rel = inc.facts.get("released", {})
+            lien = (inc.facts.get("case_events", {}).get("io_decision") or {}).get("lien")
+            await e.act(inc, "notify_merchant", {"text": f"🎉 Aapka account phir se chalu hai. Paytm ke paas ruka {rs(rel.get('released'))} aapke account mein bhej diya. Sirf {rs(lien)} police case tak ruka rahega.",
+                                                "speak": "आपका खाता फिर से चालू है। रुका हुआ पैसा आपके खाते में भेज दिया।"})
+            await e.act(inc, "schedule_followup", {"after_seconds": 76 * 86400, "purpose": "90-day review: both SOP anchors for the remaining hold"})
+            for p in inc.plan:
+                p["state"] = "done"
+            inc.status = "watching"
+            inc.money = {"amount": rel.get("released"), "label": f"paid back to her account; only {rs(lien)} still held"}
+            inc.headline = f"Account working again. Only {rs(lien)} held."
         elif action == "submit_dispute_response":
             for f in e.followups:
                 if f["incident"] == inc.id and not f.get("fired") and f["purpose"].startswith("Remind Meena: chargeback"):
@@ -1098,7 +1109,42 @@ class OfflinePlanner:
             for p in inc.plan:
                 p["state"] = "done"
             await e.act(inc, "resolve_incident", {"outcome": f"Refund {r['refund_id']} of {rs(r['amount'])} confirmed credited"})
+        elif purpose.startswith("Bank desk update: bank_submission"):
+            ev = inc.facts["case_events"]
+            filed = ev.get("bank_complaint", {}).get("date")
+            days = (e.world.now.date() - datetime.fromisoformat(filed).date()).days if filed else None
+            for f in e.followups:      # the day-5 nudge and day-7 escalation are moot now
+                if f["incident"] == inc.id and not f.get("fired") and (f["purpose"].startswith("Day 5") or f["purpose"].startswith("Day 7")):
+                    f["fired"], f["cancelled"] = True, "bank submitted"
+            await e.step(inc, "evidence", stamp="BANK FILED", title="Bank desk", tone="good", verdict=f"The bank filed in {days} days, inside the SOP's 7",
+                         rows=[{"field": "Grievance module", "claim": "within 7 days", "truth": f"{ev['bank_submission'].get('ref')} · day {days}", "match": True}])
+            await e.act(inc, "notify_merchant", {"text": f"✅ Bank ne aapki shikayat {days} din mein grievance module par bhej di (ref {ev['bank_submission'].get('ref')}). SOP ke 7 din se pehle. Ab jaanch adhikari ka faisla aayega; Kavach nazar rakhega.",
+                                                "speak": "बैंक ने आपकी शिकायत आगे भेज दी।"})
+            inc.headline = f"Bank filed on day {days}. Waiting for the officer."
+        elif purpose.startswith("Bank desk update: io_decision"):
+            lien = inc.facts["case_events"]["io_decision"].get("lien")
+            await self.think(inc, f"The bank desk says the officer limited the hold to {rs(lien)}. I won't take that on trust before moving her money: "
+                                  "sending Paytm's ₹1 validation credit to see if her bank accepts credits again.")
+            v = await e.act(inc, "validate_settlement_account", {})
+            st = (v.get("result") or {}).get("status")
+            await e.step(inc, "evidence", stamp="CREDITS LAND" if st == "CREDITED" else "STILL FROZEN", title="₹1 validation", tone="good" if st == "CREDITED" else "bad",
+                         verdict="Her bank accepts credits again" if st == "CREDITED" else "Her bank still returns credits",
+                         rows=[{"field": "Officer's decision", "claim": "—", "truth": f"hold limited to {rs(lien)} (bank desk)", "match": True},
+                               {"field": "₹1 credit", "claim": "—", "truth": st or "—", "match": st == "CREDITED"}])
+            if st != "CREDITED":
+                await e.act(inc, "escalate_to_human", {"queue": "Paytm Risk", "summary": "Bank desk shows a decision but the ₹1 validation still bounces"})
+                inc.status = "with_human"
+                return
+            res = await e.act(inc, "release_settlement_hold", {"reason": "Officer limited the hold; ₹1 validation credited"})
+            if res["status"] == "NEEDS_APPROVAL":
+                await e.act(inc, "notify_merchant", {"text": f"Achhi khabar: jaanch adhikari ne hold sirf {rs(lien)} tak seemit kiya hai, aur aapka bank ab paisa le raha hai. Paytm Risk ki manzoori milte hi aapka ruka hua paisa aapke account mein bhej dunga.",
+                                                    "speak": "अच्छी खबर। रोक सिर्फ विवादित रकम तक है।"})
+                inc.headline = "Officer limited the hold. Release waiting for Paytm Risk."
+        elif purpose.startswith("90-day review"):
+            await e.act(inc, "notify_merchant", {"text": "⏱️ 90 din ki do tareekhein paas hain (SOP mein dono likhi hain). Bank se poochiye ki ₹2,400 ka hold kab tak hai; Kavach dono dates par nazar rakh raha hai."})
         elif purpose.startswith("Day 5"):
+            if "bank_submission" in inc.facts.get("case_events", {}):
+                return
             due = (inc.facts.get("clocks") or [{}])[0].get("due")
             await e.act(inc, "notify_merchant", {"text": f"⏱️ Yaad dilana: bank ke paas {due} tak 2 din bache hain. Branch se poochiye ki shikayat grievance module mein gayi ya nahi. Mile to reference bhejiye.",
                                                 "speak": "बैंक के पास दो दिन बचे हैं।"})

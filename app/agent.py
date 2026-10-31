@@ -243,7 +243,7 @@ class Engine:
         ev = {"schedule_followup": "followup_scheduled", "escalate_to_human": "escalated_to_human", "generate_evidence_pack": "evidence_pack_issued",
               "request_settlement_hold": "payouts_held", "draft_escalation": "escalation_letter_approved", "record_case_event": "case_event_recorded",
               "initiate_refund": "refund_initiated", "draft_lien_request": "lien_request_approved", "submit_dispute_response": "chargeback_represented",
-              "accept_chargeback": "chargeback_accepted"}.get(action)
+              "accept_chargeback": "chargeback_accepted", "release_settlement_hold": "payouts_released"}.get(action)
         if ev:
             self._automation(ev, inc, {"action": action, "args": _redact(args), "summary": res.get("summary", "")})
         if verify:
@@ -327,6 +327,8 @@ class Engine:
             return {"ticket_id": tk["ticket_id"], "summary": f"{tk['ticket_id']} opened in {a.get('queue', 'Paytm Support')} queue"}
         if action == "record_case_event":
             inc.facts.setdefault("case_events", {})[a["event"]] = {"date": a["date"], "source": "Meena-reported (indicative)"}
+            if a["event"] == "bank_complaint" and inc.facts.get("disputed_txn") and os.environ.get("KAVACH_SIMULATE_AUTHORITIES", "1") == "1":
+                w.start_authority_sim(inc.id, w.txn_by_id(inc.facts["disputed_txn"])["amount"])     # SIMULATED bank + IO
             return {"summary": f"{a['event'].replace('_', ' ')} on {a['date']} recorded (Meena-reported)"}
         if action == "draft_escalation":
             letter = self._escalation_letter(inc, a)
@@ -334,6 +336,16 @@ class Engine:
             m = w.send_message("merchant", "app", letter["en"], inc.id)
             self._phone("kavach", "✉️ Bank ke grievance officer ke liye chitthi taiyaar hai (aapke naam se). Neeche padh lijiye:\n\n" + letter["en"], inc.id)
             return {"msg_id": m["msg_id"], "summary": f"Escalation letter to {a['to']} approved by Meena; ready to hand in or email"}
+        if action == "validate_settlement_account":
+            r = w.penny_drop()
+            inc.facts["validation"] = r
+            return {"status": r["status"], "summary": f"₹1 validation credit to XX4471: {r['status']}" + (f" (UTR {r['bank_utr']})" if r.get("bank_utr") else "")}
+        if action == "release_settlement_hold":
+            r = w.release_hold()
+            inc.facts["released"] = r
+            self._col(inc, "settlement", label="Payouts", tier="T1", ref=", ".join(r["batches"])[:40], amount=r["released"], status="RELEASED",
+                      when=str(w.now)[11:16], note="paid to XX4471 after the ₹1 validation")
+            return {**r, "summary": f"Hold released: ₹{r['released']:,} paid to her own account XX4471 ({len(r['batches'])} batches)"}
         if action == "submit_dispute_response":
             resp = {"evidence": a.get("evidence") or [], "merchant_attests_handover": bool(a.get("merchant_attests_handover")),
                     "statement": "Merchant states the goods were handed over at the counter (her statement, T3)" if a.get("merchant_attests_handover") else None}
@@ -404,6 +416,12 @@ class Engine:
                 return a["event"] in inc.facts.get("case_events", {}), "Case event is on the incident record"
             if action == "draft_escalation":
                 return bool(inc.facts.get("escalation_letter")), "Letter stored on the case"
+            if action == "validate_settlement_account":
+                return bool(w.validations), f"Settlement engine shows the ₹1 credit {w.validations[-1]['status']}"
+            if action == "release_settlement_hold":
+                left = [b for b in w.settlements if b["status"] in ("HELD", "RETURNED")]
+                ok = not w.settlement_config["paused"] and not left and all(b.get("bank_utr") for b in w.settlements if b.get("released_after_hold"))
+                return ok, "Settlement engine re-read: no batch held or bounced; each released batch has a bank UTR"
             if action in ("submit_dispute_response", "accept_chargeback"):
                 dd = next((x for x in w.disputes if x["dispute_id"] == a["dispute_id"]), {})
                 want = "REPRESENTED" if action == "submit_dispute_response" else "ACCEPTED"
@@ -736,6 +754,14 @@ class Engine:
     def _wake_on_callback(self, ev: dict[str, Any]) -> None:
         """Status callbacks (switch / refund service / settlement run) wake the incident watching that record now,
         instead of waiting for its next scheduled poll. The poll stays as a backstop."""
+        if ev.get("kind") == "bankdesk":      # the bank used Paytm's bank desk: Paytm learns the case status from its own product
+            inc = self.incidents.get(ev.get("case_id", ""))
+            if inc and inc.status not in ("resolved", "refused"):
+                inc.facts.setdefault("case_events", {})[ev["update"]] = {"date": self.world.now.date().isoformat(), "source": "Bank desk (simulated bank)",
+                                                                        **({"ref": ev["ref"]} if ev.get("ref") else {}), **({"lien": ev["lien"]} if ev.get("lien") else {})}
+                self.followups.append({"incident": inc.id, "due": self.world.now, "purpose": f"Bank desk update: {ev['update']}",
+                                       "id": f"FU-{len(self.followups) + 1}", "via": "bank-desk callback"})
+            return
         if ev.get("txn_ids"):
             for inc in self.incidents.values():
                 if inc.status not in ("resolved", "refused") and inc.facts.get("txn_id") in ev["txn_ids"]:

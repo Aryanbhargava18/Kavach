@@ -22,13 +22,13 @@ const APPROVER = { merchant: "Meena", paytm_ops: "Paytm Risk" };
 const ACTION_NAMES = { create_support_case: "Opened a support case", reconcile_payment: "Repaired the shop's ledger", replay_soundbox: "Replayed it on the Soundbox",
   initiate_refund: "Refunded the duplicate", schedule_followup: "Scheduled a follow-up", request_settlement_hold: "Held payouts with Paytm",
   change_settlement_account: "Change payout account", generate_evidence_pack: "Built a signed evidence pack", escalate_to_human: "Handed to a human",
-  resolve_incident: "Closed the case", draft_escalation: "Escalation letter (Meena signed)", draft_lien_request: "Lien-limiting request (Meena signed)", prepare_pa_upload: "Paytm's SOP 9.5(ii) upload, drafted", submit_dispute_response: "Chargeback reply filed (Meena approved)", accept_chargeback: "Chargeback accepted (Meena's word)", record_case_event: "Started the bank's 7-day clock",
+  resolve_incident: "Closed the case", draft_escalation: "Escalation letter (Meena signed)", draft_lien_request: "Lien-limiting request (Meena signed)", prepare_pa_upload: "Paytm's SOP 9.5(ii) upload, drafted", validate_settlement_account: "₹1 validation credit", release_settlement_hold: "Released held payouts to her account", submit_dispute_response: "Chargeback reply filed (Meena approved)", accept_chargeback: "Chargeback accepted (Meena's word)", record_case_event: "Started the bank's 7-day clock",
   issue_verified_receipt: "Verified receipt", request_payment: "QR for the exact amount due", send_customer_update_simulated: "Customer update", notify_merchant: "Told Meena" };
 const DENY_NAMES = { request_payment: "asking the customer to pay again", issue_verified_receipt: "issuing a receipt", reconcile_payment: "recording this payment in the ledger",
   initiate_refund: "refunding", change_settlement_account: "sending payouts to another account", generate_evidence_pack: "building an evidence pack",
   file_grievance: "filing on Meena's behalf", send_customer_update_simulated: "that customer message", resolve_incident: "closing the case",
   request_settlement_hold: "holding payouts", submit_dispute_response: "that chargeback reply", notify_merchant: "telling the merchant case details", schedule_followup: "another follow-up", replay_soundbox: "replaying the Soundbox" };
-const VERB = { submit_dispute_response: "reply to the chargeback in Meena's name", draft_escalation: "send a letter in Meena's name", draft_lien_request: "send a request in Meena's name", request_settlement_hold: "hold payouts with Paytm", initiate_refund: "refund the duplicate", change_settlement_account: "change the payout account" };
+const VERB = { release_settlement_hold: "release the held payouts", submit_dispute_response: "reply to the chargeback in Meena's name", draft_escalation: "send a letter in Meena's name", draft_lien_request: "send a request in Meena's name", request_settlement_hold: "hold payouts with Paytm", initiate_refund: "refund the duplicate", change_settlement_account: "change the payout account" };
 const MSG_ACTIONS = new Set(["notify_merchant", "send_customer_update_simulated", "issue_verified_receipt", "request_payment"]);
 const ICON = {
   switch: "M4 8h15l-3-3M20 16H5l3 3", ledger: "M5 3h11l3 3v15H5zM8 9h8M8 13h8M8 17h5", refund: "M4 12a8 8 0 1 0 3-6M4 4v4h4",
@@ -633,6 +633,7 @@ $("#empty-sim").onclick = (e) => { e.stopPropagation(); simMenu.hidden = false; 
 document.addEventListener("click", (e) => { if (!simMenu.contains(e.target) && e.target.id !== "sim-open") simMenu.hidden = true; if (!$("#clip-menu").contains(e.target) && e.target.closest("#clip") == null) $("#clip-menu").hidden = true; });
 async function scenario(ds) {
   simMenu.hidden = true; S.follow = true; unlockAudio();
+  if (ds.scn === "skip_days") { await post("/api/clock/skip-days", { days: Number(ds.days || 13) }); return; }
   const body = {};
   if (ds.mode) body.mode = ds.mode;
   if (ds.notice) body.notice_amount = Number(ds.notice);
@@ -764,4 +765,21 @@ $("#open-phone").onclick = async () => {
   $("#phone-qr").src = `/api/qr?data=${encodeURIComponent(url)}`;
   $("#phone-url").textContent = url;
   $("#phone-dialog").showModal();
+};
+
+// ===================================================================== business case (judge-facing)
+$("#open-biz").onclick = async () => {
+  const b = await fetch("/api/business").then((r) => r.json());
+  const F = { high: "k", medium: "", "low (near term)": "b" };
+  $("#biz-body").innerHTML = `<h2>Why Paytm would ship this</h2>
+    <p class="sub">${esc(b.pricing.model)}. ${esc(b.pricing.unit)}. Merchants pay ${esc(b.pricing.merchant_price)}.</p>
+    <h3>Measured in this repo</h3><table><tbody>${b.measured.map((m) => `<tr><td>${esc(m.label)}<br><small class="dim">${esc(m.note)}</small></td><td class="k">${esc(m.value ?? "—")}</td></tr>`).join("")}</tbody></table>
+    <h3>What Paytm already has, and what it would take</h3><table><thead><tr><th>Part</th><th>Paytm has</th><th>Needs</th><th>Feasibility</th></tr></thead><tbody>
+    ${b.components.map((c) => `<tr><td><b>${esc(c.part)}</b><br><small class="dim">${esc(c.signal)}</small></td><td>${esc(c.paytm_has)}</td><td>${esc(c.needs)}</td><td class="${F[c.feasibility] || ""}">${esc(c.feasibility)}</td></tr>`).join("")}</tbody></table>
+    <h3>Rollout, safest first</h3><table><thead><tr><th>Phase</th><th>What</th><th>Proves</th><th>Risk</th></tr></thead><tbody>
+    ${b.rollout.map((r) => `<tr><td><b>${esc(r.phase)}</b></td><td>${esc(r.what)}</td><td>${esc(r.proves)}</td><td>${esc(r.risk)}</td></tr>`).join("")}</tbody></table>
+    <h3>Numbers only Paytm has (we won't invent them)</h3><ul class="biz-list">${b.paytm_only_inputs.map((x) => `<li>${esc(x)}</li>`).join("")}</ul>
+    <p class="caveat">${esc(b.label)}</p>`;
+  $("#biz-dialog").showModal();
+  requestAnimationFrame(() => { $("#biz-dialog").scrollTop = 0; $("#biz-body").firstElementChild.scrollIntoView({ block: "start" }); });
 };

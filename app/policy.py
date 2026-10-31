@@ -39,13 +39,14 @@ RULES = {
     "P15": "One payment settles one bill. A UTR already in the shop's ledger is never applied again.",
     "P16": "A ledger entry is posted only for a switch-confirmed payment that fits the amount still due on that bill.",
     "P18": "A chargeback reply carries only evidence that exists in Paytm's records, says goods were handed over only if Meena says so (labelled as her statement), goes out only with her approval, and never after the deadline.",
+    "P19": "Held payouts go back only to the merchant's own registered account, only after the bank desk records the officer's decision and Paytm's ₹1 validation credit lands, and only with Paytm Risk's approval.",
     "P17": "When Paytm Risk holds two or more independent signals on a merchant, Kavach does not tell them about a freeze, notice or report. Only Legal's neutral template goes out, and Paytm Risk decides.",
 }
 
 RULES_BY_KIND = {
     "payment_claim": ["P1", "P2", "P3", "P8", "P12", "P14", "P15", "P16"],
     "duplicate": ["P4", "P5", "P8", "P11", "P12"],
-    "freeze": ["P6", "P7", "P9", "P10", "P13", "P17"],
+    "freeze": ["P6", "P7", "P9", "P10", "P13", "P17", "P19"],
     "settlement": ["P6", "P7", "P9", "P17"],
     "chargeback": ["P12", "P13", "P18"],
 }
@@ -284,6 +285,22 @@ def _accept_cb(world, args, ctx):
     return allow("Meena says the goods were not handed over; accepting is the honest outcome.", "P18")
 
 
+def _validate(world, args, ctx):
+    return allow("Paytm's standard ₹1 account validation to her own registered account.", "P19")
+
+
+def _release(world, args, ctx):
+    a = world.authority or {}
+    last = (getattr(world, "validations", None) or [None])[-1]
+    if not a.get("decided"):
+        return deny("P19", "No officer's decision recorded on the bank desk. The hold stays.")
+    if not last or last["status"] != "CREDITED" or last["at"] < a["decided"]["at"]:
+        return deny("P19", "Paytm's ₹1 validation credit hasn't landed since the decision. Releasing now could bounce or trap her money.")
+    if "paytm_ops" not in ctx.get("approvals", set()):
+        return Decision("NEEDS_APPROVAL", "P19", "Paytm Risk set the hold, so Paytm Risk releases it.", ["paytm_ops"])
+    return allow("Decision on the bank desk, ₹1 validation credited, Risk approved; paying her own registered account only.", "P19")
+
+
 def _pa_upload(world, args, ctx):
     t = world.txn_by_id(args.get("txn_id", ""))
     if not t or t["payee_vpa"] != MERCHANT["vpa"] or not t.get("settlement_batch"):
@@ -324,6 +341,8 @@ _CHECKS = {
     "draft_escalation": _draft,
     "draft_lien_request": _draft,
     "prepare_pa_upload": _pa_upload,
+    "validate_settlement_account": _validate,
+    "release_settlement_hold": _release,
     "submit_dispute_response": _dispute_reply,
     "accept_chargeback": _accept_cb,
     "issue_verified_receipt": _receipt,

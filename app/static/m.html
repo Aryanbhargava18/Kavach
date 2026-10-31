@@ -30,6 +30,10 @@ main { padding: 14px 14px 0; display: flex; flex-direction: column; gap: 12px; }
 .hero { border-radius: 22px; padding: 18px 18px 16px; color: #fff; position: relative; overflow: hidden; box-shadow: var(--sh); }
 .hero.ok { background: linear-gradient(140deg, #00A5E0 0%, #0062B0 55%, #002E6E 100%); }
 .hero.bad { background: linear-gradient(140deg, #13336B 0%, #0B2350 60%, #2A1240 100%); }
+.hero .trust { margin-top: 10px; font-size: 12.5px; color: rgba(255,255,255,.72); }
+.act.done { border-color: var(--good); background: linear-gradient(180deg, var(--good-2), #fff 60%); }
+.act.done .eyebrow { color: var(--good); } .act.done .eyebrow::before { background: var(--good); animation: none; }
+.mrow .dot.muted { background: var(--line); } .mrow .v.muted { color: var(--ink-3); text-decoration: line-through; font-weight: 600; }
 .hero.wait { background: linear-gradient(140deg, #3A4A63 0%, #1F2C44 100%); }
 .hero .row { display: flex; align-items: center; gap: 10px; }
 .hero .shield { width: 44px; height: 44px; border-radius: 14px; background: rgba(255,255,255,.14); display: grid; place-items: center; flex: none; position: relative; }
@@ -243,12 +247,12 @@ function render() {
   if (v.mode === "home") app.innerHTML = home(v) + clocksHtml(v.clocks);
   else if (v.case === "chargeback") app.innerHTML = [hero(v.shield.tone, v.shield.account, v.shield.title, v.shield.sub, true), action(v.action), stake(v), clocksHtml(v.clocks), tracker(v.steps)].join("");
   else if (v.mode === "neutral") app.innerHTML = hero("wait", "Paytm team", v.shield.title, v.shield.sub);
-  else app.innerHTML = [hero("bad", "Account " + esc(v.shield.account), v.shield.title, v.shield.sub, true), action(v.action), money(v), clocksHtml(v.clocks), tracker(v.steps), docs(v.docs)].join("");
+  else app.innerHTML = [hero(v.shield.tone, "Account " + esc(v.shield.account), v.shield.title, v.shield.sub, true, v.shield.trust), action(v.action), money(v), clocksHtml(v.clocks), tracker(v.steps), docs(v.docs)].join("");
   bind();
 }
-function hero(tone, pill, title, sub, listen) {
+function hero(tone, pill, title, sub, listen, trust) {
   return `<section class="hero ${tone}"><div class="row"><div class="shield">${SHIELD}</div><span class="pill">${esc(pill)}</span></div>
-    <h1>${esc(title)}</h1><p>${esc(sub)}</p>${listen && S.lastSay ? `<button class="listen" data-listen type="button"><svg viewBox="0 0 24 24"><path d="M4 9v6h4l5 4V5L8 9zM16 8a5 5 0 0 1 0 8"/></svg>Kavach ko suniye</button>` : ""}</section>`;
+    <h1>${esc(title)}</h1><p>${esc(sub)}</p>${trust ? `<p class="trust">🔒 ${esc(trust)}</p>` : ""}${listen && S.lastSay ? `<button class="listen" data-listen type="button"><svg viewBox="0 0 24 24"><path d="M4 9v6h4l5 4V5L8 9zM16 8a5 5 0 0 1 0 8"/></svg>Kavach ko suniye</button>` : ""}</section>`;
 }
 function home(v) {
   const nx = new Date(v.today.next_payout);
@@ -285,6 +289,8 @@ function money(v) {
 }
 function action(a) {
   if (!a) return "";
+  if (a.kind === "done") return `<section class="card act done"><div class="eyebrow">Ho gaya</div><h3>${esc(a.title)}</h3><p>${esc(a.body)}</p></section>`;
+  if (a.kind === "info") return `<section class="card act wait"><div class="eyebrow">Kavach kaam par</div><h3>${esc(a.title)}</h3><p>${esc(a.body)}</p></section>`;
   if (a.kind === "wait") return `<section class="card act wait"><div class="eyebrow">Kavach dekh raha hai</div><div class="count">${Math.max(a.days_left, 0)} din</div><h3>${esc(a.title)}</h3><p>${esc(a.body)}</p></section>`;
   const btns = a.kind === "approve" ? `<button class="cta" data-yes="${esc(a.incident)}">${esc(a.cta)}</button><button class="cta alt" data-no="${esc(a.incident)}">${esc(a.secondary)}</button>`
     : a.kind === "notice" ? `${S.drafts.find((d) => d.next_doc) ? `<button class="cta" data-fwd>Bank ka SMS + notice bhejo</button>` : ""}<button class="cta ${S.drafts.find((d) => d.next_doc) ? "alt" : ""}" data-cam>📷 Photo kheecho</button>`

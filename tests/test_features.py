@@ -46,6 +46,7 @@ def test_single_signal_is_never_enough():
 
 # ---------------------------------------------------------------- approvals are per action
 def test_approval_for_one_action_does_not_carry_to_another():
+    os.environ["KAVACH_SIMULATE_AUTHORITIES"] = "0"     # the bank misses its deadline here: test the escalation path
     async def go():
         w = World(); e = Engine(w); r = w.inject_freeze()
         inc = await e.merchant_message("Supplier ko payment fail ho gaya, bank bol raha account freeze hai")
@@ -60,6 +61,7 @@ def test_approval_for_one_action_does_not_carry_to_another():
 
 
 def test_clock_starts_only_from_a_dated_event_and_fires_reminders():
+    os.environ["KAVACH_SIMULATE_AUTHORITIES"] = "0"     # the bank misses its deadline here: test the escalation path
     async def go():
         w = World(); e = Engine(w); r = w.inject_freeze()
         inc = await e.merchant_message("account freeze ho gaya")
@@ -75,6 +77,10 @@ def test_clock_starts_only_from_a_dated_event_and_fires_reminders():
 
 
 # ---------------------------------------------------------------- Ask the SOP
+def teardown_function(_fn):
+    os.environ.pop("KAVACH_SIMULATE_AUTHORITIES", None)
+
+
 def test_sop_answer_is_cited_and_unknown_citations_are_stripped():
     r = run(sop_kb.ask("bank ko kitne din mein bhejna hota hai"))
     assert r["citations"] and r["citations"][0]["id"] == "10.1(a)"

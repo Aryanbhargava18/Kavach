@@ -28,6 +28,7 @@
   <span class="intg" id="intg"></span>
   <span class="clock"><time id="clock">--:--</time></span>
   <button class="tbtn" id="open-phone">Judge's phone</button>
+  <button class="tbtn" id="open-biz">Business case</button>
   <button class="tbtn" id="open-sys">Systems</button>
   <button class="tbtn" id="open-eval">Results</button>
   <button class="tbtn icon" id="sound" aria-pressed="true" aria-label="Sound">🔊</button>
@@ -94,6 +95,7 @@
     <div class="st-menu" id="st-menu" hidden>
       <p>Each one changes what really happened in Paytm's systems (simulated). Kavach has to find out on its own.</p>
       <button data-scn="payout_bounce" class="hero"><b>Meena's bank freezes her account</b><small>Nobody tells her. The next payout bounces; Kavach notices first.</small></button>
+      <button data-scn="skip_days" data-days="13" class="hero"><b>⏩ 12 days later: the bank and the officer act</b><small>Simulated bank desk + IO. Kavach verifies with ₹1, then releases with Paytm Risk.</small></button>
       <button data-scn="chargeback" class="hero"><b>Chargeback: a reply clock nobody is watching</b><small>Silence = money netted. Kavach proves what it can, asks Meena the rest.</small></button>
       <button data-scn="supplier_declined" class="hero"><b>Debit freeze: her payment to a supplier is refused</b><small>Payouts still land. Kavach reads her bank's YE code.</small></button>
       <button data-scn="payout_bounce" data-mule="true"><b>Payout bounces, but Risk has mule signals</b><small>Kavach checks first and withholds details</small></button>
@@ -229,6 +231,7 @@
 
 <dialog id="img-dialog"><img alt=""><form method="dialog"><button>Close</button></form></dialog>
 <dialog id="phone-dialog" class="eval"><div class="qr-hand"><h2>Hand a judge Meena's phone</h2><p>Scan with any phone on the same Wi-Fi. Kavach's messages arrive there live, spoken in Hindi, and the judge approves on their own device.</p><img id="phone-qr" alt="QR code that opens Meena's phone view" width="260" height="260"><p class="mono" id="phone-url"></p><p class="dim">Needs <code>make lan</code>. On localhost the QR points at this laptop only.</p></div><form method="dialog"><button>Close</button></form></dialog>
+<dialog id="biz-dialog" class="eval"><div id="biz-body"></div><form method="dialog"><button>Close</button></form></dialog>
 <dialog id="eval-dialog" class="eval"><div id="eval-body"></div><form method="dialog"><button>Close</button></form></dialog>
 </body>
 </html>

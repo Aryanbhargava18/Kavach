@@ -12,6 +12,7 @@ from typing import Any
 from .world import MERCHANT
 
 LIVE = ("resolved", "refused")
+TRUST = "Yeh Paytm for Business app ke andar hai. Kavach kabhi OTP, PIN ya paise nahi maangta."
 
 
 def _guarded(inc) -> bool:
@@ -50,10 +51,22 @@ def clocks(world, engine) -> list[dict[str, Any]]:
             out.append({"key": r["refund_id"], "label": "Refund customer tak", "due": r["resolve_at"].isoformat(), "amount": r["amount"], "note": "Kavach pahunchne tak dekhega", "tone": "wait"})
     for i in engine.incidents.values():
         ev = i.facts.get("case_events", {}) if i.status not in LIVE else {}
-        if ev.get("bank_complaint"):
-            due = date.fromisoformat(ev["bank_complaint"]["date"]) + timedelta(days=7)
-            out.append({"key": f"{i.id}-bank7", "label": "Bank ke 7 din", "due": datetime.combine(due, datetime.min.time()).isoformat(), "amount": None,
+        at = lambda d0, days: datetime.combine(date.fromisoformat(d0) + timedelta(days=days), datetime.min.time()).isoformat()
+        if ev.get("bank_complaint") and not ev.get("bank_submission"):
+            out.append({"key": f"{i.id}-bank7", "label": "Bank ke 7 din", "due": at(ev["bank_complaint"]["date"], 7), "amount": None,
                         "note": "SOP 10.1(a) · 5ve aur 7ve din Kavach check karega", "tone": "wait"})
+        if ev.get("bank_submission") and not ev.get("io_decision"):
+            out.append({"key": f"{i.id}-io15", "label": "Adhikari ke 15 din", "due": at(ev["bank_submission"]["date"], 15), "amount": None,
+                        "note": "SOP 10.1(b) · faisla bank desk par aayega", "tone": "wait"})
+        if ev.get("io_decision"):
+            lien = ev["io_decision"].get("lien")
+            hold = ((i.facts.get("notice") or {}).get("hold_date"))
+            if ev.get("bank_submission"):
+                out.append({"key": f"{i.id}-90a", "label": "90 din (shikayat se)", "due": at(ev["bank_submission"]["date"], 90), "amount": lien,
+                            "note": "SOP 10.1(f) · do tareekhein, dono par nazar", "tone": "wait"})
+            if hold:
+                out.append({"key": f"{i.id}-90b", "label": "90 din (hold se)", "due": at(hold, 90), "amount": lien,
+                            "note": "SOP Annexure I · do tareekhein, dono par nazar", "tone": "wait"})
     for c in out:
         secs = (datetime.fromisoformat(c["due"]) - world.now).total_seconds()
         c["secs_left"] = max(0, int(secs))
@@ -155,13 +168,14 @@ def build(world, engine) -> dict[str, Any]:
     pend_action = pend.get("action") if "merchant" in (pend.get("approvers") or []) else None
     ev = f.get("case_events", {})
     complaint = (ev.get("bank_complaint") or {}).get("date")
+    sub_ev, dec_ev, released = ev.get("bank_submission"), ev.get("io_decision"), f.get("released")
     due = (date.fromisoformat(complaint) + timedelta(days=7)).isoformat() if complaint else None
     notice_in = bool(f.get("notice"))
     steps = [
         {"key": "detect", "label": "Paytm ne pakda", "sub": ("Aapka apna payment bank ne roka (YE)" if own else "Bank ne payout wapas bheja") if f.get("proactive") else "Aapne bataya",
          "state": "done", "at": intake["at"] if intake else inc.created_at},
         {"key": "protect", "label": "Nayi sale surakshit", "sub": "Aap + Paytm Risk ki manzoori se payouts Paytm ke paas",
-         "state": "done" if held else ("now" if pend.get("action") == "request_settlement_hold" else "todo")},
+         "state": "done" if held or f.get("released") else ("now" if pend.get("action") == "request_settlement_hold" else "todo")},
         {"key": "notice", "label": "Notice padha", "sub": "Chhupa hua nirdesh nazarandaaz; ek payment mila" if notice_in else "Bank ka SMS ya notice bhejiye",
          "state": "done" if notice_in else ("now" if held or not pend else "todo")},
         {"key": "case", "label": "Signed case taiyaar", "sub": "SOP ke hisaab se, Paytm record se", "state": "done" if f.get("pack") else "todo"},
@@ -169,9 +183,12 @@ def build(world, engine) -> dict[str, Any]:
          "state": "done" if f.get("lien_request") else ("now" if pend.get("action") == "draft_lien_request" else "todo")},
         {"key": "branch", "label": "Branch mein shikayat", "sub": f"Mili {complaint}" if complaint else "Dated acknowledgement zaroor lijiye",
          "state": "done" if complaint else ("now" if f.get("pack") and not pend_action else "todo")},
-        {"key": "bank7", "label": "Bank 7 din mein aage bheje", "sub": f"{due} tak · SOP 10.1(a)" if due else "Shikayat ki tareekh se ginti",
-         "state": "now" if due else "todo"},
-        {"key": "officer", "label": "Jaanch adhikari ka faisla", "sub": "15 din · bank aur police tay karte hain", "state": "todo"},
+        {"key": "bank7", "label": "Bank 7 din mein aage bheje", "sub": (f"Bheja · {sub_ev.get('ref')} · bank desk" if sub_ev else (f"{due} tak · SOP 10.1(a)" if due else "Shikayat ki tareekh se ginti")),
+         "state": "done" if sub_ev else ("now" if due else "todo")},
+        {"key": "officer", "label": "Jaanch adhikari ka faisla", "sub": (f"Hold sirf {_rs(dec_ev.get('lien'))} tak" if dec_ev else "15 din · bank aur police tay karte hain"),
+         "state": "done" if dec_ev else ("now" if sub_ev else "todo")},
+        {"key": "release", "label": "Ruka paisa aapke account mein", "sub": (f"{_rs(released['released'])} bheja · ₹1 jaanch ke baad" if released else "₹1 jaanch + Paytm Risk ki manzoori ke baad"),
+         "state": "done" if released else ("now" if pend.get("action") == "release_settlement_hold" else "todo")},
     ]
     if f.get("conflict") or (inc.decisive or {}).get("text", "").startswith("Notice says"):
         for s in steps:
@@ -196,6 +213,16 @@ def build(world, engine) -> dict[str, Any]:
         action = {"kind": "branch", "incident": inc.id, "title": "Kal branch jaiye",
                   "body": "Likhit shikayat, signed pack aur request saath le jaiye. Dated acknowledgement zaroor lijiye: wahi se bank ke 7 din chalte hain.",
                   "cta": "Bank ne complaint le li ✓"}
+    elif released:
+        action = {"kind": "done", "incident": inc.id, "title": "Ab aapko kuch nahi karna",
+                  "body": f"Sirf {_rs((dec_ev or {}).get('lien'))} police case tak ruka hai. SOP ki 90 din wali dono tareekhon par Kavach khud nazar rakhega."}
+    elif pend.get("action") == "release_settlement_hold":
+        action = {"kind": "info", "incident": inc.id, "title": "Paytm Risk manzoori de raha hai",
+                  "body": "Adhikari ka faisla bank desk par aa gaya, aur ₹1 ki jaanch aapke account mein pahunch gayi. Manzoori milte hi ruka paisa aapke account mein."}
+    elif sub_ev:
+        left = 15 - (world.now.date() - date.fromisoformat(sub_ev["date"])).days
+        action = {"kind": "wait", "incident": inc.id, "title": "Jaanch adhikari ka faisla", "days_left": left,
+                  "body": f"Bank ne shikayat bhej di ({sub_ev.get('ref')}). Adhikari ke paas 15 din hain (SOP 10.1(b)). Faisla aate hi Kavach batayega."}
     elif due:
         left = (date.fromisoformat(due) - world.now.date()).days
         action = {"kind": "wait", "incident": inc.id, "title": f"Bank ke paas {max(left, 0)} din",
@@ -208,11 +235,21 @@ def build(world, engine) -> dict[str, Any]:
     if f.get("lien_request"):
         docs.append({"kind": "letter", "label": "Hold kam karne ki request", "sub": f"Sirf {f['lien_request']['disputed_text']} tak · aapke naam se", "text": f["lien_request"]["en"]})
 
+    if released:
+        lien = (dec_ev or {}).get("lien")
+        money = [{"key": "back", "label": "Aapke account mein wapas", "en": "Paid back to your account", "amount": released["released"], "source": "Paytm ke paas ruka hua tha", "tone": "good"},
+                 {"key": "still", "label": "Abhi bhi ruka (police case)", "en": "Still held", "amount": lien, "source": "adhikari ka faisla · bank desk", "tone": "warn"}]
+        if locked:
+            money.append({"key": "was", "label": "Pehle ruka hua tha", "en": "Was frozen", "amount": locked, "source": "aapka bataya hua", "tone": "muted"})
+        return {"mode": "case", "incident": inc.id, "released": True,
+                "shield": {"tone": "ok", "title": "Account phir se chalu", "account": "XX4471",
+                           "sub": f"Hold ab sirf {_rs(lien)} ka hai (police case). Paytm ke paas ruka {_rs(released['released'])} aapke account mein bhej diya.", "trust": TRUST},
+                "money": money, "ratio": None, "steps": steps, "action": action, "docs": docs, "clocks": clocks(world, engine), "headline": inc.headline}
     title = "Account freeze" + (" · debit" if debit else "")
     sub = (f"{'Aapka bank paisa nikalne nahi de raha' if debit else 'Aapke bank ne payout lauta diya'}. Kavach ne {_hm(inc.created_at)} par pakda"
            + (", aapke kisi ko batane se pehle." if f.get("proactive") else "."))
     return {"mode": "case", "incident": inc.id,
-            "shield": {"tone": "bad", "title": title, "sub": sub, "account": "XX4471"},
+            "shield": {"tone": "bad", "title": title, "sub": sub, "account": "XX4471", "trust": TRUST},
             "money": money, "ratio": ratio, "steps": steps, "action": action, "docs": docs,
             "clocks": clocks(world, engine), "headline": inc.headline}
 

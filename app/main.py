@@ -130,6 +130,28 @@ async def skip_to_payout():
     return {"now": W().now.isoformat()}
 
 
+class Skip(BaseModel):
+    days: int = 13
+
+
+@app.post("/api/clock/skip-days")
+async def skip_days(sk: Skip):
+    """Presenter time-lapse: move the simulated world forward one day at a time so every watcher and follow-up fires in order.
+    The bank and investigating officer acting in this window are SIMULATED."""
+    async def go():
+        for _ in range(max(1, min(sk.days, 30))):
+            await E().tick(86400, background=False)
+            bus.publish({"type": "world", "world": W().snapshot()})
+    run_bg(go())
+    return {"ok": True}
+
+
+@app.get("/api/business")
+def business_case():
+    from . import business
+    return business.build()
+
+
 @app.get("/api/integrations")
 def integrations():
     from . import automation, sop_kb

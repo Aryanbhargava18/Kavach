@@ -84,6 +84,8 @@ class World:
     own_payments: list[dict[str, Any]] = field(default_factory=list)  # Meena's own UPI payments via the Paytm app (Paytm = her PSP)
     risk_signals: list[dict[str, Any]] = field(default_factory=list)  # Paytm Risk's review signals on this merchant (never a verdict)
     disputes: list[dict[str, Any]] = field(default_factory=list)      # Paytm dispute desk: chargebacks raised by payers' banks
+    validations: list[dict[str, Any]] = field(default_factory=list)   # ₹1 account-validation credits
+    authority: dict[str, Any] | None = None   # SIMULATED bank grievance officer + investigating officer, acting through the bank desk
     lock: threading.RLock = field(default_factory=threading.RLock, repr=False)
 
     def __post_init__(self) -> None:
@@ -268,6 +270,7 @@ class World:
                     t["status_reason"] = "Remitter bank timeout. Customer debit auto-reverses (T+1, RBI TAT framework)." if t["debited"] else "Declined before debit."
                     happened.append(self._event("switch", f"UPI switch: {t['txn_id']} moved PENDING → FAILED", txn_id=t["txn_id"]))
         happened += self._process_disputes()
+        happened += self._process_authority()
         for r in self.refunds:
             if r["status"] == "PENDING" and self.now >= r["resolve_at"]:
                 r["status"] = "SUCCESS"
@@ -538,6 +541,52 @@ class World:
                 d.update({"status": "WON" if won else "LOST", "decided_at": self.now.isoformat()})
                 out.append(self._event("dispute", f"Dispute desk: {d['dispute_id']} decided {'in the merchant’s favour' if won else 'for the payer'} (simulated issuer decision)", dispute_id=d["dispute_id"]))
         return out
+
+    # ------------------------------------------------- simulated bank + investigating officer
+    def start_authority_sim(self, case_id: str, disputed: int, submit_days: int = 3, decide_days: int = 12) -> dict[str, Any]:
+        """SIMULATED. Once the merchant's written complaint is at the branch, the bank's grievance officer files it through
+        the bank desk (Paytm Intelligence) and, later, the investigating officer limits the hold. Neither is a real system."""
+        if self.authority and self.authority.get("case_id") == case_id:
+            return self.authority
+        self.authority = {"case_id": case_id, "disputed": disputed, "submit_at": self.now + timedelta(days=submit_days),
+                          "decide_at": self.now + timedelta(days=decide_days), "submitted": None, "decided": None}
+        return self.authority
+
+    def _process_authority(self) -> list[dict[str, Any]]:
+        a, out = self.authority, []
+        if not a:
+            return out
+        if not a["submitted"] and self.now >= a["submit_at"]:
+            a["submitted"] = {"ref": "GRM-" + "".join(str(self.rng.randint(0, 9)) for _ in range(8)), "at": self.now.isoformat()}
+            out.append(self._event("bankdesk", f"Bank desk (simulated bank officer): grievance submitted to the grievance module · {a['submitted']['ref']}",
+                                   case_id=a["case_id"], update="bank_submission", ref=a["submitted"]["ref"]))
+        if a["submitted"] and not a["decided"] and self.now >= a["decide_at"]:
+            a["decided"] = {"outcome": "lien_limited", "lien": a["disputed"], "at": self.now.isoformat()}
+            self.bank_account = {"state": "LIEN", "lien": a["disputed"], "since": self.now.date().isoformat()}
+            out.append(self._event("bankdesk", f"Bank desk (simulated IO decision): hold limited to ₹{a['disputed']:,}; rest of the account released",
+                                   case_id=a["case_id"], update="io_decision", lien=a["disputed"]))
+        return out
+
+    def penny_drop(self) -> dict[str, Any]:
+        """Paytm's standard ₹1 account-validation credit. A frozen account returns it; a lien-only or active one accepts it."""
+        ok = self.bank_account.get("state") in ("ACTIVE", "LIEN", "DEBIT_FROZEN")
+        r = {"amount": 1, "account": MERCHANT["settlement_bank"], "at": self.now.isoformat(), "status": "CREDITED" if ok else "RETURNED",
+             "bank_utr": _utr(self.rng) if ok else None, "return_code": None if ok else "SYN-ACCT-FROZEN"}
+        self.validations.append(r)
+        self._event("settlement", f"₹1 validation credit to XX4471: {r['status']}")
+        return r
+
+    def release_hold(self) -> dict[str, Any]:
+        """Hand the held and bounced payouts to her own registered account, now that it accepts credits."""
+        moved = []
+        for b in self.settlements:
+            if b["status"] in ("HELD", "RETURNED"):
+                b.update({"status": "SETTLED", "credited_at": self.now, "bank_utr": _utr(self.rng), "released_after_hold": True, "return_code": None})
+                moved.append(b)
+        self.settlement_config.update({"paused": False, "pause_reason": None, "released_at": self.now.isoformat()})
+        total = sum(b["amount"] for b in moved)
+        self._event("settlement", f"Settlement engine: hold released · ₹{total:,} paid to XX4471 ({len(moved)} batches)", txn_ids=[])
+        return {"released": total, "batches": [b["batch_id"] for b in moved]}
 
     def declines_due(self) -> list[dict[str, Any]]:
         return [p for p in self.own_payments if p.get("watched") and p["code"] == "YE"]
