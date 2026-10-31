@@ -296,7 +296,8 @@
       if (inc.money && inc.money.amount) h += ` <b class="amt-b">${rs(inc.money.amount)}</b> ${esc(inc.money.label)}.`;
       if (denies) h += ` Stopped <b class="bad">${denies}</b> unsafe step${denies > 1 ? "s" : ""}.`;
     } else if (inc.kind === "freeze" && inc.facts && inc.facts.released) {
-      const days = Math.round((new Date(S.world ? S.world.now : inc.updated_at) - new Date(inc.created_at)) / 86400000);
+      const rel = steps.find((x) => x.kind === "action" && x.action === "release_settlement_hold");
+      const days = Math.floor((new Date(rel ? rel.at : inc.updated_at) - new Date(inc.created_at)) / 86400000);
       h = `Account working again after <b class="good">${days} days</b> (bank and officer simulated). <b class="amt-b">${rs(inc.facts.released.released)}</b> paid back; only the disputed amount still held.`;
     } else if (inc.kind === "chargeback") {
       const intake = steps.find((x) => x.kind === "intake");
