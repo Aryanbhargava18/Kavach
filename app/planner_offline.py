@@ -750,6 +750,18 @@ class OfflinePlanner:
     async def after_decline(self, inc, action) -> bool:
         """Meena said no. For a chargeback that means the goods were not handed over: accept it, don't fight it."""
         e = self.e
+        if action == "request_settlement_hold":   # her money, her call: say so, keep helping
+            await self.think(inc, "Meena said not now. Nothing is held; her payouts keep going to her bank. Respect it and keep building the case.")
+            await e.act(inc, "notify_merchant", {"text": "Okay, nothing is held. Your payouts keep going to your bank; if it sends them back, they return safely to Paytm. You can change your mind any time. Next: send me the bank's SMS or notice.",
+                                                 "hi": "ठीक है, कुछ नहीं रोका। आपके पेआउट बैंक जाते रहेंगे; बैंक लौटाएगा तो पैसा सुरक्षित पेटीएम के पास लौट आएगा। आप कभी भी मन बदल सकते हैं। अगला कदम: बैंक का SMS या नोटिस भेजिए।",
+                                                 "speak": "ठीक है, कुछ नहीं रोका।", "speak_en": "Okay, nothing is held."})
+            inc.status = "waiting_merchant"
+            inc.headline = "Meena chose not to hold payouts. Waiting for the bank's notice."
+            return True
+        if action == "draft_lien_request":
+            await e.act(inc, "notify_merchant", {"text": "Okay, I won't send the request. Your signed case is ready whenever you want it.", "hi": "ठीक है, अनुरोध नहीं भेजूँगा। आपका केस जब चाहें तैयार है।"})
+            inc.status = "waiting_merchant"
+            return True
         if action != "submit_dispute_response":
             return False
         await self.think(inc, "Meena says she didn't hand over the goods. Fighting it would mean a false reply in her name. Accepting is the honest outcome.")

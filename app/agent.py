@@ -616,7 +616,7 @@ class Engine:
                 return {"ok": True}
             inc.approvals.setdefault(inc.pending["action"], set()).add(approver)
             if approver == "merchant":
-                self._phone("merchant", "✅ Haan, approve", inc.id)
+                self._phone("merchant", "✅ Yes, go ahead", inc.id, hi="✅ हाँ, कीजिए")
             await self.step(inc, "approval_result", approver=approver, approved=True)
             p = inc.pending
             p["approvers"] = [a for a in p["approvers"] if a != approver]

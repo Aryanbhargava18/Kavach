@@ -1,62 +1,94 @@
-# 3-minute demo script: five beats, one story
+# How to show Kavach: a 5-minute demo where the judges drive
 
-**Setup (before you walk up).**
-1. Run `make lan` and open Chrome full screen at the LAN address it prints. If the venue Wi-Fi blocks device-to-device traffic, use a phone hotspot that the laptop and the judge's phone both join.
-2. Click the page once (unlocks sound), press **R** to start over. The screen shows only three real surfaces: Meena's phone, her Soundbox, and Paytm's Risk & Ops desk. Demo controls sit in the dark dock at the bottom: **1** freeze, **2** chargeback, **3** missed bill, **→** skip ahead when time is the next thing, **R** reset. Keys work even after you tap the phone.
-3. Optional: run `make sarvam-check` with the key in `.env` for Sarvam voices. Without it, Kavach runs on its rules planner and the browser voice.
-4. For the judge's own phone, open `http://<laptop-LAN-IP>:8000/m` on it (printed by `make lan`).
-5. **Live Paytm check:** put `PAYTM_MID` and `PAYTM_MERCHANT_KEY` (staging) in `.env`, make one test payment on that MID before you walk up, and note its Order ID. Run `make paytm-check ORDER=<id>` once; it must print `OK: Paytm answered.`
+**The idea:** the world is simulated (bank, police, UPI switch, billing app), because nobody can plug a real bank into a hackathon. **The agent is live.** Nothing it says is pre-recorded; it reacts to whatever happens. So don't just play a story: **let the judges push it, and let it respond.**
 
-One person drives the laptop, one talks, and **the judge holds Meena's phone the whole time.**
+## Before you walk up (5 minutes)
+1. On the laptop: `python run.py`. Open `http://localhost:8000/` full screen on the projector. Press **R** to start clean.
+2. On your phone (or the judge's), open the `/m` address it prints; pick **English** or **हिन्दी**. That's Meena's app.
+3. Optional: a second phone on `/soundbox` (tap once for sound). That's her Soundbox on the counter.
+4. Sound on. Click the projector page once so audio works.
+
+Two people: **one talks, one drives.** The judge holds the phone.
 
 ---
 
-**Beat 1 · 0:00 · The problem (15 s, idle screen)**
-> "One ₹1,000 UPI sale froze a shop's whole ₹8.26 lakh account for ten months. I4C's own table: about ₹303 crore frozen against ₹29 crore actually disputed. And the shopkeeper finds out last, from a bounced supplier payment. Paytm finds out first, and today nobody acts on that."
+## 0:00 · The problem (40 s, idle screen, no clicking)
 
-Hand over the QR. The judge picks **English** or **हिन्दी** (they can switch any time with EN/हि). They're holding her Paytm for Business app with **Kavach Shield**: status, today's sales, the clocks Kavach is holding. It's not a chat.
+> "Meena runs a kirana store in Lucknow. A customer pays her ₹2,400 on UPI. Weeks later that money is reported as cyber fraud, maybe not even about her. Her bank freezes her **whole** account. Nobody tells her. She finds out when her payment to her supplier bounces.
+>
+> This is real. A shop in Andhra Pradesh had ₹8.26 lakh frozen for ten months over one ₹1,000 payment; it took the High Court to fix it. The government's own numbers show about ₹303 crore frozen against ₹29 crore actually disputed.
+>
+> Here's the thing: **Paytm usually knows first.** The moment her payout bounces back from her bank, Paytm sees it. Today, nobody acts on that."
 
-**Beat 2 · 0:30 · Kavach knows first** (press **1**)
-- The 9:00 payout bounces. Nobody typed anything. Kavach **checks Paytm Risk before saying a word** (a possible mule would get only a neutral line).
-- **The Soundbox lights up and speaks** in her language; "What she heard" shows the words. The app turns into a case card with a trust line: *Kavach kabhi OTP, PIN ya paise nahi maangta*.
-- Judge taps **Yes, keep it safe** on the phone. The case lands on **Paytm's desk** as "Your approval"; the driver clicks **Approve**: that's Paytm Risk's real job, not a demo button. New sales are now safe with Paytm and never move to another account.
+## 0:40 · Set the rules of the demo (15 s)
 
-**Beat 3 · 1:00 · The case builds itself** (judge taps **Send bank SMS + notice**)
-- Kavach reads the notice, **ignores the instruction hidden in it**, matches the one ₹2,400 payment, signs the pack and drafts Paytm's own SOP 9.5(ii) upload.
-- On the phone: **₹3,10,000 frozen, a sliver of ₹2,400 disputed, 129×.**
-- Judge taps **Prepare the request**, then **The bank took my complaint ✓**.
-- *Optional, if a judge is curious:* **Signed evidence pack › Verify** on their phone → Valid; tap the edited copy → TAMPERED. Scroll to the bank officer's checklist.
+> "Three screens: Meena's phone, her Soundbox on the shop counter, and Paytm's Risk desk. The bank, police and UPI switch are a simulator, because no one can connect a real bank at a hackathon. Kavach itself is not scripted. It watches that simulator exactly the way it would watch Paytm's files. **Please try to break it.**"
 
-**Beat 4 · 1:45 · Twelve days later** (press **→**; the dock shows "12 days later")
-> "The bank and the officer are simulated. Watch what Kavach does with their decisions."
-- Day 3: the bank files **through the bank desk**, inside the SOP's 7 days, so no escalation letter is needed.
-- Day 12: the officer limits the hold to ₹2,400. **Kavach doesn't take that on trust**: it sends Paytm's ₹1 validation credit, and **CREDITS LAND**.
-- Paytm's desk asks for approval to release; the driver clicks **Approve**.
-- **The judge's phone turns green: "Your account works again."** The held payouts are back in her account. Only the disputed ₹2,400 stays held, and both 90-day dates are on the clocks row.
-> "In Sri Sai Wines, ten months and a High Court. Here the bank and the officer are simulated, so we're not claiming twelve days. What's real is that every step the SOP asks of the merchant and of Paytm was ready on day one, and Kavach checked the money before it moved."
+## 0:55 · Kavach notices first (40 s): press **1**
 
-**Beat 5 · 2:25 · What's live on Paytm today, every clock, and the business** (10–15 s each)
-- Dock **⋯** → **Check a real Paytm order** → paste your staging Order ID. Kavach calls **Paytm's real Transaction Status API** twice, the UPI tile flips from SIMULATED to **LIVE · Paytm API**, and it signs a pack from Paytm's actual response. "Every tile says whether it's live or simulated. This one is Paytm, right now."
-- Press **2** (customer disputes). The phone shows what's proven (payment, bill) and **what isn't** ("no record can show the goods were handed over"). One question; the judge taps **Yes, I handed them over**; the reply goes in before the deadline. "It owns every clock that silently costs her money."
-- Say it (no screen): "Priced per verified resolution, sold through Paytm Intelligence. 6.6 verified actions per incident, zero model calls in offline mode, and a shadow-mode rollout that proves it on Paytm's own history before any merchant hears from it."
+What the judges see:
+- The bank sends Meena's ₹4,580 payout back. **Nobody typed anything.**
+- Within seconds, her phone shows **"Account frozen"**, and the tracker shows exactly where her money stopped.
+- The Soundbox says only *"an important message from Paytm is waiting in your app"*.
 
-**Close · 2:50**
+> "Notice what the Soundbox *didn't* say. It's a loudspeaker on her counter, and customers are standing there. Private trouble stays on her phone."
+
+## 1:35 · The judge decides (40 s)
+
+The phone asks: *"Keep today's sales safe with Paytm?"*
+
+> "Your call. You're Meena."
+
+- **If the judge taps No:** Kavach respects it and doesn't hold anything. Say: *"It never moves money without her."* (Press **R** and **1** to go again if you need the full story.)
+- **If Yes:** the case jumps to Paytm's desk as **"Your approval"**. Click **Approve**: *"This is Paytm Risk's real job. Two keys: the merchant and Paytm. The AI can't move money alone."*
+
+## 2:15 · The case builds itself (40 s)
+
+Judge taps **Send bank SMS + notice** on the phone.
+- Kavach reads the notice, **ignores a fake instruction hidden inside it**, and matches the one disputed payment in Paytm's records.
+- The phone shows: **₹3,10,000 frozen for a ₹2,400 dispute, 129 times more.**
+- It drafts a request, in her name, to freeze only the disputed amount, plus a signed evidence pack.
+
+> "Change one digit in that pack and verification fails. The bank's officer gets proof, not a story."
+
+The judge taps **Prepare the request**, then **The bank took my complaint**.
+
+## 2:55 · Twelve days later (30 s): press **→**
+
+> "The bank and police are simulated; watch what Kavach does with their decision."
+- The officer limits the hold to ₹2,400. **Kavach doesn't trust that blindly:** it sends ₹1 to check the account works.
+- The desk asks for approval to release; click **Approve**.
+- The phone turns green: **"Your account works again."**
+
+## 3:25 · Prove it isn't scripted (60 s): the most important minute
+
+Pick two:
+- **"Ask it anything, in your own words."** The judge types on the phone, any phrasing, English or Hindi: *"paisa kab aayega"*, *"is my money safe"*, typos included. It answers from her actual records, not a script.
+- **"Upload a messy file."** Open **Today's return file →** on the desk. Download the sample, mess it up in front of them (rename columns, write a sentence instead of a code), and upload it. It still sorts every row; only real freezes become cases.
+- **"Fake proof."** Dock **⋯** → *Screenshot ₹4,200, bank says ₹2,400*: it trusts the bank, not the picture.
+- **"Real Paytm."** If staging keys are in `.env`: Dock **⋯** → *Check a real Paytm order*. That's Paytm's actual API, live.
+
+## 4:25 · The second deadline (20 s): press **2**
+
+> "Freezes aren't the only silent clock. A customer disputes a payment; if nobody replies in time, the money is deducted automatically."
+- Kavach shows what Paytm can prove and **admits what it can't** (that the goods were handed over). The judge answers one question; it replies before the deadline.
+
+## 4:45 · Why Paytm (15 s, say it, no screen)
+
+> "Fewer support calls, fewer chargebacks lost to silence, merchants who stay digital, and an AI product Paytm can sell to banks. The way to make it real: run it in shadow mode on 90 days of Paytm's own data, no merchant contact, and count what it would have caught."
+
+## Close
 > "The Soundbox tells a shop it got paid. Kavach makes sure it keeps the money."
 
 ---
 
-### Questions you'll get, and the screen that answers them
-| Question | Show |
-|---|---|
-| "What if the merchant is the mule?" | Dock ⋯ → **Bounce on a merchant Risk has flagged**: neutral line, Soundbox shows PAYTM TEAM, the right panel becomes Paytm Risk's view |
-| "What about a debit freeze?" | Dock ⋯ → **Her payment to a supplier is refused**: caught from UPI code `YE` on her own payment |
-| "How do you know it works?" | Dock ⋯ → **Evaluation results**: 240 money-clock scenarios plus the break-the-guard test |
-| "Couldn't it just lie to win a chargeback?" | P18: the phone's proof list shows the gap; tap **No, I didn't** → honest accept |
-| "Is any of this real?" | Dock ⋯ → **Check a real Paytm order**; every source row on Paytm's desk says Simulated or Live |
-| "Show me the agent's reasoning" | Expand **Kavach's log** on Paytm's desk, or Dock ⋯ → **Engineer's view** |
+## Saying "simulated" without losing the room
+- Say it **once, early, confidently**, as a rule of the demo, not an apology.
+- Then put the live parts where judges can touch them: **their own words, their own file, their own decision.**
+- If asked "is the data real?": *"The shop and the bank are simulated; the agent's decisions are live. The path to real data is shadow mode on Paytm's history. That's step one of the rollout."*
 
-### If something breaks
-* **The judge's phone can't connect:** the phone on the laptop screen is the same app; drive it there.
-* **No sound:** click the page once. "What she heard" still shows the words.
-* **Sarvam down:** the rules planner takes over and says so.
-* **Start over:** **Reset** (the judge's phone clears itself).
+## If something breaks
+- **Phone won't connect:** use the phone on the projector screen; it's the same app.
+- **No sound:** click the page once; "What she heard" shows the words anyway.
+- **Anything weird:** press **R**, then **1**. Ten seconds to restart.
+- **Sarvam slow or down:** Kavach falls back to its rules and keeps going.
