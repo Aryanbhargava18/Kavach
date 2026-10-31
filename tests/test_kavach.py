@@ -686,3 +686,33 @@ def test_ops_return_file_routes_by_reason_idempotent_and_scales():
     br = ops.triage(big, set(), bmeta["payouts"])
     assert br["summary"]["opened"] == bmeta["returns"] == 15000 and br["summary"]["ms"] < 5000   # a crore-merchant day is a 15k-row job
     assert "error" in ops.triage("foo,bar\n1,2\n")
+
+
+def test_ops_reads_a_messy_real_world_return_file():
+    """Renamed headers, BOM, semicolons, rupee amounts, lowercase codes, sentences instead of codes, blank and broken rows."""
+    from app import ops
+    messy = ("\ufeff MID ; Shop Name ;Language; UTR ; Amt ; Reason Code ; Bank Remarks \n"
+             "meena0417; Meena Kirana ;Hindi;UTR881; ₹4,580.00 ;r-frz;\n"
+             "AB1234;Ramesh Dairy;english;UTR882;Rs. 1,240/-;;Account is DORMANT - KYC not updated\n"
+             "CD5678;Asha Sweets;hi;UTR883;760;;A/c closed by customer\n"
+             "EF9012;Imran Mobiles;en;UTR884;2150;;Beneficiary name mismatch\n"
+             "GH3456;Pooja Medical;ta;UTR885;380;;Invalid IFSC code\n"
+             "JK7890;Salim Hardware;en;UTR886;5600;;Debit freeze on account by LEA\n"
+             ";;;;;;\n"
+             ";Nameless;en;UTR887;900;R-CLS;\n"
+             "LM1111;Odd Shop;en;UTR888;abc;;Technical error at beneficiary bank\n"
+             "AB1234;Ramesh Dairy;english;utr882;1240;;dormant\n")
+    r = ops.triage(messy, set())
+    assert "error" not in r
+    by = {c["merchant_id"]: c for c in r["cases"]}
+    assert by["meena0417"]["route"] == "freeze" and by["meena0417"]["amount"] == 4580 and by["meena0417"]["message_lang"] == "hi"
+    assert by["AB1234"]["route"] == "dormant" and by["AB1234"]["amount"] == 1240 and by["AB1234"]["read_from"] == "text"
+    assert by["CD5678"]["route"] == "bank_details" and by["EF9012"]["route"] == "kyc_name" and by["GH3456"]["route"] == "bank_details"
+    assert by["JK7890"]["route"] == "freeze"
+    assert by["LM1111"]["route"] == "human"                                  # never guess: unknown words go to a person
+    assert any(c["route"] == "human" and c["merchant_id"] == "—" for c in r["cases"])   # a row with no merchant ID is surfaced, not dropped
+    s = r["summary"]
+    assert s["blank_rows"] == 1 and s["skipped_duplicates"] == 1           # same UTR in a different case is still the same return
+    assert "Couldn't find" in ops.triage("foo,bar\n1,2\n")["error"]
+    tabbed = "merchant\treason\nZZ1\tAccount frozen\n"
+    assert ops.triage(tabbed, set())["cases"][0]["route"] == "freeze"

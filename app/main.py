@@ -154,7 +154,11 @@ async def ops_returns(file: UploadFile | None = File(None), sample: bool = Form(
         raw = await file.read()
         if len(raw) > 20 * 1024 * 1024:
             raise HTTPException(413, "file too large")
-        text, n = raw.decode("utf-8", "replace"), None
+        try:
+            text = raw.decode("utf-8-sig")
+        except UnicodeDecodeError:          # Excel on Windows saves CSVs as cp1252
+            text = raw.decode("cp1252", "replace")
+        n = None
     elif sample:
         text, meta = ops.sample_file(max(100, min(payouts, 2_000_000)))
         n = meta["payouts"]

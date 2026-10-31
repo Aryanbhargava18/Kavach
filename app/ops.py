@@ -14,6 +14,7 @@ from __future__ import annotations
 import csv
 import io
 import random
+import re
 import time
 from datetime import date
 from typing import Any
@@ -45,6 +46,81 @@ CITIES = ["Lucknow", "Patna", "Jaipur", "Indore", "Kanpur", "Varanasi", "Bhopal"
 NAMES = ["Kirana Store", "General Store", "Medical", "Sweets", "Mobile Centre", "Dairy", "Hardware", "Tea Stall", "Fruits & Veg", "Garments", "Pan Shop", "Bakery"]
 OWNERS = ["Meena", "Ramesh", "Sunita", "Imran", "Kavita", "Arjun", "Farah", "Deepak", "Pooja", "Sanjay", "Asha", "Manoj", "Neha", "Vikas", "Ritu", "Salim"]
 LANGS = ["hi"] * 6 + ["en"] * 3 + ["ta", "te", "mr", "bn", "gu", "kn"]   # merchants' chosen app language
+
+# Banks and ops teams never send the same file twice: headers change case, columns get renamed, Excel adds a BOM,
+# amounts arrive as "₹1,240.00", and many banks send a sentence instead of a code. All of that lands here.
+ALIASES = {
+    "merchant_id": ["merchant_id", "mid", "merchant", "merchant_code", "merchantid", "mer_id", "beneficiary_id", "id"],
+    "merchant_name": ["merchant_name", "name", "beneficiary_name", "bene_name", "shop", "shop_name", "business_name"],
+    "city": ["city", "town", "location"],
+    "lang": ["lang", "language", "app_language", "preferred_language"],
+    "batch_id": ["batch_id", "batch", "settlement_id", "utr", "payout_id", "reference", "ref", "ref_no", "txn_ref"],
+    "business_date": ["business_date", "date", "settlement_date", "value_date"],
+    "amount": ["amount", "amt", "payout_amount", "value", "settlement_amount", "rs", "inr"],
+    "return_code": ["return_code", "code", "reason_code", "rc", "status_code"],
+    "return_reason": ["return_reason", "reason", "remarks", "description", "bank_remarks", "narration", "status"],
+    "risk_signals": ["risk_signals", "risk", "risk_score", "signals"],
+}
+# Free-text reason -> code. Order matters: "closed" must win over "account", "inoperative" over "invalid".
+KEYWORDS = [
+    ("R-FRZ", r"freez|frozen|block|debit\s*freeze|lien|attach|hold\s*by\s*(police|court|order)|cyber|lea\b|1930"),
+    ("R-DOR", r"dormant|inoperat|inactive|kyc\s*(expir|lapse|pending|not\s*updated)|re-?kyc"),
+    ("R-CLS", r"closed|close\b|account\s*clos"),
+    ("R-NAM", r"name\s*mismatch|name\s*does\s*not\s*match|beneficiary\s*name|name\s*not\s*match"),
+    ("R-INV", r"invalid|incorrect|wrong|does\s*not\s*exist|no\s*such|not\s*found|ifsc"),
+]
+LANG_NAMES = {"hindi": "hi", "english": "en", "tamil": "ta", "telugu": "te", "marathi": "mr", "bengali": "bn", "bangla": "bn",
+              "gujarati": "gu", "kannada": "kn", "हिंदी": "hi", "हिन्दी": "hi"}
+
+
+def _key(h: str) -> str:
+    return re.sub(r"[^a-z0-9]+", "_", (h or "").replace("\ufeff", "").strip().lower()).strip("_")
+
+
+def _columns(fieldnames: list[str]) -> dict[str, str]:
+    """Map each canonical field to the header the file actually used."""
+    norm = {_key(h): h for h in fieldnames if h}
+    out = {}
+    for field, names in ALIASES.items():
+        for n in names:
+            if n in norm and norm[n] not in out.values():
+                out[field] = norm[n]
+                break
+    return out
+
+
+def _reader(text: str) -> csv.DictReader:
+    text = text.lstrip("\ufeff")
+    try:
+        dialect = csv.Sniffer().sniff(text[:4096], delimiters=",;\t|")
+    except csv.Error:
+        dialect = csv.excel
+    return csv.DictReader(io.StringIO(text), dialect=dialect)
+
+
+def amount(v: Any) -> int:
+    """"₹1,240.00", "Rs. 1240", "1 240", "1240/-" -> 1240. Unreadable -> 0 (and the row goes to a human)."""
+    s = re.sub(r"(?i)rs\.?|inr|₹|/-|\s", "", str(v or "")).replace(",", "")
+    m = re.search(r"-?\d+(\.\d+)?", s)
+    return int(float(m.group())) if m else 0
+
+
+def code_for(code: str, reason: str) -> tuple[str, str]:
+    """A known code wins; otherwise read the bank's words. Returns (code, how) where how is 'code', 'text' or ''."""
+    c = re.sub(r"[^A-Z0-9]", "", (code or "").upper())
+    for k in ROUTES:
+        if c and c == k.replace("-", ""):
+            return k, "code"
+    text = f"{code or ''} {reason or ''}".lower()
+    for k, pat in KEYWORDS:
+        if re.search(pat, text):
+            return k, "text"
+    return (code or "").strip().upper(), ""
+
+
+def _lang(v: str) -> str:
+    v = (v or "").strip().lower()
+    return LANG_NAMES.get(v, v[:2] if v else "en")
 
 
 def sample_file(payouts: int = 5000, seed: int = 31) -> tuple[str, dict[str, Any]]:
@@ -78,30 +154,45 @@ def triage(csv_text: str, seen: set | None = None, payouts: int | None = None) -
     """Route every returned payout. Pure and deterministic: same file in, same decisions out; reprocessing a file opens nothing twice."""
     t0 = time.perf_counter()
     seen = seen if seen is not None else set()
-    reader = csv.DictReader(io.StringIO(csv_text))
-    missing = [f for f in ("merchant_id", "batch_id", "amount", "return_code") if f not in (reader.fieldnames or [])]
-    if missing:
-        return {"error": f"missing columns: {', '.join(missing)}"}
-    cases, skipped, unknown, alerts = [], 0, [], {}
-    for row in reader:
-        key = (row["merchant_id"], row["batch_id"])
+    reader = _reader(csv_text)
+    col = _columns(reader.fieldnames or [])
+    if "merchant_id" not in col or ("return_code" not in col and "return_reason" not in col):
+        need = [n for n, ok in (("merchant ID", "merchant_id" in col), ("return code or reason", "return_code" in col or "return_reason" in col)) if not ok]
+        return {"error": f"Couldn't find a column for: {', '.join(need)}. Columns seen: {', '.join(h for h in (reader.fieldnames or []) if h) or 'none'}"}
+    cases, skipped, unknown, alerts, blank, read_text = [], 0, [], {}, 0, 0
+    for raw in reader:
+        row = {f: str(raw.get(h) or "").strip() for f, h in col.items()}
+        if not row.get("merchant_id"):
+            if any(str(v or "").strip() for v in raw.values() if not isinstance(v, list)):
+                cases.append({**_base(row), "merchant_id": "—", "route": "human", "label": "No merchant ID on this row", "action": "Hand to Paytm Ops: row has no merchant ID", "guarded": False, "message": None})
+            else:
+                blank += 1
+            continue
+        row.setdefault("batch_id", "")
+        key = (row["merchant_id"].upper(), row["batch_id"].upper() or row.get("business_date", ""))
         if key in seen:                       # idempotent: the same return never opens two cases
             skipped += 1
             continue
         seen.add(key)
-        code = (row.get("return_code") or "").strip().upper()
+        code, how = code_for(row.get("return_code", ""), row.get("return_reason", ""))
+        read_text += how == "text"
+        row["return_code"] = code
         r = ROUTES.get(code)
         if not r:
             unknown.append(row["merchant_id"])
-            cases.append({**_base(row), "route": "human", "label": f"Unrecognised code {code or '—'}", "action": "Hand to Paytm Ops: unknown return code", "guarded": False, "message": None})
+            cases.append({**_base(row), "route": "human", "label": f"Unrecognised: {(row.get('return_reason') or code or '—')[:60]}", "action": "Hand to Paytm Ops: reason not recognised", "guarded": False, "message": None})
             continue
-        guarded = r["route"] == "freeze" and int(row.get("risk_signals") or 0) >= 2     # P17, per merchant
-        lang = (row.get("lang") or "en").strip()
+        try:
+            risk = int(float(row.get("risk_signals") or 0))
+        except ValueError:
+            risk = 0
+        guarded = r["route"] == "freeze" and risk >= 2     # P17, per merchant
+        lang = _lang(row.get("lang", ""))
         msg_lang = "hi" if lang == "hi" else "en"          # this build ships English and Hindi; other languages queue with English until translated
         message = NEUTRAL[msg_lang] if guarded else r["msg_" + msg_lang]
         alerts[lang] = alerts.get(lang, 0) + 1
-        cases.append({**_base(row), "route": "risk_edd" if guarded else r["route"], "label": r["label"], "guarded": guarded,
-                      "action": "Neutral message only; Paytm Risk EDD decides (P17)" if guarded else r["action"],
+        cases.append({**_base(row), "lang": lang, "route": "risk_edd" if guarded else r["route"], "label": r["label"], "guarded": guarded,
+                      "read_from": how, "action": "Neutral message only; Paytm Risk EDD decides (P17)" if guarded else r["action"],
                       "message": message, "message_lang": msg_lang})
     ms = round((time.perf_counter() - t0) * 1000, 1)
     by = {}
@@ -112,13 +203,10 @@ def triage(csv_text: str, seen: set | None = None, payouts: int | None = None) -
                                          "freezes": by.get("freeze", 0) + by.get("risk_edd", 0), "not_freezes": sum(v for k, v in by.items() if k not in ("freeze", "risk_edd")),
                                          "guarded": by.get("risk_edd", 0), "unknown_codes": len(unknown), "amount_held_safe": held,
                                          "alerts_by_language": alerts, "payouts_in_file": payouts, "ms": ms,
+                                         "blank_rows": blank, "read_from_text": read_text,
                                          "per_return_ms": round(ms / max(1, len(cases)), 3)}}
 
 
 def _base(row: dict[str, str]) -> dict[str, Any]:
-    try:
-        amt = int(float(row.get("amount") or 0))
-    except ValueError:
-        amt = 0
-    return {"merchant_id": row["merchant_id"], "merchant_name": row.get("merchant_name") or row["merchant_id"], "city": row.get("city") or "",
-            "lang": row.get("lang") or "en", "batch_id": row["batch_id"], "amount": amt, "return_code": row.get("return_code")}
+    return {"merchant_id": row.get("merchant_id") or "—", "merchant_name": row.get("merchant_name") or row.get("merchant_id") or "—", "city": row.get("city") or "",
+            "lang": row.get("lang") or "en", "batch_id": row.get("batch_id") or "", "amount": amount(row.get("amount")), "return_code": row.get("return_code")}
