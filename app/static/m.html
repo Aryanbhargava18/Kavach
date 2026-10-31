@@ -135,7 +135,7 @@ const L = {
     protected: "Protected by Kavach", askBar: "Ask about your money…", nextPay: "Next payout", onTrack: "On track", reaches: "reaches bank", collected: "Collected", withPaytm: "With Paytm", yourBank: "Your bank", confirmed: "Confirmed",
     pays: "payments", now2: "now", byKavach: "by Kavach", landNote: "Kavach checks it actually lands, and tells you at once if your bank sends it back.", lastPay: "Last payout", reached: "reached your bank",
     nothingWait: "Nothing waiting", watchT: "Kavach is watching", wPay: "Payments", wPaySub: "today, each checked with the bank", wOut: "Payouts", wOutSub: "confirms it lands", wDis: "Disputes", wDisNone: "None open", wDisOpen: "reply due", live: "Live",
-    recent: "Recently fixed", todayPays: "Today's payments", bankOk: "Bank confirmed", allSteps: "Show all steps", hi2: "Ask me about your money", hiSub: "I check Paytm's own records before I answer, in English or Hindi.", tomorrow: "Tomorrow", today2: "Today", pushPrivate: "Important update about your money. Open to see.", returned: "sent it back", safeNow: "Safe with Paytm", worksAgain: "works again", inAccount: "In your account" },
+    recent: "Recently fixed", todayPays: "Today's payments", bankOk: "Bank confirmed", allSteps: "Show all steps", hi2: "Ask me about your money", hiSub: "I check Paytm's own records before I answer, in English or Hindi.", tomorrow: "Tomorrow", today2: "Today", pushPrivate: "Important update about your money. Open to see.", received: "received", sbT: "Soundbox", sbSub: "last said", returned: "sent it back", safeNow: "Safe with Paytm", worksAgain: "works again", inAccount: "In your account" },
   hi: { askSub: "हिन्दी या English में पूछिए", letterTitle: "बैंक के लिए अनुरोध", now: "· अभी", shieldOn: "शील्ड चालू", todaySales: "आज की बिक्री", payments: "भुगतान", nextPayout: "अगला पेआउट",
     whatDid: "कवच ने क्या किया", nothingYet: "अभी कुछ करना नहीं पड़ा। कवच नज़र रख रहा है।", nextStep: "आपका अगला कदम", watching: "कवच देख रहा है", daysLeft: "दिन बचे", done: "हो गया", working: "कवच काम पर",
     fwd: "बैंक का SMS + नोटिस भेजो", photo: "फ़ोटो खींचो", whereMoney: "आपका पैसा कहाँ है", frozenSub: "बैंक में रुका हुआ · आपका बताया हुआ", more: "× ज़्यादा", disputed: "विवादित", frozen: "रुका",
@@ -146,7 +146,7 @@ const L = {
     protected: "कवच से सुरक्षित", askBar: "अपने पैसे के बारे में पूछिए…", nextPay: "अगला पेआउट", onTrack: "समय पर", reaches: "बैंक पहुँचेगा", collected: "जमा हुआ", withPaytm: "पेटीएम के पास", yourBank: "आपका बैंक", confirmed: "पक्का",
     pays: "भुगतान", now2: "अभी", byKavach: "कवच ने जाँचा", landNote: "कवच देखेगा कि पैसा सच में पहुँचा, और बैंक ने लौटाया तो तुरंत बताएगा।", lastPay: "पिछला पेआउट", reached: "बैंक पहुँचा",
     nothingWait: "कुछ बाकी नहीं", watchT: "कवच नज़र रख रहा है", wPay: "भुगतान", wPaySub: "आज के, हर एक बैंक से जाँचा", wOut: "पेआउट", wOutSub: "पहुँचना पक्का करेगा", wDis: "विवाद", wDisNone: "कोई नहीं", wDisOpen: "जवाब बाकी", live: "चालू",
-    recent: "हाल में ठीक किया", todayPays: "आज के भुगतान", bankOk: "बैंक ने पक्का किया", allSteps: "सारे कदम देखें", hi2: "अपने पैसे के बारे में पूछिए", hiSub: "जवाब देने से पहले मैं पेटीएम के अपने रिकॉर्ड देखता हूँ।", tomorrow: "कल", today2: "आज", pushPrivate: "आपके पैसे से जुड़ा ज़रूरी अपडेट। खोलकर देखिए।", returned: "लौटा दिया", safeNow: "पेटीएम के पास सुरक्षित", worksAgain: "फिर चालू", inAccount: "आपके खाते में" },
+    recent: "हाल में ठीक किया", todayPays: "आज के भुगतान", bankOk: "बैंक ने पक्का किया", allSteps: "सारे कदम देखें", hi2: "अपने पैसे के बारे में पूछिए", hiSub: "जवाब देने से पहले मैं पेटीएम के अपने रिकॉर्ड देखता हूँ।", tomorrow: "कल", today2: "आज", pushPrivate: "आपके पैसे से जुड़ा ज़रूरी अपडेट। खोलकर देखिए।", received: "प्राप्त हुए", sbT: "साउंडबॉक्स", sbSub: "आख़िरी बार बोला", returned: "लौटा दिया", safeNow: "पेटीएम के पास सुरक्षित", worksAgain: "फिर चालू", inAccount: "आपके खाते में" },
 };
 let LANG = (() => { const q = new URLSearchParams(location.search).get("lang"); if (q === "hi" || q === "en") return q; try { return localStorage.getItem("kavach.lang") || "en"; } catch { return "en"; } })();
 const T = (k) => (L[LANG] || L.en)[k];
@@ -173,7 +173,7 @@ const left = (secs) => secs >= 86400 ? `${Math.floor(secs / 86400)} ${T("d")}` :
 
 // ---------------------------------------------------------------- voice: Sarvam Bulbul when live, else the phone's own Hindi voice
 const voiceQ = []; let speaking = false;
-function speak(t) { if (!S.audio || !t || EMBED) return; voiceQ.push(t); if (!speaking) nextVoice(); }
+function speak(t, force) { if (!t || (!force && (!S.audio || EMBED))) return; voiceQ.push(t); if (!speaking) nextVoice(); }
 async function nextVoice() {
   const t = voiceQ.shift(); if (!t) { speaking = false; return; }
   speaking = true;
@@ -241,6 +241,7 @@ function home(v) {
   const watch = `<section data-k="watch" class="card p-5"><p class="eyebrow mb-3">${T("watchT")}</p>
       ${row("badge-check", T("wPay"), `${v.today.count} ${T("wPaySub")}`)}
       ${row("landmark", T("wOut"), p.amount ? `${rs(p.amount)} · ${esc(dayWord(p.at))} ${tm(p.at)} · ${T("wOutSub")}` : T("wOutSub"))}
+      ${(v.payments || [])[0] ? row("speaker", T("sbT"), `${T("sbSub")} “+${rs(v.payments[0].amount)} ${T("received")}” · ${tm(v.payments[0].at)}`) : ""}
       ${row("scale", T("wDis"), v.disputes_open ? `${v.disputes_open} ${T("wDisOpen")}` : T("wDisNone"), v.disputes_open ? "bad" : "ok")}
       ${recent}</section>`;
   const pays = (v.payments || []).length ? `<section data-k="pays" class="card p-5"><div class="flex items-baseline justify-between mb-2"><p class="eyebrow">${T("todayPays")}</p><p class="num text-[13px] font-semibold text-ink-2">${rs(v.today.sales)} · ${v.today.count}</p></div>
@@ -379,7 +380,7 @@ function bind() {
   document.querySelectorAll("[data-cam]").forEach((b) => b.onclick = () => $("#cam").click());
   document.querySelectorAll("[data-branch]").forEach((b) => b.onclick = () => { b.disabled = true; haptic(); send(T("branchMsg")); });
   document.querySelectorAll("[data-allsteps]").forEach((b) => b.onclick = () => { S.trkAll = true; render(); });
-  document.querySelectorAll("[data-listen]").forEach((b) => b.onclick = () => { S.audio = true; speak(S.lastSay); });
+  document.querySelectorAll("[data-listen]").forEach((b) => b.onclick = () => { S.audio = true; if ("speechSynthesis" in window) speechSynthesis.cancel(); voiceQ.length = 0; speaking = false; speak(S.lastSay, true); });   // a tap always speaks, even if an earlier line got stuck
   document.querySelectorAll("[data-letter]").forEach((b) => b.onclick = () => { const d = S.view.docs.find((x) => x.kind === "letter"); $("#lettertext").textContent = d ? d.text : ""; openSheet("#letter"); });
 }
 const haptic = () => { if (navigator.vibrate) navigator.vibrate(12); };
@@ -434,6 +435,9 @@ async function boot() {
       S.chat.push(msg);
       if (msg.who === "kavach") { const sp = msgSpeak(msg); if (sp) S.lastSay = sp; speak(sp); if (!$("#sheet").classList.contains("on")) { S.unread++; push(msgText(msg)); } }
       renderChat(); refresh();
+    } else if (ev.type === "world_event" && ev.event && ev.event.kind === "soundbox" && ev.event.amount) {
+      if (!EMBED) { const a = Number(ev.event.amount).toLocaleString("en-IN"); speak(LANG === "hi" ? `पेटीएम पर ${a} रुपये प्राप्त हुए` : `Received ${a} rupees on Paytm`); push(`+₹${a} ${T("received")}`); }   // on its own, the phone is her Soundbox
+      refresh();
     } else if (ev.type === "incident" || ev.type === "world" || ev.type === "step") { if (ev.world && ev.world.now) S.now = ev.world.now; refresh(); }
     else if (ev.type === "draft") { S.drafts = [ev.draft]; refresh(); }
     else if (ev.type === "lang") { if (ev.lang !== LANG) setLang(ev.lang, true); }

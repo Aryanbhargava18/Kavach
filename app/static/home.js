@@ -249,6 +249,13 @@ function soundbox(s) {
   speak(s, text);
 }
 
+function sayLine(text) {   // payment announcements: short, frequent, so the browser voice (no API credits)
+  if (!S.sound || !S.live || !("speechSynthesis" in window)) return;
+  const u = new SpeechSynthesisUtterance(text), hi = S.mlang === "hi";
+  const v = hi ? voices.find((x) => x.lang.startsWith("hi")) : (voices.find((x) => x.lang === "en-IN") || voices.find((x) => x.lang.startsWith("en")));
+  if (v) u.voice = v; u.lang = hi ? "hi-IN" : "en-IN"; speechSynthesis.speak(u);
+}
+
 // ---------------------------------------------------------------- events
 function handle(ev) {
   switch (ev.type) {
@@ -264,7 +271,11 @@ function handle(ev) {
     case "incident": S.incidents[ev.incident.id] = ev.incident; if (!S.sel) S.sel = ev.incident.id; render(); clearTimeout(S.rt); S.rt = setTimeout(() => { refresh(); refreshFollowups().then(render); }, 250); break;
     case "world": S.world = ev.world; $("#clock").textContent = tm(ev.world.now); refreshFollowups().then(render); if (!$("#sbx").classList.contains("speaking")) idleLcd(); break;
     case "world_event":
-      if (ev.event.kind === "soundbox" && ev.event.amount) { lcd("+₹ " + Number(ev.event.amount).toLocaleString("en-IN"), false, 3500); }
+      if (ev.event.kind === "soundbox" && ev.event.amount) {
+        const a = Number(ev.event.amount).toLocaleString("en-IN");
+        lcd("+₹ " + a, false, 3500); $("#sbx").classList.add("speaking"); setTimeout(() => $("#sbx").classList.remove("speaking"), 2500);
+        sayLine(S.mlang === "hi" ? `पेटीएम पर ${a} रुपये प्राप्त हुए` : `Received ${a} rupees on Paytm`);
+      }
       refresh(); break;
     case "clock": $("#clock").textContent = tm(ev.now); break;
     case "lang": S.mlang = ev.lang; break;
