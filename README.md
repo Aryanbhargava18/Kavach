@@ -7,6 +7,15 @@ Everything here runs on synthetic data. No real money, messages, banks or police
 
 ---
 
+## Live on Paytm (staging)
+The read path runs on Paytm's real **Transaction Status API** (`v3/order/status`), signed with Paytm's official `paytmchecksum` library.
+1. Paytm Business dashboard → Developer settings → test mode: copy the **MID** and **merchant key** into `.env` as `PAYTM_MID` and `PAYTM_MERCHANT_KEY` (`PAYTM_ENV=staging` is the default).
+2. Make any test transaction on that MID and copy its **Order ID**.
+3. `make paytm-check ORDER=<order id>` → must print `OK: Paytm answered.`
+4. In the app: Run a scenario → **LIVE: check a real Paytm order**. The UPI tile shows **LIVE · Paytm API**; every other tile says **SIMULATED**, because payout returns, PSP decline codes and the dispute desk aren't open to outside developers.
+
+Kavach never signs a pack unless Paytm's own API said SUCCESS, asked twice (rule P20). No keys means it says so; it never fakes a live answer.
+
 ## Start here
 * `docs/STRATEGY.md`: what this is, who at Paytm pays for it, where it plugs in, and what's still simulated.
 * `docs/DEMO_SCRIPT.md`: the 3-minute run, with a judge holding Meena's phone (`make lan`, then **Judge's phone**).
@@ -89,7 +98,7 @@ make demo          # http://127.0.0.1:8000
 Needs Python 3.11+ and Tesseract OCR (`brew install tesseract`). Without Tesseract everything works except reading screenshots, and Kavach asks for the UPI reference instead. Chrome gives Hindi voice input and output through the browser; typing always works.
 
 ```sh
-make test          # 45 tests: both proactive watchers (billing app, payouts), policy invariants, hero + every judge challenge, tamper detection, desk, clocks, both LLM paths (scripted)
+make test          # 50 tests: both proactive watchers (billing app, payouts), policy invariants, hero + every judge challenge, tamper detection, desk, clocks, both LLM paths (scripted)
 make eval          # 243 everyday incidents + 800 desk merchants vs naive baselines, then 180 freeze-watch scenarios with a mutation check (≈3–4 min, offline)
 make sarvam-check  # with SARVAM_API_KEY: one live call to each Sarvam API Kavach uses
 make llm-check     # with SARVAM_API_KEY (or ANTHROPIC_API_KEY): hero scenarios on the live planner, safety + timing

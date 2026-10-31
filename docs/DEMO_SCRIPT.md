@@ -4,7 +4,8 @@
 1. Run `make lan` and open Chrome full screen at the LAN address it prints. If the venue Wi-Fi blocks device-to-device traffic, use a phone hotspot that the laptop and the judge's phone both join.
 2. Turn the sound on, click the page once, press **Reset**.
 3. Run `make sarvam-check` with the key in `.env`. If it fails, Kavach runs on its rules planner and the top bar says so. Don't hide that.
-4. Open **Judge's phone** in the top bar and keep the QR ready.
+4. Open **Phone** in the top bar and keep the QR ready.
+5. **Live Paytm check:** put `PAYTM_MID` and `PAYTM_MERCHANT_KEY` (staging) in `.env`, make one test payment on that MID before you walk up, and note its Order ID. Run `make paytm-check ORDER=<id>` once; it must print `OK: Paytm answered.` The top bar's **Paytm staging** chip lights up.
 
 One person drives the laptop, one talks, and **the judge holds Meena's phone the whole time.**
 
@@ -34,9 +35,10 @@ Hand over the QR. The judge taps **Main Meena hoon · Shuru karo**. They're hold
 - **The judge's phone turns green: "Account phir se chalu."** The held payouts are back in her account. Only the disputed ₹2,400 stays held, and both 90-day dates are on the clocks row.
 > "In Sri Sai Wines, ten months and a High Court. Here the bank and the officer are simulated, so we're not claiming twelve days. What's real is that every step the SOP asks of the merchant and of Paytm was ready on day one, and Kavach checked the money before it moved."
 
-**Beat 5 · 2:25 · Every clock, and the business** (15 s each)
+**Beat 5 · 2:25 · What's live on Paytm today, every clock, and the business** (10–15 s each)
+- Run a scenario → **LIVE: check a real Paytm order** → paste your staging Order ID. Kavach calls **Paytm's real Transaction Status API** twice, the UPI tile flips from SIMULATED to **LIVE · Paytm API**, and it signs a pack from Paytm's actual response. "Every tile says whether it's live or simulated. This one is Paytm, right now."
 - Run a scenario → **Chargeback: a reply clock nobody is watching**. The phone shows what's proven (payment, bill) and **what isn't** ("no record can show the goods were handed over"). One question; the judge taps **Haan**; the reply goes in before the deadline. "It owns every clock that silently costs her money."
-- Top bar → **Business case**: "Priced per verified resolution, sold through Paytm Intelligence. 6.6 verified actions per incident, zero model calls in offline mode, and a shadow-mode rollout that proves it on Paytm's own history before any merchant hears from it."
+- Top bar → **Business** (opens on *This problem exists today*, with sources): "Priced per verified resolution, sold through Paytm Intelligence. 6.6 verified actions per incident, zero model calls in offline mode, and a shadow-mode rollout that proves it on Paytm's own history before any merchant hears from it."
 
 **Close · 2:50**
 > "The Soundbox tells a shop it got paid. Kavach makes sure it keeps the money."
@@ -50,7 +52,9 @@ Hand over the QR. The judge taps **Main Meena hoon · Shuru karo**. They're hold
 | "What about a debit freeze?" | **Debit freeze: her payment to a supplier is refused**: caught from UPI code `YE` on her own payment |
 | "How do you know it works?" | **Results**: 240 money-clock scenarios plus the break-the-guard test |
 | "Couldn't it just lie to win a chargeback?" | P18: the phone's proof list shows the gap; tap **Nahi diya** → honest accept |
-| "Can Paytm actually build this?" | **Business case** → feasibility column and rollout |
+| "Can Paytm actually build this?" | **Business** → feasibility column and rollout |
+| "Is any of this real?" | **LIVE: check a real Paytm order**; the SIMULATED/LIVE tag under every tile |
+| "Is this a real problem?" | **Business** → *This problem exists today*: court orders, I4C data, the RBI draft, Paytm's own docs |
 
 ### If something breaks
 * **The phone can't connect:** the laptop's left phone is the same app; drive it there.
