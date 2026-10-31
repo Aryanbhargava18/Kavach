@@ -17,6 +17,27 @@ The read path runs on Paytm's real **Transaction Status API** (`v3/order/status`
 Kavach never signs a pack unless Paytm's own API said SUCCESS, asked twice (rule P20). No keys means it says so; it never fakes a live answer.
 
 ## Start here
+
+**Run it on your laptop (Mac or Windows), about one minute:**
+
+```
+cd kavach
+python3 -m venv .venv
+source .venv/bin/activate        # Windows: .venv\Scripts\activate
+pip install -r requirements.txt
+python run.py
+```
+
+It prints four addresses. Kavach is three products on one engine:
+
+| Product | Who uses it | Open |
+|---|---|---|
+| **Soundbox** | Meena hears Kavach on the device she already trusts | `/soundbox` on a spare phone (tap once for sound) |
+| **Merchant app** | Kavach Shield inside Paytm for Business | `/m` on the judge's phone |
+| **Paytm staff website** | Risk & Ops approve anything that moves money; Ops triage the day's return file | `/desk` and `/ops` |
+
+`http://localhost:8000/` shows all three side by side for the projector. Keys: **1** bank freeze, **2** chargeback, **3** missed bill, **→** skip ahead, **R** start over. Phones need the same Wi-Fi (or the laptop's hotspot).
+
 * `docs/STRATEGY.md`: what this is, who at Paytm pays for it, where it plugs in, and what's still simulated.
 * `docs/DEMO_SCRIPT.md`: the 3-minute run, with a judge holding Meena's phone (`make lan`, then **Judge's phone**).
 * `docs/JUDGE_QA.md`: the hard questions, answered honestly.

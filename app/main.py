@@ -92,6 +92,18 @@ def index():
     return FileResponse(STATIC / "home.html")
 
 
+@app.get("/desk", response_class=HTMLResponse)
+def desk_page():
+    """Paytm's staff website: the Risk & Ops desk on its own, for a second screen."""
+    return FileResponse(STATIC / "home.html")
+
+
+@app.get("/soundbox", response_class=HTMLResponse)
+def soundbox_page():
+    """Meena's Soundbox on its own: open on a spare phone or tablet and it speaks like the device."""
+    return FileResponse(STATIC / "home.html")
+
+
 @app.get("/classic", response_class=HTMLResponse)
 def classic():
     """The earlier presenter stage (systems map + console), kept as a fallback."""

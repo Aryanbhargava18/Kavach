@@ -14,7 +14,7 @@ demo: install
 
 # Same, reachable from a phone on the venue Wi-Fi (QR codes in packs will point here)
 lan: install
-	KAVACH_PUBLIC_URL=http://$$(ipconfig getifaddr en0 2>/dev/null || hostname -I | awk '{print $$1}'):8000 $(BIN)/python -m uvicorn app.main:app --host 0.0.0.0 --port 8000
+	$(BIN)/python run.py
 
 test: install
 	KAVACH_PLANNER=offline $(BIN)/python -m pytest -q

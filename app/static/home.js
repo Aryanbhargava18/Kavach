@@ -1,4 +1,6 @@
 "use strict";
+const ONLY = { "/desk": "only-desk", "/soundbox": "only-sound" }[location.pathname];
+if (ONLY) document.documentElement.classList.add(ONLY);
 /* Kavach home: the three real surfaces (Meena's app, her Soundbox, Paytm's Risk & Ops desk) on one live engine. Demo controls live in a separate dock. */
 const APPROVER = { merchant: "Meena", paytm_ops: "Paytm Risk" };
 const ACTION_NAMES = { create_support_case: "Opened a support case", reconcile_payment: "Repaired the shop's ledger", replay_soundbox: "Replayed it on the Soundbox",
@@ -319,5 +321,11 @@ $("#open-eval").onclick = async () => {
     <tbody>${r.metrics.map((m) => `<tr class="border-t border-line"><td class="py-2 pr-4 text-ink-2">${esc(m.label)}</td><td class="py-2 text-right font-semibold num">${esc(m.kavach)}</td><td class="py-2 text-right text-ink-3 num">${esc(m.baseline)}</td></tr>`).join("")}</tbody></table>
     <p class="mt-4 text-[12px] text-ink-3 leading-relaxed">${esc(r.caveat)}</p>`);
 };
+if (ONLY === "only-sound") {   // a phone won't speak until someone taps it once
+  const t = $("#tap"); t.classList.add("on");
+  t.onclick = () => { if ("speechSynthesis" in window) speechSynthesis.speak(new SpeechSynthesisUtterance("")); t.classList.remove("on"); };
+}
+if (ONLY === "only-desk") document.title = "Paytm Risk & Ops desk · Kavach";
+if (ONLY === "only-sound") document.title = "Meena's Soundbox · Kavach";
 icons();
 boot();
