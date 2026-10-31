@@ -104,6 +104,13 @@ def soundbox_page():
     return FileResponse(STATIC / "home.html")
 
 
+@app.get("/case", response_class=HTMLResponse)
+@app.get("/case/{inc_id}", response_class=HTMLResponse)
+def case_story(inc_id: str | None = None):
+    """One case end to end: what Kavach noticed, decided, did, checked, and where people stepped in."""
+    return FileResponse(STATIC / "case.html")
+
+
 @app.get("/classic", response_class=HTMLResponse)
 def classic():
     """The earlier presenter stage (systems map + console), kept as a fallback."""

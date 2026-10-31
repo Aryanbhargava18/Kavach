@@ -179,7 +179,7 @@ function renderCase(inc) {
   const box = $("#case"), st = S.steps[inc.id] || [];
   const [stxt, scls, sdot] = statusOf(inc);
   const top = `<div class="px-6 pt-5 pb-4"><div class="flex items-center gap-2"><span class="text-[12px] font-medium text-ink-3">${esc(KIND[inc.kind] || inc.kind)} · ${esc(inc.id)}</span><span class="ml-auto inline-flex items-center gap-1.5 h-6 px-2.5 rounded-full text-[11.5px] font-semibold ${scls}"><i class="size-1.5 rounded-full ${sdot}"></i>${stxt}</span></div>
-    <h2 class="mt-1.5 text-[21px] leading-tight font-semibold tracking-[-0.02em]">${esc(inc.headline || inc.title || "")}</h2><p class="mt-1 text-[13.5px] text-ink-2">Meena Kirana Store · MEENAKIRANA0417 · Lucknow</p></div>`;
+    <h2 class="mt-1.5 text-[21px] leading-tight font-semibold tracking-[-0.02em]">${esc(inc.headline || inc.title || "")}</h2><a href="/case/${esc(inc.id)}" target="_blank" rel="noopener" class="mt-2 inline-flex items-center gap-1 text-[13px] font-semibold text-navy-2 hover:underline">Open the full case story<i data-lucide="arrow-up-right" class="size-3.5"></i></a><p class="mt-1 text-[13.5px] text-ink-2">Meena Kirana Store · MEENAKIRANA0417 · Lucknow</p></div>`;
   const sig = [inc.id, stxt, inc.headline, JSON.stringify(inc.pending), JSON.stringify(inc.facts), JSON.stringify(inc.recon), (S.followups || []).length, S.world && S.world.settlement_config && S.world.settlement_config.paused].join("|");
   if (box.dataset.sig !== sig) {
     box.dataset.sig = sig;

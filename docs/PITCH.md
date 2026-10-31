@@ -6,6 +6,25 @@
 
 ---
 
+## The brief, and how Kavach answers it
+
+> *"Build AI teammates that don't just respond; they get the job done. How might we build an AI teammate that can independently handle a customer-service workflow end to end: resolving issues, taking actions across systems, and escalating to humans only when needed?"*
+
+Kavach is that teammate for **Paytm's merchant customer service**. Paytm's customer is the merchant, and the most painful service issue a merchant has is money that's stuck.
+
+| The brief asks for | What Kavach does | Where judges can see it |
+|---|---|---|
+| **Goes beyond answering questions** | Starts the work itself, from Paytm's own signals, before the merchant asks | Press 1: nobody typed anything, the case opens at 9:01 |
+| **Understands context** | Reads the payout return, her payments, Risk signals, the police notice and the SOP before acting; answers vague questions ("when will it come?") from her actual records | Case story → "Understood" steps |
+| **Makes decisions** | Decides what's safe: checks Risk before warning, refuses a notice that contradicts the record, picks the right SOP route | Case story → "Decided" steps, with the rule behind each |
+| **Takes actions across systems** | Settlement engine, dispute desk, billing app, refund service, evidence signer, nodal queue, notifications, Soundbox: about 12 systems in one freeze case | Case story → "Systems it worked across" |
+| **Works alongside humans** | Meena decides what's hers; Paytm Risk approves anything that moves money; the bank and police decide the freeze | Case story → "Humans in the loop" |
+| **Escalates only when needed** | Asks a person only when money moves or only a human knows (did you hand over the goods?). Hands to a human queue only if it can't resolve | Case story → "Escalated to a person?" |
+| **Measurable outcomes** | Time to notice, time to tell the merchant, actions taken and re-checked, human decisions needed, unsafe steps blocked, money protected; across 483 simulated cases | Case story → the outcome tiles; Evidence → evaluation results |
+| **End to end** | From the first bounced payout to money back in her account, with follow-ups on its own | Case story: one case, every step, start to finish |
+
+---
+
 ## 1. Who this is for
 
 | Who | Their life today | What Kavach gives them |

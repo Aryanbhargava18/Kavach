@@ -68,6 +68,13 @@ Pick two:
 - **"Fake proof."** Dock **⋯** → *Screenshot ₹4,200, bank says ₹2,400*: it trusts the bank, not the picture.
 - **"Real Paytm."** If staging keys are in `.env`: Dock **⋯** → *Check a real Paytm order*. That's Paytm's actual API, live.
 
+## Show the whole case in one screen (30 s): this is the brief, answered
+On Paytm's desk click **Open the full case story** (or Dock **⋯** → *Case story*). Ideally keep it open on a second screen during the demo; it updates live.
+
+> "This is the one case we just ran, end to end, straight from the engine's log. It noticed at 9:01 before anyone asked, told Meena in 6 seconds, used 12 systems, took 8 actions and re-checked every one, and asked a human only 3 times, only when money moved. Filter by Decided, Acted, Human: every step, who did it, which system it touched."
+
+Point at the tiles while you say the brief's words: **understands context, decides, acts across systems, works with humans, escalates only when needed, measurable outcomes.**
+
 ## 4:25 · The second deadline (20 s): press **2**
 
 > "Freezes aren't the only silent clock. A customer disputes a payment; if nobody replies in time, the money is deducted automatically."
