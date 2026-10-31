@@ -646,3 +646,43 @@ def test_live_check_flow_signs_only_what_paytm_said(monkeypatch):
         w3 = World(); e3 = Engine(w3); return await e3.live_check("ORD-1")
     inc3 = run(nokeys())
     assert "pack" not in inc3.facts and "not set" in inc3.headline
+
+
+def test_english_by_default_hindi_on_request_no_hinglish():
+    import re as _re
+    from app import merchant_view as mv
+    async def go():
+        w = World(); e = Engine(w)
+        w.inject_freeze(freeze_type="total", bounce_next=True)
+        await e.tick((w.next_settlement - w.now).total_seconds() + 60)
+        en, hi = mv.build(w, e), mv.build(w, e, "hi")
+        assert en["shield"]["title"] == "Account frozen" and en["action"]["cta"] == "Yes, keep it safe"
+        assert _re.search(r"[ऀ-ॿ]", hi["shield"]["title"]) and _re.search(r"[ऀ-ॿ]", hi["action"]["cta"])
+        msgs = [m for m in e.chat if m["who"] == "kavach"]
+        assert msgs and all(m.get("hi") and _re.search(r"[ऀ-ॿ]", m["hi"]) for m in msgs)
+        hinglish = _re.compile(r"\b(aapke|aapka|dijiye|kijiye|bhejiye|surakshit|nahi|hai)\b", _re.I)
+        assert not any(hinglish.search(m["text"]) for m in msgs)                 # English text is English
+        assert not hinglish.search(str(en))
+    run(go())
+
+
+def test_ops_return_file_routes_by_reason_idempotent_and_scales():
+    from app import ops
+    text, meta = ops.sample_file(5000)
+    seen = set()
+    r = ops.triage(text, seen, meta["payouts"])
+    s = r["summary"]
+    assert s["opened"] == meta["returns"] and s["not_freezes"] > s["freezes"]          # most returns are NOT freezes
+    meena = next(c for c in r["cases"] if c["merchant_id"] == "MEENAKIRANA0417")
+    assert meena["route"] == "freeze" and meena["message_lang"] == "hi"
+    for c in r["cases"]:
+        if c["guarded"]:
+            assert c["route"] == "risk_edd" and not policy.CASE_DETAIL.search(c["message"])    # P17 per merchant
+        if c["route"] in ("dormant", "bank_details", "kyc_name"):
+            assert not policy.CASE_DETAIL.search(c["message"])                            # no freeze scare for a closed or dormant account
+    again = ops.triage(text, seen, meta["payouts"])
+    assert again["summary"]["opened"] == 0 and again["summary"]["skipped_duplicates"] == meta["returns"]   # idempotent
+    big, bmeta = ops.sample_file(1_000_000)
+    br = ops.triage(big, set(), bmeta["payouts"])
+    assert br["summary"]["opened"] == bmeta["returns"] == 15000 and br["summary"]["ms"] < 5000   # a crore-merchant day is a 15k-row job
+    assert "error" in ops.triage("foo,bar\n1,2\n")

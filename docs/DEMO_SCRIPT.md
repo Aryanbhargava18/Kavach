@@ -14,17 +14,17 @@ One person drives the laptop, one talks, and **the judge holds Meena's phone the
 **Beat 1 · 0:00 · The problem (15 s, idle screen)**
 > "One ₹1,000 UPI sale froze a shop's whole ₹8.26 lakh account for ten months. I4C's own table: about ₹303 crore frozen against ₹29 crore actually disputed. And the shopkeeper finds out last, from a bounced supplier payment. Paytm finds out first, and today nobody acts on that."
 
-Hand over the QR. The judge taps **Main Meena hoon · Shuru karo**. They're holding her Paytm for Business app with **Kavach Shield**: status, today's sales, the clocks Kavach is holding. It's not a chat.
+Hand over the QR. The judge picks **English** or **हिन्दी** (they can switch any time with EN/हि). They're holding her Paytm for Business app with **Kavach Shield**: status, today's sales, the clocks Kavach is holding. It's not a chat.
 
 **Beat 2 · 0:30 · Kavach knows first** (click **Meena's bank freezes her account**)
 - The 9:00 payout bounces. Nobody typed anything. Kavach **checks Paytm Risk before saying a word** (a possible mule would get only a neutral line).
 - **The judge's phone buzzes and speaks Hindi.** The app turns into a case card with a trust line: *Kavach kabhi OTP, PIN ya paise nahi maangta*.
-- Judge taps **Haan, surakshit rakho**. The driver taps **Approve as Paytm Risk**. New sales are now safe with Paytm and never move to another account.
+- Judge taps **Yes, keep it safe**. The driver taps **Approve as Paytm Risk**. New sales are now safe with Paytm and never move to another account.
 
-**Beat 3 · 1:00 · The case builds itself** (judge taps **Bank ka SMS + notice bhejo**)
+**Beat 3 · 1:00 · The case builds itself** (judge taps **Send bank SMS + notice**)
 - Kavach reads the notice, **ignores the instruction hidden in it**, matches the one ₹2,400 payment, signs the pack and drafts Paytm's own SOP 9.5(ii) upload.
 - On the phone: **₹3,10,000 frozen, a sliver of ₹2,400 disputed, 129×.**
-- Judge taps **Request taiyaar karo**, then **Bank ne complaint le li ✓**.
+- Judge taps **Prepare the request**, then **The bank took my complaint ✓**.
 - *Optional, if a judge is curious:* **Signed evidence pack › Verify** on their phone → Valid; tap the edited copy → TAMPERED. Scroll to the bank officer's checklist.
 
 **Beat 4 · 1:45 · Twelve days later** (Run a scenario → **⏩ 12 days later: the bank and the officer act**)
@@ -32,12 +32,12 @@ Hand over the QR. The judge taps **Main Meena hoon · Shuru karo**. They're hold
 - Day 3: the bank files **through the bank desk**, inside the SOP's 7 days, so no escalation letter is needed.
 - Day 12: the officer limits the hold to ₹2,400. **Kavach doesn't take that on trust**: it sends Paytm's ₹1 validation credit, and **CREDITS LAND**.
 - The driver taps **Approve as Paytm Risk** to release.
-- **The judge's phone turns green: "Account phir se chalu."** The held payouts are back in her account. Only the disputed ₹2,400 stays held, and both 90-day dates are on the clocks row.
+- **The judge's phone turns green: "Your account works again."** The held payouts are back in her account. Only the disputed ₹2,400 stays held, and both 90-day dates are on the clocks row.
 > "In Sri Sai Wines, ten months and a High Court. Here the bank and the officer are simulated, so we're not claiming twelve days. What's real is that every step the SOP asks of the merchant and of Paytm was ready on day one, and Kavach checked the money before it moved."
 
 **Beat 5 · 2:25 · What's live on Paytm today, every clock, and the business** (10–15 s each)
 - Run a scenario → **LIVE: check a real Paytm order** → paste your staging Order ID. Kavach calls **Paytm's real Transaction Status API** twice, the UPI tile flips from SIMULATED to **LIVE · Paytm API**, and it signs a pack from Paytm's actual response. "Every tile says whether it's live or simulated. This one is Paytm, right now."
-- Run a scenario → **Chargeback: a reply clock nobody is watching**. The phone shows what's proven (payment, bill) and **what isn't** ("no record can show the goods were handed over"). One question; the judge taps **Haan**; the reply goes in before the deadline. "It owns every clock that silently costs her money."
+- Run a scenario → **Chargeback: a reply clock nobody is watching**. The phone shows what's proven (payment, bill) and **what isn't** ("no record can show the goods were handed over"). One question; the judge taps **Yes, I handed them over**; the reply goes in before the deadline. "It owns every clock that silently costs her money."
 - Say it (no screen): "Priced per verified resolution, sold through Paytm Intelligence. 6.6 verified actions per incident, zero model calls in offline mode, and a shadow-mode rollout that proves it on Paytm's own history before any merchant hears from it."
 
 **Close · 2:50**
@@ -51,7 +51,7 @@ Hand over the QR. The judge taps **Main Meena hoon · Shuru karo**. They're hold
 | "What if the merchant is the mule?" | Run a scenario → **Payout bounces, but Risk has mule signals**: neutral line, Soundbox shows PAYTM TEAM, the right panel becomes Paytm Risk's view |
 | "What about a debit freeze?" | **Debit freeze: her payment to a supplier is refused**: caught from UPI code `YE` on her own payment |
 | "How do you know it works?" | **Results**: 240 money-clock scenarios plus the break-the-guard test |
-| "Couldn't it just lie to win a chargeback?" | P18: the phone's proof list shows the gap; tap **Nahi diya** → honest accept |
+| "Couldn't it just lie to win a chargeback?" | P18: the phone's proof list shows the gap; tap **No, I didn't** → honest accept |
 | "Is any of this real?" | **LIVE: check a real Paytm order**; the SIMULATED/LIVE tag under every tile |
 
 ### If something breaks

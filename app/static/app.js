@@ -46,6 +46,7 @@ const svgI = (k) => `<svg viewBox="0 0 24 24"><path d="${ICON[k] || ICON.switch}
 // ===================================================================== boot + stream
 async function boot() {
   const st = await fetch("/api/state").then((r) => r.json());
+  S.mlang = st.merchant_lang || "en";
   S.world = st.world; S.followups = st.followups || [];
   for (const inc of st.incidents) S.incidents[inc.id] = inc;
   for (const s of st.steps) (S.steps[s.incident] ||= []).push(s);
@@ -62,6 +63,8 @@ async function boot() {
 }
 
 function handle(ev) {
+  if (ev.type === "lang") S.mlang = ev.lang;
+  if (ev.type === "reset") S.mlang = "en";
   if (window.stageOn) { try { stageOn(ev); } catch (e) { console.error(e); } }
   switch (ev.type) {
     case "tool_start": {
@@ -95,7 +98,7 @@ function handle(ev) {
 }
 
 function live(s) {   // side effects only for steps that arrive live (not on replay)
-  if (s.kind === "action" && s.action === "notify_merchant" && s.args && s.args.speak) say(s.args.speak);
+  if (s.kind === "action" && s.action === "notify_merchant" && s.args) { const sp = S.mlang === "hi" ? s.args.speak : (s.args.speak_en || null); if (sp) say(sp); }
   if ((s.kind === "action" && s.action === "schedule_followup") || s.kind === "followup" || (s.kind === "action" && s.action === "resolve_incident")) {
     refreshFollowups(); setTimeout(refreshFollowups, 600);
   }
@@ -606,7 +609,7 @@ function say(text, voice = "kavach") {
   if (!S.sound) { window.stageVoice && stageVoice.silent(text, voice); return; }
   if (window.stageVoice) stageVoice.pending(text, voice);
   if (window.stageSpeak && voice === "kavach") stageSpeak(text);
-  if (S.intg && S.intg.sarvam) { audioQ.push({ src: `/api/tts?voice=${voice}&text=${encodeURIComponent(text)}`, text, voice }); playNext(); return; }
+  if (S.intg && S.intg.sarvam) { audioQ.push({ src: `/api/tts?voice=${voice}&lang=${S.mlang === "hi" || /[\u0900-\u097F]/.test(text) ? "hi-IN" : "en-IN"}&text=${encodeURIComponent(text)}`, text, voice }); playNext(); return; }
   if (!("speechSynthesis" in window)) { window.stageVoice && stageVoice.silent(text, voice); return; }
   const u = new SpeechSynthesisUtterance(text);
   if (window.stageVoice) {
@@ -614,8 +617,9 @@ function say(text, voice = "kavach") {
     u.onboundary = (e) => stageVoice.word(e.charIndex);
     u.onend = u.onerror = () => stageVoice.end();
   }
-  const v = voices.find((x) => x.lang === "hi-IN") || voices.find((x) => x.lang.startsWith("hi"));
-  if (v) u.voice = v; u.lang = "hi-IN";
+  const hi = S.mlang === "hi" || /[\u0900-\u097F]/.test(text);      // the Soundbox speaks the merchant's chosen language
+  const v = hi ? (voices.find((x) => x.lang === "hi-IN") || voices.find((x) => x.lang.startsWith("hi"))) : (voices.find((x) => x.lang === "en-IN") || voices.find((x) => x.lang.startsWith("en")));
+  if (v) u.voice = v; u.lang = hi ? "hi-IN" : "en-IN";
   speechSynthesis.speak(u);
 }
 function unlockAudio() { if ("speechSynthesis" in window && !S.unlocked) { S.unlocked = true; speechSynthesis.speak(new SpeechSynthesisUtterance("")); } }

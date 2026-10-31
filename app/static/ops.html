@@ -1,0 +1,118 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Kavach Ops · Payout returns</title>
+<script src="/static/vendor/tailwind.browser.js"></script>
+<script src="/static/vendor/lucide.min.js"></script>
+<script src="/static/vendor/motion.js"></script>
+<style>
+@font-face { font-family: "Geist"; src: url(/static/vendor/fonts/Geist-Variable.woff2) format("woff2"); font-weight: 100 900; }
+@font-face { font-family: "Anek"; src: url(/static/fonts/anek-devanagari.woff2) format("woff2"); font-weight: 100 800; unicode-range: U+0900-097F; }
+</style>
+<style type="text/tailwindcss">
+@theme {
+  --font-sans: "Geist", "Anek", ui-sans-serif, system-ui, sans-serif;
+  --color-navy: #001B44; --color-navy-2: #002E6E; --color-sky: #00B9F1; --color-page: #F4F6FA; --color-line: #E7ECF3;
+  --color-ink: #0A1628; --color-ink-2: #475569; --color-ink-3: #94A3B8;
+}
+@layer components {
+  .card { @apply bg-white rounded-2xl ring-1 ring-black/[0.05] shadow-[0_1px_2px_rgba(10,22,40,.04),0_8px_24px_-14px_rgba(10,22,40,.15)]; }
+  .eyebrow { @apply text-[11px] font-semibold uppercase tracking-[0.12em] text-ink-3; }
+}
+.num { font-variant-numeric: tabular-nums; }
+</style>
+</head>
+<body class="bg-page text-ink font-sans antialiased min-h-screen">
+<header class="bg-navy text-white">
+  <div class="max-w-[1280px] mx-auto px-6 h-16 flex items-center gap-3">
+    <div class="size-9 rounded-xl bg-gradient-to-br from-sky to-navy-2 grid place-items-center"><i data-lucide="shield-check" class="size-5"></i></div>
+    <div><p class="text-[11px] text-white/60">Paytm Ops · simulated</p><p class="font-semibold leading-tight">Kavach · Payout returns</p></div>
+    <div class="ml-auto flex items-center gap-2">
+      <a href="/" class="h-9 px-3 rounded-lg bg-white/10 hover:bg-white/15 text-[13px] font-medium flex items-center gap-1.5"><i data-lucide="monitor-play" class="size-4"></i>Live stage</a>
+      <a href="/api/ops/sample.csv" class="h-9 px-3 rounded-lg bg-white/10 hover:bg-white/15 text-[13px] font-medium flex items-center gap-1.5"><i data-lucide="download" class="size-4"></i>Sample file</a>
+    </div>
+  </div>
+</header>
+
+<main class="max-w-[1280px] mx-auto px-6 py-6 grid gap-5">
+  <section class="card p-5 flex flex-wrap items-center gap-4">
+    <div class="flex-1 min-w-[260px]">
+      <p class="eyebrow">Today's settlement return file</p>
+      <p class="mt-1 text-[15px] text-ink-2">Every payout a bank refused, with its reason. Kavach routes each one; only frozen accounts become freeze cases.</p>
+    </div>
+    <label class="h-11 px-4 rounded-xl ring-1 ring-line bg-white hover:bg-page text-[14px] font-semibold text-navy-2 flex items-center gap-2 cursor-pointer"><i data-lucide="upload" class="size-4"></i>Upload CSV<input id="file" type="file" accept=".csv,text/csv" hidden></label>
+    <button id="run" class="h-11 px-5 rounded-xl bg-navy-2 text-white text-[14px] font-semibold flex items-center gap-2 shadow-[0_8px_20px_-8px_rgba(0,46,110,.6)]"><i data-lucide="play" class="size-4"></i>Process a day (5,000 payouts)</button>
+  </section>
+
+  <section id="tiles" class="grid grid-cols-2 md:grid-cols-5 gap-3"></section>
+
+  <section class="grid md:grid-cols-[1.2fr_1fr] gap-5">
+    <div class="card p-5"><p class="eyebrow">Routed by return reason</p><div id="routes" class="mt-4 grid gap-3"><p class="text-ink-3 text-[14px]">Process a file to see the routing.</p></div></div>
+    <div class="card p-5"><p class="eyebrow">Alerts queued, by merchant's language</p><div id="langs" class="mt-4 grid gap-2"></div>
+      <p class="mt-4 text-[12px] text-ink-3">English and Hindi ship today; other languages queue with English until their strings are added (same table as the Soundbox's 11 languages).</p></div>
+  </section>
+
+  <section class="card overflow-hidden">
+    <div class="p-5 pb-3 flex flex-wrap items-center gap-3"><p class="eyebrow flex-1">Cases opened</p>
+      <div id="filters" class="flex flex-wrap gap-1.5"></div></div>
+    <div class="overflow-x-auto"><table class="w-full text-[13.5px]"><thead class="bg-page text-ink-3 text-[11px] uppercase tracking-wider"><tr>
+      <th class="text-left font-semibold px-5 py-2.5">Merchant</th><th class="text-left font-semibold px-3 py-2.5">Reason</th><th class="text-right font-semibold px-3 py-2.5">Payout</th>
+      <th class="text-left font-semibold px-3 py-2.5">Kavach's route</th><th class="text-left font-semibold px-3 py-2.5">Message (merchant's language)</th><th class="px-5"></th></tr></thead>
+      <tbody id="rows"></tbody></table></div>
+    <p id="more" class="px-5 py-3 text-[12px] text-ink-3"></p>
+  </section>
+  <p class="text-[12px] text-ink-3 pb-6">Synthetic file and reason codes, modelled on how NEFT/IMPS returns are described. Decisions are deterministic: the same file gives the same routes, and reprocessing opens nothing twice.</p>
+</main>
+
+<script>
+"use strict";
+const $ = (q) => document.querySelector(q);
+const esc = (s) => String(s ?? "").replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+const rs = (n) => "₹" + Number(n || 0).toLocaleString("en-IN");
+const R = { freeze: ["Freeze case", "shield-alert", "bg-rose-50 text-rose-700", "#E11D48"], risk_edd: ["Risk EDD (details withheld)", "eye-off", "bg-slate-100 text-slate-700", "#475569"],
+  dormant: ["Re-KYC nudge (dormant)", "user-round-check", "bg-amber-50 text-amber-700", "#D97706"], bank_details: ["Fix bank details", "landmark", "bg-sky-50 text-sky-700", "#0284C7"],
+  kyc_name: ["Name match via KYC", "id-card", "bg-violet-50 text-violet-700", "#7C3AED"], human: ["Paytm Ops", "user", "bg-slate-100 text-slate-700", "#64748B"] };
+const LN = { hi: "Hindi", en: "English", ta: "Tamil", te: "Telugu", mr: "Marathi", bn: "Bengali", gu: "Gujarati", kn: "Kannada" };
+let DATA = null, FILTER = "all";
+function tiles(s) {
+  const t = [["Payouts in file", s.payouts_in_file ? s.payouts_in_file.toLocaleString("en-IN") : "—", "file-spreadsheet"], ["Returned", s.returns.toLocaleString("en-IN"), "undo-2"],
+    ["Actual freezes", s.freezes, "shield-alert"], ["Not freezes (no scare)", s.not_freezes, "shield-check"], ["Processed in", `${s.ms} ms`, "zap"]];
+  $("#tiles").innerHTML = t.map(([a, b, i]) => `<div class="card p-4"><div class="flex items-center gap-2 text-ink-3 text-[12px]"><i data-lucide="${i}" class="size-4"></i>${a}</div><p class="num mt-2 text-[26px] font-bold tracking-tight">${b}</p></div>`).join("");
+}
+function routes(s) {
+  const total = Object.values(s.by_route).reduce((a, b) => a + b, 0) || 1;
+  $("#routes").innerHTML = Object.entries(s.by_route).sort((a, b) => b[1] - a[1]).map(([k, v]) => { const r = R[k] || [k, "circle", "", "#94A3B8"];
+    return `<div><div class="flex items-center justify-between text-[14px]"><span class="flex items-center gap-2 font-medium"><i data-lucide="${r[1]}" class="size-4"></i>${r[0]}</span><span class="num font-semibold">${v}</span></div>
+      <div class="mt-1.5 h-2 rounded-full bg-page overflow-hidden"><div class="bar h-full rounded-full" style="width:0;background:${r[3]}" data-w="${(v / total) * 100}"></div></div></div>`; }).join("")
+    + `<p class="text-[12.5px] text-ink-2 pt-2 border-t border-line">${s.skipped_duplicates ? `${s.skipped_duplicates} duplicate rows skipped (already opened). ` : ""}${rs(s.amount_held_safe)} held safely with Paytm while merchants fix the cause. ${s.per_return_ms} ms per return.</p>`;
+  const L = Object.entries(s.alerts_by_language).sort((a, b) => b[1] - a[1]);
+  $("#langs").innerHTML = L.map(([k, v]) => `<div class="flex items-center gap-3 text-[14px]"><span class="w-20 text-ink-2">${LN[k] || k}</span><div class="flex-1 h-2 rounded-full bg-page overflow-hidden"><div class="bar h-full rounded-full bg-sky" style="width:0" data-w="${(v / Math.max(...L.map((x) => x[1]))) * 100}"></div></div><span class="num w-8 text-right font-semibold">${v}</span></div>`).join("");
+}
+function table() {
+  const rows = DATA.cases.filter((c) => FILTER === "all" || c.route === FILTER);
+  $("#filters").innerHTML = ["all", ...Object.keys(DATA.summary.by_route)].map((k) => `<button data-f="${k}" class="h-8 px-3 rounded-full text-[12.5px] font-medium ${FILTER === k ? "bg-navy-2 text-white" : "bg-page text-ink-2"}">${k === "all" ? "All" : (R[k] || [k])[0]}</button>`).join("");
+  $("#rows").innerHTML = rows.slice(0, 60).map((c) => { const r = R[c.route] || [c.route, "circle", "bg-slate-100 text-slate-700"]; const meena = c.merchant_id === "MEENAKIRANA0417";
+    return `<tr class="border-t border-line ${meena ? "bg-sky-50/60" : ""}"><td class="px-5 py-3"><p class="font-semibold">${esc(c.merchant_name)}</p><p class="text-[12px] text-ink-3">${esc(c.merchant_id)} · ${esc(c.city)}</p></td>
+      <td class="px-3 py-3 text-ink-2">${esc(c.label)}<p class="text-[11px] text-ink-3 font-mono">${esc(c.return_code)}</p></td><td class="px-3 py-3 text-right num font-semibold">${rs(c.amount)}</td>
+      <td class="px-3 py-3"><span class="inline-flex items-center gap-1.5 h-7 px-2.5 rounded-full text-[12px] font-semibold ${r[2]}"><i data-lucide="${r[1]}" class="size-3.5"></i>${r[0]}</span></td>
+      <td class="px-3 py-3 max-w-[380px]"><p class="text-[12.5px] text-ink-2 line-clamp-2" lang="${c.message_lang || "en"}">${esc(c.message || c.action)}</p><p class="text-[11px] text-ink-3">${LN[c.lang] || c.lang}</p></td>
+      <td class="px-5 py-3 text-right">${meena ? `<a href="/" data-open class="h-8 px-3 rounded-lg bg-navy-2 text-white text-[12px] font-semibold inline-flex items-center gap-1">Open case<i data-lucide="arrow-up-right" class="size-3.5"></i></a>` : ""}</td></tr>`; }).join("");
+  $("#more").textContent = rows.length > 60 ? `Showing 60 of ${rows.length}.` : `${rows.length} cases.`;
+  document.querySelectorAll("[data-f]").forEach((b) => b.onclick = () => { FILTER = b.dataset.f; table(); });
+  document.querySelectorAll("[data-open]").forEach((a) => a.onclick = (e) => { e.preventDefault(); fetch("/api/reset", { method: "POST" }).then(() => fetch("/api/scenario/payout_bounce", { method: "POST", headers: { "content-type": "application/json" }, body: "{}" })).then(() => { location.href = "/"; }); });
+  lucide.createIcons();
+}
+function show(d) {
+  DATA = d; tiles(d.summary); routes(d.summary); table(); lucide.createIcons();
+  document.querySelectorAll(".bar[data-w]").forEach((b) => window.Motion ? Motion.animate(b, { width: ["0%", b.dataset.w + "%"] }, { duration: 0.8, easing: [0.2, 0.8, 0.2, 1] }) : (b.style.width = b.dataset.w + "%"));
+  if (window.Motion) Motion.animate("#tiles > div", { opacity: [0, 1], transform: ["translateY(10px)", "translateY(0px)"] }, { delay: Motion.stagger(0.05), duration: 0.4 });
+}
+async function send(fd) { const r = await fetch("/api/ops/returns", { method: "POST", body: fd }); const d = await r.json(); if (!r.ok) { alert(d.detail || "Could not process the file"); return; } show(d); }
+$("#run").onclick = () => { const fd = new FormData(); fd.append("sample", "true"); fd.append("payouts", "5000"); send(fd); };
+$("#file").onchange = (e) => { const f = e.target.files[0]; if (!f) return; const fd = new FormData(); fd.append("file", f); send(fd); e.target.value = ""; };
+lucide.createIcons();
+</script>
+</body>
+</html>

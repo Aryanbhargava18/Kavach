@@ -32,9 +32,12 @@ state: dict[str, Any] = {}
 def fresh() -> None:
     if state.get("engine"):
         state["engine"].alive = False
+    from .world import MERCHANT
+    MERCHANT["language"] = "en"
     state["world"] = World()
     state["engine"] = Engine(state["world"], bus, pace=PACE, base_url=PUBLIC_URL)
     state["drafts"] = []
+    state["ops_seen"] = set()
     from . import automation, desk
     automation.reset()
     state["desk"] = desk.make_feed(int(os.environ.get("KAVACH_DESK_SEED", "11")))
@@ -96,11 +99,11 @@ def merchant_phone():
 
 
 @app.get("/api/merchant/view")
-def merchant_view():
+def merchant_view(lang: str = "en"):
     """Meena's app as state: status, money map, tracker, next action, documents. Built server-side; P17 applies."""
     from . import merchant_view as mv
     with W().lock:
-        return mv.build(W(), E())
+        return mv.build(W(), E(), lang)
 
 
 @app.get("/api/state")
@@ -109,7 +112,7 @@ def api_state():
     return {"world": W().snapshot(), "incidents": [i.summary() for i in e.incidents.values()], "followups": _followups(),
             "steps": [s for i in e.incidents.values() for s in i.steps], "chat": e.chat, "drafts": state["drafts"],
             "planner": {"mode": e.planner.label, "label": e.planner.label_long}, "ocr": shots.ocr_available(),
-            "fingerprint": proof.fingerprint(), "pace": PACE}
+            "fingerprint": proof.fingerprint(), "pace": PACE, "merchant_lang": W().snapshot()["merchant"].get("language", "en")}
 
 
 def _followups() -> list[dict[str, Any]]:
@@ -128,6 +131,53 @@ async def skip_to_payout():
     await E().tick(secs, background=True)
     bus.publish({"type": "world", "world": W().snapshot()})
     return {"now": W().now.isoformat()}
+
+
+@app.get("/ops", response_class=HTMLResponse)
+def ops_page():
+    """Paytm Ops console: a whole day's settlement return file, triaged by Kavach."""
+    return FileResponse(STATIC / "ops.html")
+
+
+@app.get("/api/ops/sample.csv")
+def ops_sample(payouts: int = 5000):
+    from . import ops
+    text, _ = ops.sample_file(max(100, min(payouts, 2_000_000)))
+    return Response(text, media_type="text/csv", headers={"Content-Disposition": "attachment; filename=settlement_returns_2026-10-31.csv"})
+
+
+@app.post("/api/ops/returns")
+async def ops_returns(file: UploadFile | None = File(None), sample: bool = Form(False), payouts: int = Form(5000)):
+    """Ingest a settlement return file (CSV) or a synthetic day. Idempotent across uploads: a return never opens two cases."""
+    from . import ops
+    if file is not None:
+        raw = await file.read()
+        if len(raw) > 20 * 1024 * 1024:
+            raise HTTPException(413, "file too large")
+        text, n = raw.decode("utf-8", "replace"), None
+    elif sample:
+        text, meta = ops.sample_file(max(100, min(payouts, 2_000_000)))
+        n = meta["payouts"]
+    else:
+        raise HTTPException(400, "send a CSV file or sample=true")
+    res = ops.triage(text, state.setdefault("ops_seen", set()), n)
+    if "error" in res:
+        raise HTTPException(400, res["error"])
+    state["ops_last"] = res
+    return res
+
+
+class Lang(BaseModel):
+    lang: str
+
+
+@app.post("/api/merchant/lang")
+def merchant_lang(l: Lang):
+    """Meena's language lives on her merchant profile, so every channel (app, push, Soundbox) uses it."""
+    from .world import MERCHANT
+    MERCHANT["language"] = "hi" if l.lang == "hi" else "en"
+    bus.publish({"type": "lang", "lang": MERCHANT["language"]})
+    return {"lang": MERCHANT["language"]}
 
 
 class Live(BaseModel):

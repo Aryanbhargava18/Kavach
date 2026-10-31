@@ -72,7 +72,7 @@ def test_clock_starts_only_from_a_dated_event_and_fires_reminders():
         c = inc.facts["clocks"][0]
         assert c["state"] == "running" and c["start"] == w.now.date().isoformat()
         await e.tick(5 * 86400 + 10)
-        assert any("2 din bache" in m["text"] for m in w.outbox)
+        assert any("2 days left" in m["text"] for m in w.outbox)
     run(go())
 
 

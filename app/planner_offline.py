@@ -121,7 +121,7 @@ class OfflinePlanner:
             return await self.duplicate(inc, u)
         if inc.kind == "settlement":
             return await self.settlement(inc)
-        await self.e.act(inc, "notify_merchant", {"text": "Main samjha nahi. Bataiye — customer ka payment, double charge, settlement, ya account freeze?"})
+        await self.e.act(inc, "notify_merchant", {"text": "I didn't catch that. Is it about a customer's payment, a double charge, a payout, or an account freeze?", "hi": "मैं समझ नहीं पाया। ग्राहक का भुगतान, दोहरा कटना, पेआउट, या खाता फ्रीज़ — किस बारे में है?"})
         inc.status = "waiting_merchant"
 
     async def _intake(self, inc, text, u):
@@ -209,8 +209,7 @@ class OfflinePlanner:
             await e.act(inc, "send_customer_update_simulated", {"text": "Thanks. To find your payment, please share the last 4 digits of the UPI Ref No. from your payment app."})
             inc.status = "waiting_customer"
         else:
-            await e.act(inc, "notify_merchant", {"text": f"🔎 {rs(claimed)} ke {len(near)} payment mile: {listing}. Kisi aur customer ka bhi ho sakta hai, isliye main andaza nahi lagaunga. Customer se UPI Ref ke aakhri 4 ank poochkar yahan likhiye.",
-                                                "speak": "ग्राहक से यूपीआई रेफ़रेंस के आख़िरी चार अंक पूछिए।"})
+            await e.act(inc, "notify_merchant", {"text": f"I found {len(near)} payments of {rs(claimed)}: {listing}. One may be another customer's, so I won't guess. Ask the customer for the last 4 digits of their UPI Ref and type them here.", "hi": f"{rs(claimed)} के {len(near)} भुगतान मिले: {listing}। यह किसी और ग्राहक का भी हो सकता है, इसलिए मैं अंदाज़ा नहीं लगाऊँगा। ग्राहक से UPI Ref के आख़िरी 4 अंक पूछकर यहाँ लिखिए।", "speak": "ग्राहक से यूपीआई रेफ़रेंस के आख़िरी चार अंक पूछिए।", "speak_en": "Ask the customer for the last four digits of the UPI reference."})
             inc.status = "waiting_merchant"
         inc.headline = "Asked for the reference number instead of guessing"
 
@@ -319,7 +318,7 @@ class OfflinePlanner:
                                "Posting the switch record into the ledger is allowed, auditable and idempotent on the UTR." if fails else
                                f"The bank says {rs(st['amount'])} SUCCESS but the ledger has no entry for it. Repairing from the switch record."))
         if not bill_id:
-            await e.act(inc, "notify_merchant", {"text": f"{rs(st['amount'])} aaya hai (UPI Ref …{st['utr'][-4:]}), par billing app mein is amount ka koi khula bill nahi mila. Kaunse bill ka hai?"})
+            await e.act(inc, "notify_merchant", {"text": f"{rs(st['amount'])} has arrived (UPI Ref …{st['utr'][-4:]}), but your billing app has no open bill for this amount. Which bill is it for?", "hi": f"{rs(st['amount'])} आ गए हैं (UPI Ref …{st['utr'][-4:]}), पर बिलिंग ऐप में इस रकम का कोई खुला बिल नहीं मिला। यह किस बिल का है?"})
             inc.status = "waiting_merchant"
             return
         r = await e.act(inc, "reconcile_payment", {"utr": st["utr"], "bill_id": bill_id})
@@ -333,9 +332,11 @@ class OfflinePlanner:
         if not any(x["txn_id"] == st["txn_id"] for x in sb["announcements"]):
             await e.act(inc, "replay_soundbox", {"txn_id": st["txn_id"]})
         if inc.facts.get("proactive"):
-            await e.act(inc, "notify_merchant", {"text": f"✅ {self._who(inc)} ka {rs(st['amount'])} aa gaya, par aapke billing app tak Paytm ka message nahi pahuncha (server error ×{len(fails) or 1}). "
-                                                        f"Maine bank record se bill {bill_id} paid kar diya aur dobara check kiya. Aapko kuch nahi karna.",
-                                                "speak": f"{self._who(inc)} के {st['amount']} रुपये आ गए हैं। बिलिंग ऐप में अपडेट नहीं हुआ था, मैंने ठीक कर दिया है।"})
+            await e.act(inc, "notify_merchant", {"text": f"✅ {self._who(inc)}'s {rs(st['amount'])} arrived, but Paytm's update never reached your billing app (server error ×{len(fails) or 1}). "
+                                                        f"I marked bill {bill_id} paid from the bank's record and checked it again. Nothing for you to do.",
+                                                "hi": f"✅ {self._who(inc)} के {rs(st['amount'])} आ गए, पर पेटीएम का संदेश आपके बिलिंग ऐप तक नहीं पहुँचा (सर्वर एरर ×{len(fails) or 1})। मैंने बैंक के रिकॉर्ड से बिल {bill_id} पेड कर दिया और दोबारा जाँचा। आपको कुछ नहीं करना है।",
+                                                "speak": f"{self._who(inc)} के {st['amount']} रुपये आ गए हैं। बिलिंग ऐप में अपडेट नहीं हुआ था, मैंने ठीक कर दिया है।",
+                                                "speak_en": f"{st['amount']} rupees from {self._who(inc)} arrived. Your billing app missed it, and I've fixed it."})
             due = (e.world.next_settlement - e.world.now).total_seconds() + 300
             await e.act(inc, "schedule_followup", {"after_seconds": int(due), "purpose": "Confirm tomorrow's 9:00 payout includes this payment"})
             e.tick_plan(inc, plan[6])
@@ -346,9 +347,10 @@ class OfflinePlanner:
         await e.act(inc, "issue_verified_receipt", {"txn_id": st["txn_id"]})
         await self._tell_customer(inc, f"Hi {self._who(inc)}, Meena Kirana Store has received your {rs(st['amount'])} (UPI Ref {st['utr']}). "
                                        f"Your bill {bill_id} is now marked paid. Sorry for the wait — the shop's billing app had missed the payment update.")
-        await e.act(inc, "notify_merchant", {"text": f"✅ {self._who(inc)} ka {rs(st['amount'])} {hm(st.get('created_at'))} pe hi aa gaya tha, par aapke billing app tak Paytm ka message nahi pahuncha (server error ×{len(fails) or 1}). "
-                                                    f"Maine bank record se bill {bill_id} paid kar diya aur dobara check kiya — dono match karte hain. Saman de dijiye.",
-                                            "speak": f"{st['amount']} रुपये आ गए थे। बिल ठीक कर दिया है। सामान दे दीजिए।"})
+        await e.act(inc, "notify_merchant", {"text": f"✅ {self._who(inc)}'s {rs(st['amount'])} arrived at {hm(st.get('created_at'))}, but Paytm's update never reached your billing app (server error ×{len(fails) or 1}). "
+                                                    f"I marked bill {bill_id} paid from the bank's record and checked both again; they match. You can hand over the goods.",
+                                            "hi": f"✅ {self._who(inc)} के {rs(st['amount'])} {hm(st.get('created_at'))} पर ही आ गए थे, पर पेटीएम का संदेश आपके बिलिंग ऐप तक नहीं पहुँचा। मैंने बैंक के रिकॉर्ड से बिल {bill_id} पेड कर दिया और दोबारा जाँचा — दोनों मेल खाते हैं। सामान दे दीजिए।",
+                                            "speak": f"{st['amount']} रुपये आ गए थे। बिल ठीक कर दिया है। सामान दे दीजिए।", "speak_en": f"{st['amount']} rupees had arrived. The bill is fixed. You can hand over the goods."})
         due = (e.world.next_settlement - e.world.now).total_seconds() + 300
         await e.act(inc, "schedule_followup", {"after_seconds": int(due), "purpose": "Confirm tomorrow's 9:00 payout includes this payment"})
         e.tick_plan(inc, plan[6])
@@ -362,9 +364,7 @@ class OfflinePlanner:
         await self.think(inc, f"This screenshot shows a real payment, but UTR …{st['utr'][-4:]} was already applied to bill {entry['bill_id']} at {hm(entry['at'])}. "
                               "Applying it to this bill as well would count one payment twice.", "warn")
         await e.act(inc, "reconcile_payment", {"utr": st["utr"], "bill_id": bill_id or "?"})
-        await e.act(inc, "notify_merchant", {"text": f"⚠️ Ruk jaiye. Yeh screenshot pehle wale payment ka hai jo {hm(entry['at'])} baje bill {entry['bill_id']} mein lag chuka hai. "
-                                                    f"Bill {bill_id} ke liye koi paisa nahi aaya. Saman abhi mat dijiye; maine customer ko naya QR bhej diya hai.",
-                                            "speak": "रुकिए। यह पुराने पेमेंट का स्क्रीनशॉट है। इस बिल का पैसा नहीं आया।"})
+        await e.act(inc, "notify_merchant", {"text": f"⚠️ Wait. This screenshot is of an earlier payment already used for bill {entry['bill_id']} at {hm(entry['at'])}. " f"No money has come in for bill {bill_id}. Don't hand over the goods yet; I've sent the customer a fresh QR.", "hi": f"⚠️ रुकिए। यह स्क्रीनशॉट पुराने भुगतान का है जो {hm(entry['at'])} बजे बिल {entry['bill_id']} में लग चुका है। बिल {bill_id} के लिए कोई पैसा नहीं आया। अभी सामान मत दीजिए; मैंने ग्राहक को नया QR भेज दिया है।", "speak": "रुकिए। यह पुराने पेमेंट का स्क्रीनशॉट है। इस बिल का पैसा नहीं आया।", "speak_en": "Wait. This screenshot is of an old payment. Nothing has come in for this bill."})
         amt = claimed or st["amount"]
         await e.act(inc, "request_payment", {"amount": amt, "bill_id": bill_id, "claimed_amount": amt, "related_txn_ids": []})
         await self._tell_customer(inc, f"This payment (UPI Ref …{st['utr'][-4:]}) was already used for an earlier purchase today at {hm(entry['at'])}, "
@@ -389,9 +389,10 @@ class OfflinePlanner:
         await e.act(inc, "request_payment", {"amount": st["amount"], "bill_id": bill_id, "claimed_amount": claimed or st["amount"], "related_txn_ids": [st["txn_id"]]})
         await self._tell_customer(inc, f"Your {rs(st['amount'])} reached us after this order's payment QR had expired, so it is being refunded to you automatically "
                                        f"(Ref {r['refund_id']}). To complete this purchase, please pay {rs(st['amount'])} using the QR. We'll confirm here when your refund lands.")
-        await e.act(inc, "notify_merchant", {"text": f"{self._who(inc)} ka {rs(st['amount'])} order expire hone ke baad aaya tha, isliye apne-aap refund ho raha hai ({r['refund_id']}). "
-                                                    f"Bill {bill_id} abhi unpaid hai. Customer ko naya QR diya. Naya payment aate hi saman dijiye.",
-                                            "speak": "पहला पेमेंट रिफंड हो रहा है। नया पेमेंट आते ही सामान दीजिए।"})
+        await e.act(inc, "notify_merchant", {"text": f"{self._who(inc)}'s {rs(st['amount'])} arrived after the order expired, so it's being refunded automatically ({r['refund_id']}). "
+                                                    f"Bill {bill_id} is still unpaid. I've given the customer a fresh QR; hand over the goods once the new payment lands.",
+                                            "hi": f"{self._who(inc)} के {rs(st['amount'])} ऑर्डर की समय-सीमा के बाद आए, इसलिए अपने-आप रिफंड हो रहे हैं ({r['refund_id']})। बिल {bill_id} अभी अनपेड है। ग्राहक को नया QR दिया है; नया भुगतान आते ही सामान दीजिए।",
+                                            "speak": "पहला पेमेंट रिफंड हो रहा है। नया पेमेंट आते ही सामान दीजिए।", "speak_en": "The first payment is being refunded. Hand over the goods once the new payment arrives."})
         await e.act(inc, "schedule_followup", {"after_seconds": 120, "purpose": "Confirm the refund was credited"})
         inc.status = "watching"
         inc.headline = "Late payment is being refunded. Fresh QR sent; refund tracked."
@@ -407,8 +408,9 @@ class OfflinePlanner:
             await e.act(inc, "replay_soundbox", {"txn_id": st["txn_id"]})
         await e.act(inc, "issue_verified_receipt", {"txn_id": st["txn_id"]})
         await self._tell_customer(inc, f"Hi {self._who(inc)}, your {rs(st['amount'])} to Meena Kirana Store is confirmed (UPI Ref {st['utr']}). Thank you!")
-        await e.act(inc, "notify_merchant", {"text": f"✅ {rs(st['amount'])} aapke account mein aa gaya hai (UPI Ref {st['utr']}). Customer ko verified receipt bhej di. Saman de dijiye.",
-                                            "speak": f"{st['amount']} रुपये आ गए हैं। सामान दे दीजिए।"})
+        await e.act(inc, "notify_merchant", {"text": f"✅ {rs(st['amount'])} is in your account (UPI Ref {st['utr']}). I've sent the customer a verified receipt. You can hand over the goods.",
+                                            "hi": f"✅ {rs(st['amount'])} आपके खाते में आ गए हैं (UPI Ref {st['utr']})। ग्राहक को सत्यापित रसीद भेज दी। सामान दे दीजिए।",
+                                            "speak": f"{st['amount']} रुपये आ गए हैं। सामान दे दीजिए।", "speak_en": f"{st['amount']} rupees received. You can hand over the goods."})
         await self._close(inc, st["txn_id"], "SUCCESS", f"Payment of {rs(st['amount'])} confirmed and receipted")
         inc.money = {"amount": st["amount"], "label": "confirmed with the bank, not the screenshot"}
 
@@ -417,8 +419,9 @@ class OfflinePlanner:
         due = claimed - st["amount"]
         e.tick_plan(inc, inc.plan[5]["text"])
         await self.think(inc, f"Only {rs(st['amount'])} reached the switch. Handing over {rs(claimed)} of goods on this screenshot would lose {rs(due)}.", "warn")
-        await e.act(inc, "notify_merchant", {"text": f"⚠️ Ruk jaiye. Sirf {rs(st['amount'])} aaya hai. Screenshot pe {rs(claimed)} dikh raha hai, par bank record (UPI Ref {st['utr']}) mein {rs(st['amount'])} hai. Baaki {rs(due)} milne tak saman mat dijiye. Maine customer ko baaki rakam ka QR bhej diya hai.",
-                                            "speak": f"रुकिए। सिर्फ {st['amount']} रुपये आए हैं। बाकी {due} रुपये मिलने तक सामान मत दीजिए।"})
+        await e.act(inc, "notify_merchant", {"text": f"⚠️ Wait. Only {rs(st['amount'])} has arrived. The screenshot shows {rs(claimed)}, but the bank record (UPI Ref {st['utr']}) says {rs(st['amount'])}. Hold the goods until the remaining {rs(due)} arrives. I've sent the customer a QR for it.",
+                                            "hi": f"⚠️ रुकिए। सिर्फ़ {rs(st['amount'])} आए हैं। स्क्रीनशॉट पर {rs(claimed)} दिख रहा है, पर बैंक रिकॉर्ड (UPI Ref {st['utr']}) में {rs(st['amount'])} है। बाकी {rs(due)} मिलने तक सामान मत दीजिए। मैंने ग्राहक को बाकी रकम का QR भेज दिया है।",
+                                            "speak": f"रुकिए। सिर्फ {st['amount']} रुपये आए हैं। बाकी {due} रुपये मिलने तक सामान मत दीजिए।", "speak_en": f"Wait. Only {st['amount']} rupees arrived. Hold the goods until the remaining {due} rupees come in."})
         await e.act(inc, "request_payment", {"amount": due, "bill_id": inc.facts.get("bill_id"), "claimed_amount": claimed, "related_txn_ids": [st["txn_id"]]})
         await self._tell_customer(inc, f"We have received {rs(st['amount'])} from you (UPI Ref {st['utr']}). {rs(due)} is still due for this purchase; you can pay it with the QR.")
         await self._close(inc, st["txn_id"], "SUCCESS", f"Short payment: {rs(st['amount'])} received, {rs(due)} requested; goods held")
@@ -431,8 +434,7 @@ class OfflinePlanner:
                                              "claimed_amount": claimed or st["amount"], "related_txn_ids": [st["txn_id"]]})
         e.set_plan(inc, [p["text"] for p in inc.plan[:5]] + ["Block re-collection while pending", "Watch the switch and follow up"])
         e.tick_plan(inc, "Block re-collection while pending")
-        await e.act(inc, "notify_merchant", {"text": f"⏳ {rs(st['amount'])} customer ke bank mein atka hai (PENDING). Dobara payment mat lijiye — warna customer ka paisa do baar katega. Main switch par nazar rakh raha hoon, confirm hote hi bataunga.",
-                                            "speak": "पैसा बैंक में अटका है। दोबारा पेमेंट मत लीजिए। मैं नज़र रख रहा हूँ।"})
+        await e.act(inc, "notify_merchant", {"text": f"⏳ {rs(st['amount'])} is stuck at the customer's bank (PENDING). Don't take the payment again, or the customer will be charged twice. I'm watching it and will tell you the moment it confirms.", "hi": f"⏳ {rs(st['amount'])} ग्राहक के बैंक में अटके हैं (PENDING)। दोबारा भुगतान मत लीजिए, वरना ग्राहक का पैसा दो बार कटेगा। मैं नज़र रख रहा हूँ, पुष्टि होते ही बताऊँगा।", "speak": "पैसा बैंक में अटका है। दोबारा पेमेंट मत लीजिए। मैं नज़र रख रहा हूँ।", "speak_en": "The money is stuck at the bank. Don't take the payment again. I'm watching it."})
         await self._tell_customer(inc, f"Your payment of {rs(st['amount'])} to Meena Kirana Store is pending with your bank. Please don't pay again — "
                                        "Kavach is watching it and will confirm here as soon as your bank does.")
         await e.act(inc, "schedule_followup", {"after_seconds": 45, "purpose": "Re-check payment status at the switch"})
@@ -446,10 +448,12 @@ class OfflinePlanner:
         e.tick_plan(inc, inc.plan[5]["text"])
         debited = st.get("debited")
         r = await e.act(inc, "request_payment", {"amount": st["amount"], "bill_id": inc.facts.get("bill_id"), "claimed_amount": st["amount"], "related_txn_ids": [st["txn_id"]]})
-        msg = (f"❌ Yeh payment FAIL ho gaya. Customer ka kata hua paisa unke bank se apne-aap wapas aayega (T+1). "
-               if debited else "❌ Yeh payment bank ne decline kar diya — paisa kata hi nahi. ")
-        msg += "Ab naya payment lena safe hai; maine customer ko QR bhej diya." if r["status"] == "DONE" else ""
-        await e.act(inc, "notify_merchant", {"text": msg, "speak": "पेमेंट फेल हो गया। अब नया पेमेंट लेना सुरक्षित है।"})
+        msg = (f"❌ This payment FAILED. Any money taken from the customer goes back to them automatically (T+1). "
+               if debited else "❌ The bank declined this payment; no money was taken. ")
+        msg += "It's safe to take a new payment; I've sent the customer a QR." if r["status"] == "DONE" else ""
+        msg_hi = ("❌ यह भुगतान फ़ेल हो गया। ग्राहक का कटा हुआ पैसा उनके बैंक से अपने-आप वापस आएगा (T+1)। " if debited else "❌ बैंक ने यह भुगतान अस्वीकार कर दिया; पैसा कटा ही नहीं। ")
+        msg_hi += "अब नया भुगतान लेना सुरक्षित है; मैंने ग्राहक को QR भेज दिया है।" if r["status"] == "DONE" else ""
+        await e.act(inc, "notify_merchant", {"text": msg, "hi": msg_hi, "speak": "पेमेंट फेल हो गया। अब नया पेमेंट लेना सुरक्षित है।", "speak_en": "The payment failed. It's safe to take a new one."})
         await self._tell_customer(inc, f"Your payment of {rs(st['amount'])} to Meena Kirana Store did not go through." +
                                   (" Any amount debited will be reversed by your bank automatically (T+1)." if debited else "") +
                                   " You can pay again safely with the QR.")
@@ -459,8 +463,9 @@ class OfflinePlanner:
     async def _not_received(self, inc, claimed, utr):
         e = self.e
         e.tick_plan(inc, inc.plan[5]["text"])
-        await e.act(inc, "notify_merchant", {"text": f"❌ Is UPI Ref No ({utr or 'not given'}) ka koi payment aapke account mein nahi aaya. Saman abhi mat dijiye. Customer se kahiye apne app ki history dekhein; agar unka paisa kata hai to apne bank se baat karein.",
-                                            "speak": "यह पेमेंट आपके खाते में नहीं आया। सामान अभी मत दीजिए।"})
+        await e.act(inc, "notify_merchant", {"text": f"❌ No payment with UPI Ref {utr or '(not given)'} reached your account. Don't hand over the goods yet. Ask the customer to check their app history; if money left their account, they should contact their bank.",
+                                            "hi": f"❌ इस UPI Ref ({utr or 'नहीं दिया'}) का कोई भुगतान आपके खाते में नहीं आया। अभी सामान मत दीजिए। ग्राहक से कहिए अपने ऐप की हिस्ट्री देखें; अगर पैसा कटा है तो अपने बैंक से बात करें।",
+                                            "speak": "यह पेमेंट आपके खाते में नहीं आया। सामान अभी मत दीजिए।", "speak_en": "This payment did not reach your account. Don't hand over the goods yet."})
         await self._tell_customer(inc, f"We could not find a payment to Meena Kirana Store with UPI Ref {utr or '(not provided)'}. If money left your account, please contact your bank with this reference.")
         again = await e.call(inc, "lookup_transaction", {"utr": utr, "minutes_back": 120} if utr else {"amount": claimed, "minutes_back": 15})
         inc.outcome_verified = not again["matches"]
@@ -474,8 +479,7 @@ class OfflinePlanner:
     async def _wrong_payee(self, inc, claim):
         e = self.e
         e.tick_plan(inc, inc.plan[5]["text"])
-        await e.act(inc, "notify_merchant", {"text": f"❌ Customer ne galat QR/UPI ID pe pay kiya hai — screenshot mein '{claim.get('payee_name')}' hai, aap nahi. Aapke account mein kuch nahi aaya. Saman abhi mat dijiye.",
-                                            "speak": "ग्राहक ने गलत खाते में पैसे भेजे हैं। आपके खाते में कुछ नहीं आया।"})
+        await e.act(inc, "notify_merchant", {"text": f"❌ The customer paid a different QR/UPI ID: the screenshot shows '{claim.get('payee_name')}', not you. Nothing reached your account. Don't hand over the goods yet.", "hi": f"❌ ग्राहक ने गलत QR/UPI ID पर भुगतान किया है — स्क्रीनशॉट में '{claim.get('payee_name')}' है, आप नहीं। आपके खाते में कुछ नहीं आया। अभी सामान मत दीजिए।", "speak": "ग्राहक ने गलत खाते में पैसे भेजे हैं। आपके खाते में कुछ नहीं आया।", "speak_en": "The customer paid someone else. Nothing reached your account."})
         await self._tell_customer(inc, f"Your payment went to a different merchant ({claim.get('payee_name')}), not Meena Kirana Store. Please contact that merchant or your bank with the UPI reference.")
         inc.outcome_verified = True
         await e.step(inc, "verify", action="final re-check", ok=True, check="Switch shows no payment to this merchant with that reference")
@@ -501,8 +505,7 @@ class OfflinePlanner:
         r = await e.act(inc, "request_payment", {"amount": inc.facts.get("claimed") or 0, "bill_id": inc.facts.get("bill_id"),
                                                   "claimed_amount": inc.facts.get("claimed"), "related_txn_ids": [txn] if txn else []})
         if r["status"] == "DENIED":
-            await e.act(inc, "notify_merchant", {"text": "🙏 Abhi dobara payment nahi mangwa sakta: " + r["decision"]["reason"] + " Main check kar raha hoon.",
-                                                "speak": "अभी दोबारा पेमेंट नहीं ले सकते। मैं जाँच कर रहा हूँ।"})
+            await e.act(inc, "notify_merchant", {"text": "🙏 I can't ask for the payment again right now: " + r["decision"]["reason"] + " I'm checking.", "hi": "🙏 अभी दोबारा भुगतान नहीं माँग सकता: ग्राहक का पैसा दो बार कट सकता है। मैं जाँच कर रहा हूँ।", "speak": "अभी दोबारा पेमेंट नहीं ले सकते। मैं जाँच कर रहा हूँ।", "speak_en": "We can't take the payment again right now. I'm checking."})
 
     # -------------------------------------------------------- duplicate
     async def duplicate(self, inc, u):
@@ -511,7 +514,7 @@ class OfflinePlanner:
         plan = [f"Find every {rs(amt)} payment in the last 30 min", "Check whether the same payer paid twice", "Refund only the duplicate, once", "Confirm the refund actually landed"]
         e.set_plan(inc, plan)
         if not amt:
-            await e.act(inc, "notify_merchant", {"text": "Kitne rupaye do baar kate? Amount bataiye."})
+            await e.act(inc, "notify_merchant", {"text": "How much was charged twice? Tell me the amount.", "hi": "कितने रुपये दो बार कटे? रकम बताइए।"})
             inc.status = "waiting_merchant"
             return
         await e.act(inc, "create_support_case", {"summary": f"Charged twice: {rs(amt)}", "channel": inc.channel})
@@ -522,7 +525,7 @@ class OfflinePlanner:
         if not dup:
             await e.step(inc, "evidence", stamp="NOT A DUPLICATE", title="Same amount, same payer?", tone="good", verdict="Different people paid the same amount — not a duplicate",
                          rows=[{"field": "Payers", "claim": "same person, twice", "truth": ", ".join(g["payer"] for g in r["groups"]) or "none", "match": False}])
-            await e.act(inc, "notify_merchant", {"text": f"Yeh duplicate nahi hai: {rs(amt)} do alag logon ne diya. Refund nahi karunga.", "speak": "यह डुप्लिकेट नहीं है।"})
+            await e.act(inc, "notify_merchant", {"text": f"This isn't a duplicate: two different people each paid {rs(amt)}. I won't refund it.", "hi": f"यह डुप्लिकेट नहीं है: {rs(amt)} दो अलग लोगों ने दिए। मैं रिफंड नहीं करूँगा।", "speak": "यह डुप्लिकेट नहीं है।", "speak_en": "This is not a duplicate."})
             inc.outcome_verified = True
             inc.headline = "Two different customers. No refund."
             await e.act(inc, "resolve_incident", {"outcome": "Not a duplicate; no refund"})
@@ -539,14 +542,15 @@ class OfflinePlanner:
         e.tick_plan(inc, plan[1])
         res = await e.act(inc, "initiate_refund", {"txn_id": t2["txn_id"], "amount": amt})
         if res["status"] == "NEEDS_APPROVAL":
-            await e.act(inc, "notify_merchant", {"text": f"Customer ({g['payer']}) ne {rs(amt)} do baar pay kiya, {g['gap_seconds']} second ke andar. Doosra payment refund kar doon?",
-                                                "speak": f"ग्राहक ने {amt} रुपये दो बार दिए। दूसरा पेमेंट वापस कर दूँ?", "extra": {"approval": inc.id}})
+            await e.act(inc, "notify_merchant", {"text": f"The customer ({g['payer']}) paid {rs(amt)} twice, {g['gap_seconds']} seconds apart. Shall I refund the second payment?",
+                                                "hi": f"ग्राहक ({g['payer']}) ने {rs(amt)} दो बार दिए, {g['gap_seconds']} सेकंड के अंदर। दूसरा भुगतान वापस कर दूँ?",
+                                                "speak": f"ग्राहक ने {amt} रुपये दो बार दिए। दूसरा पेमेंट वापस कर दूँ?", "speak_en": f"The customer paid {amt} rupees twice. Shall I refund the second payment?", "extra": {"approval": inc.id}})
             if inc.channel == "whatsapp":
                 await self._tell_customer(inc, f"Thanks — we can see two payments of {rs(amt)} from you, {g['gap_seconds']} seconds apart. The shop is approving a refund of the second one now.")
             inc.headline = "Waiting for your OK to refund"
             return
         if res["status"] == "DENIED":
-            await e.act(inc, "notify_merchant", {"text": "Refund nahi kiya: " + res["decision"]["reason"]})
+            await e.act(inc, "notify_merchant", {"text": "Refund not made: " + res["decision"]["reason"], "hi": "रिफंड नहीं किया: यह साबित डुप्लिकेट नहीं है।"})
             inc.headline = "Refund refused: " + res["decision"]["reason"].split(".")[0]
             inc.outcome_verified = True
             await e.act(inc, "resolve_incident", {"outcome": "Refund refused by policy"})
@@ -585,7 +589,7 @@ class OfflinePlanner:
         e.tick_plan(inc, plan[0])
         b = (r.get("batches") or [None])[0]
         if not b:
-            await e.act(inc, "notify_merchant", {"text": "Kal ka koi settlement batch nahi mila. Main Paytm Support ko de raha hoon."})
+            await e.act(inc, "notify_merchant", {"text": "I couldn't find yesterday's payout batch. I'm handing this to Paytm Support.", "hi": "कल का कोई पेआउट बैच नहीं मिला। मैं इसे पेटीएम सपोर्ट को दे रहा हूँ।"})
             await e.act(inc, "escalate_to_human", {"queue": "Paytm Support", "summary": "No settlement batch for yesterday"})
             inc.status = "with_human"
             return
@@ -593,8 +597,7 @@ class OfflinePlanner:
             await e.step(inc, "evidence", stamp="PAID OUT", title="Payout trail", tone="good", verdict="Payout reached the bank",
                          rows=[{"field": "Batch", "claim": "missing", "truth": f"{b['batch_id']} {rs(b['amount'])}", "match": False},
                                {"field": "Bank UTR", "claim": "—", "truth": b["bank_utr"], "match": True}])
-            await e.act(inc, "notify_merchant", {"text": f"Kal ka {rs(b['amount'])} aapke bank mein {str(b['credited_at'])[11:16]} baje aa chuka hai. Passbook mein UTR {b['bank_utr']} dekhiye.",
-                                                "speak": "कल का पैसा आपके बैंक में आ चुका है।"})
+            await e.act(inc, "notify_merchant", {"text": f"Yesterday's {rs(b['amount'])} reached your bank at {str(b['credited_at'])[11:16]}. Look for UTR {b['bank_utr']} in your passbook.", "hi": f"कल के {rs(b['amount'])} आपके बैंक में {str(b['credited_at'])[11:16]} बजे आ चुके हैं। पासबुक में UTR {b['bank_utr']} देखिए।", "speak": "कल का पैसा आपके बैंक में आ चुका है।", "speak_en": "Yesterday's money has reached your bank."})
             inc.outcome_verified = True
             inc.headline = "The payout reached the bank."
             await e.act(inc, "resolve_incident", {"outcome": f"Payout {b['batch_id']} credited; UTR shared"})
@@ -615,15 +618,22 @@ class OfflinePlanner:
             await self.think(inc, "Paytm only sees this because the bank also refused credits. A debit-only freeze would stay invisible to Paytm: payouts would keep landing. "
                                   "So this watcher catches some freezes early, not all of them.", "info")
             await e.act(inc, "notify_merchant", {
-                "text": (f"⚠️ Meena ji, aaj subah ka {rs(b['amount'])} payout aapke bank ne wapas bhej diya. Bank ke hisaab se aapka account FREEZE hai. "
-                         "Shayad aapko abhi pata nahi chala. Supplier ko payment karne se pehle bank se baat kar lijiye.\n"
-                         "Main freeze hata nahi sakta, par case taiyaar kar sakta hoon. Branch se yeh teen cheezein maangiye:\n"
-                         "1) NCRP acknowledgement number\n2) Police ka notice ya requisition\n3) Kitni rakam disputed hai\n"
-                         "Bank ka SMS ya notice aaye to yahan bhejiye."),
-                "speak": "मीना जी, आपके बैंक ने आज का पेआउट वापस भेज दिया। खाता फ्रीज़ है। सप्लायर को पेमेंट करने से पहले बैंक से बात कीजिए।"})
+                "text": (f"⚠️ Meena ji, your bank sent back this morning's {rs(b['amount'])} payout. It says your account is FROZEN. "
+                         "You may not know yet. Talk to your bank before you pay any supplier.\n"
+                         "I can't lift a freeze, but I can build your case. Ask your branch for three things:\n"
+                         "1) The NCRP acknowledgement number\n2) The police notice or requisition\n3) How much is disputed\n"
+                         "Send me the bank's SMS or notice when you get it."),
+                "hi": (f"⚠️ मीना जी, आपके बैंक ने आज सुबह का {rs(b['amount'])} का पेआउट वापस भेज दिया। बैंक के अनुसार आपका खाता फ्रीज़ है। "
+                       "शायद आपको अभी पता नहीं चला। सप्लायर को भुगतान करने से पहले बैंक से बात कर लीजिए।\n"
+                       "मैं फ्रीज़ हटा नहीं सकता, पर आपका केस तैयार कर सकता हूँ। शाखा से ये तीन चीज़ें माँगिए:\n"
+                       "1) NCRP पावती नंबर\n2) पुलिस का नोटिस या अनुरोध-पत्र\n3) कितनी रकम विवादित है\n"
+                       "बैंक का SMS या नोटिस आए तो यहाँ भेजिए।"),
+                "speak": "मीना जी, आपके बैंक ने आज का पेआउट वापस भेज दिया। खाता फ्रीज़ है। सप्लायर को पेमेंट करने से पहले बैंक से बात कीजिए।",
+                "speak_en": "Meena ji, your bank returned today's payout. Your account is frozen. Talk to your bank before paying any supplier."})
         else:
-            await e.act(inc, "notify_merchant", {"text": f"⚠️ Kal ka {rs(b['amount'])} aapke bank ne wapas bhej diya — bank ke hisaab se aapka account FREEZE hai. Main freeze hata nahi sakta, par aapka case taiyaar kar sakta hoon. Bank ka SMS ya police notice yahan bhejiye.",
-                                                "speak": "आपका बैंक खाता फ्रीज़ है। बैंक का SMS या पुलिस नोटिस भेजिए।"})
+            await e.act(inc, "notify_merchant", {"text": f"⚠️ Your bank sent back yesterday's {rs(b['amount'])}: it says your account is FROZEN. I can't lift a freeze, but I can build your case. Send me the bank's SMS or the police notice.",
+                                                "hi": f"⚠️ कल के {rs(b['amount'])} आपके बैंक ने वापस भेज दिए — बैंक के अनुसार आपका खाता फ्रीज़ है। मैं फ्रीज़ हटा नहीं सकता, पर आपका केस तैयार कर सकता हूँ। बैंक का SMS या पुलिस नोटिस यहाँ भेजिए।",
+                                                "speak": "आपका बैंक खाता फ्रीज़ है। बैंक का SMS या पुलिस नोटिस भेजिए।", "speak_en": "Your bank account is frozen. Send me the bank's SMS or the police notice."})
         inc.money = {"amount": b["amount"], "label": "payout bounced, safe with Paytm"}
         await self._propose_hold(inc)
 
@@ -648,7 +658,7 @@ class OfflinePlanner:
         if r["status"] != "SUCCESS":
             await e.step(inc, "evidence", stamp=r["status"], title="Paytm, live", tone="bad" if r["status"] == "FAILED" else "warn",
                          verdict=f"Paytm says {r['status']}: {r.get('result_msg') or ''}", rows=[{"field": "Status", "claim": "—", "truth": r["status"], "match": False}])
-            await e.act(inc, "notify_merchant", {"text": f"Paytm ke record mein order {order_id}: {r['status']} ({r.get('result_msg') or ''}). Saman dene se pehle ruk jaiye."})
+            await e.act(inc, "notify_merchant", {"text": f"Paytm's record for order {order_id}: {r['status']} ({r.get('result_msg') or ''}). Hold the goods for now.", "hi": f"पेटीएम के रिकॉर्ड में ऑर्डर {order_id}: {r['status']}। सामान देने से पहले रुकिए।"})
             inc.status, inc.headline = "with_human", f"Paytm says {r['status']}. Nothing receipted."
             return
         again = await e.call(inc, "paytm_order_status", {"order_id": order_id})
@@ -667,8 +677,9 @@ class OfflinePlanner:
         res = await e.act(inc, "issue_live_pack", {"order_id": order_id})
         e.tick_plan(inc, plan[2])
         pack = (res.get("result") or {})
-        await e.act(inc, "notify_merchant", {"text": f"✅ Paytm ne khud confirm kiya: order {order_id}, ₹{r['amount_text']} SUCCESS (bank ref {r.get('bank_txn_id') or '—'}). Signed pack taiyaar.",
-                                            "speak": "पेटीएम ने पुष्टि की, भुगतान सफल है।", "extra": {"pack": pack.get("token"), "verify_url": pack.get("verify_url")}})
+        await e.act(inc, "notify_merchant", {"text": f"✅ Paytm itself confirmed it: order {order_id}, ₹{r['amount_text']} SUCCESS (bank ref {r.get('bank_txn_id') or '—'}). Your signed pack is ready.",
+                                            "hi": f"✅ पेटीएम ने ख़ुद पुष्टि की: ऑर्डर {order_id}, ₹{r['amount_text']} सफल (बैंक रेफ़ {r.get('bank_txn_id') or '—'})। हस्ताक्षरित पैक तैयार है।",
+                                            "speak": "पेटीएम ने पुष्टि की, भुगतान सफल है।", "speak_en": "Paytm confirmed it. The payment was successful.", "extra": {"pack": pack.get("token"), "verify_url": pack.get("verify_url")}})
         e.tick_plan(inc, plan[3])
         inc.outcome_verified = True
         inc.money = {"amount": r.get("amount"), "label": "confirmed by Paytm's live API"}
@@ -679,9 +690,9 @@ class OfflinePlanner:
     async def proactive_dispute(self, inc, d):
         """A chargeback landed. If nobody replies by the deadline, it is deemed valid and netted from her payout."""
         e = self.e
-        due = hm(d["respond_by"])
+        due = due_en = hm(d["respond_by"])
         if datetime.fromisoformat(d["respond_by"]).date() != e.world.now.date():
-            due = "kal " + due
+            due, due_en = "कल " + due, "tomorrow " + due_en
         plan = ["Notice the chargeback", "Gather what Paytm's records prove", "Say what they don't prove", "Ask Meena one question", "Reply before the deadline", "Watch the outcome"]
         e.set_plan(inc, plan)
         await e.step(inc, "intake", text=f"Dispute desk: chargeback {d['dispute_id']} on {rs(d['amount'])} · \"{d['reason']}\" · reply by {due} or it is deemed valid",
@@ -720,10 +731,13 @@ class OfflinePlanner:
         res = await e.act(inc, "submit_dispute_response", {"dispute_id": d["dispute_id"], "evidence": ev, "merchant_attests_handover": True})
         if res["status"] == "NEEDS_APPROVAL":
             await e.act(inc, "notify_merchant", {
-                "text": (f"⏱️ {rs(d['amount'])} ka chargeback aaya hai: customer ke bank ka kehna hai \"{d['reason']}\" (bill {inc.facts.get('bill_id', '')}). "
-                         f"{due} tak jawab nahi diya to yeh paisa aapke agle payout se kat jayega.\n"
-                         "Payment aur bill ka saboot mere paas hai. Sirf ek baat aap bata sakti hain: kya aapne saman diya tha?"),
-                "speak": f"{d['amount']} रुपये का चार्जबैक आया है। क्या आपने सामान दिया था?", "extra": {"approval": inc.id}})
+                "text": (f"⏱️ A {rs(d['amount'])} chargeback has come in: the customer's bank says \"{d['reason']}\" (bill {inc.facts.get('bill_id', '')}). "
+                         f"If nobody replies by {due_en}, it comes out of your next payout.\n"
+                         "I have proof of the payment and the bill. Only you can answer one thing: did you hand over the goods?"),
+                "hi": (f"⏱️ {rs(d['amount'])} का चार्जबैक आया है: ग्राहक के बैंक का कहना है \"सामान नहीं मिला\" (बिल {inc.facts.get('bill_id', '')})। "
+                       f"{due} तक जवाब नहीं दिया तो यह पैसा आपके अगले पेआउट से कट जाएगा।\n"
+                       "भुगतान और बिल का सबूत मेरे पास है। सिर्फ़ एक बात आप बता सकती हैं: क्या आपने सामान दिया था?"),
+                "speak": f"{d['amount']} रुपये का चार्जबैक आया है। क्या आपने सामान दिया था?", "speak_en": f"A {d['amount']} rupee chargeback has come in. Did you hand over the goods?", "extra": {"approval": inc.id}})
             e.tick_plan(inc, plan[3])
             await e.act(inc, "schedule_followup", {"after_seconds": max(600, int((datetime.fromisoformat(d["respond_by"]) - e.world.now).total_seconds()) - 6 * 3600),
                                                   "purpose": "Remind Meena: chargeback reply due in 6 hours"})
@@ -739,8 +753,7 @@ class OfflinePlanner:
         inc.approvals.setdefault("accept_chargeback", set()).add("merchant")
         d = inc.facts["dispute_id"]
         await e.act(inc, "accept_chargeback", {"dispute_id": d})
-        await e.act(inc, "notify_merchant", {"text": "Theek hai. Chargeback maan liya, customer ko paisa wapas jayega. Galat jawab dena aapke liye aur nuksaan karta.",
-                                            "speak": "ठीक है, चार्जबैक मान लिया।"})
+        await e.act(inc, "notify_merchant", {"text": "Okay. I've accepted the chargeback; the customer gets the money back. A false reply would have hurt you more.", "hi": "ठीक है। चार्जबैक मान लिया, ग्राहक को पैसा वापस जाएगा। गलत जवाब देना आपके लिए और नुकसानदेह होता।", "speak": "ठीक है, चार्जबैक मान लिया।", "speak_en": "Okay. I've accepted the chargeback."})
         inc.outcome_verified = True
         inc.headline = "Chargeback accepted honestly on Meena's word."
         await e.act(inc, "resolve_incident", {"outcome": f"{d} accepted: merchant says goods were not handed over"})
@@ -756,8 +769,7 @@ class OfflinePlanner:
         names = " and ".join(x["detail"] for x in r["signals"][:2])
         await self.think(inc, f"Stopping before I tell her anything. Paytm Risk holds {r['independent']} independent signals: {names}. "
                               "Case details could tip off a mule operator. That's not a verdict on her; it's a decision for a human.", "warn")
-        await e.act(inc, "notify_merchant", {"text": "Namaste Meena ji, aapke payout mein ek rukawat aayi hai. Paytm ki team jald aapse baat karegi. Tab tak aapka paisa Paytm ke paas surakshit hai.",
-                                            "template": "legal_neutral"})
+        await e.act(inc, "notify_merchant", {"text": "Namaste Meena ji, there's a delay with your payout. The Paytm team will contact you soon. Until then your money is safe with Paytm.", "hi": "नमस्ते मीना जी, आपके पेआउट में थोड़ी देरी है। पेटीएम की टीम जल्द आपसे बात करेगी। तब तक आपका पैसा पेटीएम के पास सुरक्षित है।", "template": "legal_neutral"})
         await e.act(inc, "escalate_to_human", {"queue": "Paytm Risk (EDD)", "summary": "Bounced payout on a merchant with 2 independent Risk signals; details withheld from merchant (P17)"})
         inc.status = "with_human"
         inc.headline = "Possible mule pattern. Details withheld; Paytm Risk decides."
@@ -786,10 +798,15 @@ class OfflinePlanner:
         if await self._risk_guarded(inc):
             return
         await e.act(inc, "notify_merchant", {
-            "text": (f"⚠️ Meena ji, {p['payee']} ko aapka {rs(p['amount'])} ka payment aapke bank ne rok diya (code {p['code']}): bank ke hisaab se account se paisa nikalna band hai, yaani DEBIT FREEZE. "
-                     "Paytm ke payouts abhi bhi us account mein ja rahe hain, jahan se aap nikal nahi sakti.\n"
-                     "Branch se yeh teen cheezein maangiye:\n1) NCRP acknowledgement number\n2) Police ka notice ya requisition\n3) Kitni rakam disputed hai\n"
-                     "Bank ka SMS ya notice aaye to yahan bhejiye."),
+            "text": (f"⚠️ Meena ji, your bank stopped your {rs(p['amount'])} payment to {p['payee']} (code {p['code']}): money can't leave your account. That's a DEBIT FREEZE. "
+                     "Paytm's payouts are still landing in that account, where you can't use them.\n"
+                     "Ask your branch for three things:\n1) The NCRP acknowledgement number\n2) The police notice or requisition\n3) How much is disputed\n"
+                     "Send me the bank's SMS or notice when you get it."),
+            "hi": (f"⚠️ मीना जी, {p['payee']} को आपका {rs(p['amount'])} का भुगतान आपके बैंक ने रोक दिया (कोड {p['code']}): खाते से पैसा निकालना बंद है, यानी डेबिट फ्रीज़। "
+                   "पेटीएम के पेआउट अभी भी उसी खाते में जा रहे हैं, जहाँ से आप निकाल नहीं सकतीं।\n"
+                   "शाखा से ये तीन चीज़ें माँगिए:\n1) NCRP पावती नंबर\n2) पुलिस का नोटिस या अनुरोध-पत्र\n3) कितनी रकम विवादित है\n"
+                   "बैंक का SMS या नोटिस आए तो यहाँ भेजिए।"),
+            "speak_en": "Meena ji, your bank stopped your payment. Money can't leave your account. Ask your branch for the notice and the disputed amount.",
             "speak": "मीना जी, आपके बैंक ने आपका भुगतान रोक दिया। खाते से पैसा निकालना बंद है। शाखा से नोटिस और विवादित रकम पूछिए।"})
         inc.money = {"amount": b.get("amount") or 0, "label": "would land next in an account she can't use"}
         await self._propose_hold(inc, debit=True)
@@ -802,8 +819,7 @@ class OfflinePlanner:
         res = await e.act(inc, "draft_lien_request", {"reason": "Notice names one disputed payment; the whole account is frozen"})
         if res["status"] == "NEEDS_APPROVAL":
             amt = rs((inc.money or {}).get("amount"))
-            await e.act(inc, "notify_merchant", {"text": f"Ek aur kadam: bank ko aapke naam se likhit request bana doon ki hold sirf {amt} (vivadit rakam) tak rakhein, aur baaki account chalu karein? Aap padh kar hi bhejengi.",
-                                                "speak": "बैंक को चिट्ठी बना दूँ कि रोक सिर्फ विवादित रकम तक रहे?", "extra": {"approval": inc.id}})
+            await e.act(inc, "notify_merchant", {"text": f"One more step: shall I write to your bank, in your name, asking them to hold only {amt} (the disputed amount) and free the rest of your account? You'll read it before it goes.", "hi": f"एक और कदम: बैंक को आपके नाम से लिखित अनुरोध बना दूँ कि रोक सिर्फ़ {amt} (विवादित रकम) तक रहे, और बाकी खाता चालू हो? आप पढ़कर ही भेजेंगी।", "speak": "बैंक को चिट्ठी बना दूँ कि रोक सिर्फ विवादित रकम तक रहे?", "speak_en": "Shall I write to your bank asking them to hold only the disputed amount?", "extra": {"approval": inc.id}})
             inc.headline = "Signed pack ready. Lien-limiting request waiting for Meena's OK."
 
     async def _freeze_plan(self, inc, first: str = "Confirm why payouts bounce"):
@@ -818,9 +834,11 @@ class OfflinePlanner:
             return
         res = await e.act(inc, "request_settlement_hold", {"reason": "Bank returns credits as frozen; keep payouts in the Paytm settlement balance"})
         if res["status"] == "NEEDS_APPROVAL" and "merchant" in res["approvers"]:
-            why = "warna woh us account mein jayega jisse aap nikal nahi sakti" if debit else "bank use wapas bhej raha hai"
-            await e.act(inc, "notify_merchant", {"text": f"Jab tak freeze ka hal nahi hota, aaj ki sale ka paisa Paytm ke paas surakshit rakhun? ({why}.) Kisi doosre account mein nahi jayega. Paytm Risk bhi approve karega.",
-                                                "speak": "आज की बिक्री का पैसा पेटीएम के पास सुरक्षित रखूँ?", "extra": {"approval": inc.id}})
+            why_en = "otherwise it lands in an account you can't withdraw from" if debit else "your bank is sending it back"
+            why_hi = "वरना वह उस खाते में जाएगा जहाँ से आप निकाल नहीं सकतीं" if debit else "बैंक उसे वापस भेज रहा है"
+            await e.act(inc, "notify_merchant", {"text": f"Until the freeze is sorted, shall I keep today's sales safe with Paytm? ({why_en}.) Nothing goes to any other account. Paytm Risk approves too.",
+                                                "hi": f"जब तक फ्रीज़ का हल नहीं होता, आज की बिक्री का पैसा पेटीएम के पास सुरक्षित रखूँ? ({why_hi}।) किसी दूसरे खाते में नहीं जाएगा। पेटीएम रिस्क भी मंज़ूरी देगा।",
+                                                "speak": "आज की बिक्री का पैसा पेटीएम के पास सुरक्षित रखूँ?", "speak_en": "Shall I keep today's sales safe with Paytm?", "extra": {"approval": inc.id}})
         inc.headline = "Waiting for approvals to hold payouts"
 
     async def freeze_report(self, inc, u):
@@ -828,7 +846,7 @@ class OfflinePlanner:
         if u.get("amount") and u["amount"] >= 10000:
             inc.facts["locked_stated"] = u["amount"]
         if inc.plan and inc.plan[0]["text"] == "Confirm why payouts bounce":
-            await e.act(inc, "notify_merchant", {"text": "Samajh gaya. Bank ka SMS ya police notice bhejiye, main aage badhta hoon."})
+            await e.act(inc, "notify_merchant", {"text": "Understood. Send me the bank's SMS or the police notice and I'll take it from there.", "hi": "समझ गया। बैंक का SMS या पुलिस नोटिस भेजिए, मैं आगे बढ़ता हूँ।"})
             return
         await self._freeze_plan(inc, first="Check what Paytm can see")
         r = await e.call(inc, "get_bank_signal", {})
@@ -840,8 +858,9 @@ class OfflinePlanner:
             await self.think(inc, f"Paytm can't see a debit freeze: yesterday's payout ({b.get('batch_id', '—')}) still SETTLED into her account. "
                                   "Credits keep landing; she just can't take money out. So I'll go on her report and the notice, and I won't claim more than that.", "warn")
         e.tick_plan(inc, "Check what Paytm can see")
-        await e.act(inc, "notify_merchant", {"text": "Samajh gaya. Main freeze hata nahi sakta — woh bank aur police ka faisla hai — par aapka case pakka bana sakta hoon. Bank ka SMS ya police notice yahan bhejiye.",
-                                            "speak": "बैंक का SMS या पुलिस नोटिस भेजिए।"})
+        await e.act(inc, "notify_merchant", {"text": "Understood. I can't lift a freeze (that's for the bank and the police to decide), but I can build a solid case. Send me the bank's SMS or the police notice.",
+                                            "hi": "समझ गया। मैं फ्रीज़ हटा नहीं सकता — वह बैंक और पुलिस का फ़ैसला है — पर आपका केस पक्का बना सकता हूँ। बैंक का SMS या पुलिस नोटिस यहाँ भेजिए।",
+                                            "speak": "बैंक का SMS या पुलिस नोटिस भेजिए।", "speak_en": "Send me the bank's SMS or the police notice."})
         await self._propose_hold(inc, debit=not r["last_return"])
         if not inc.pending:
             inc.status = "waiting_merchant"
@@ -862,7 +881,7 @@ class OfflinePlanner:
             await self.think(inc, f"{c['check']}: {'pass' if c['pass'] else 'FAIL'}. {c['note']}", "info" if c["pass"] else "warn")
         inc.facts.update({"notice": f, "action_kind": p["action_kind"]})
         if p["action_kind"] == "unknown":
-            await e.act(inc, "notify_merchant", {"text": "Is notice mein hold/freeze/seizure ka zikr nahi hai. Main ise galat SOP raste se nahi bhejunga — Paytm Support dekhega."})
+            await e.act(inc, "notify_merchant", {"text": "This notice doesn't mention a hold, freeze or seizure. I won't send it down the wrong SOP route; Paytm Support will look at it.", "hi": "इस नोटिस में रोक, फ्रीज़ या ज़ब्ती का ज़िक्र नहीं है। मैं इसे गलत SOP रास्ते से नहीं भेजूँगा — पेटीएम सपोर्ट देखेगा।"})
             await e.act(inc, "escalate_to_human", {"queue": "Paytm Support", "summary": "Out-of-scope notice"})
             inc.status = "with_human"
             return
@@ -873,7 +892,7 @@ class OfflinePlanner:
                          rows=[{"field": "UTR", "claim": utr or "—", "truth": "not in Paytm records", "match": False}])
             inc.decisive = {"label": "Decisive evidence", "text": f"UTR {utr} is not a Paytm payment"}
             await e.act(inc, "generate_evidence_pack", {"utr": utr or "", "notice_amount": f.get("amount")})
-            await e.act(inc, "notify_merchant", {"text": "Notice wala payment Paytm se nahi aaya tha, isliye main Paytm record ke naam pe koi pack nahi banaunga. Bank branch mein likhit shikayat dijiye aur dated acknowledgement lijiye — main checklist bhej raha hoon."})
+            await e.act(inc, "notify_merchant", {"text": "The payment in the notice didn't come through Paytm, so I won't build a pack in Paytm's name. File a written complaint at your branch and get a dated acknowledgement; I'm sending you a checklist.", "hi": "नोटिस वाला भुगतान पेटीएम से नहीं आया था, इसलिए मैं पेटीएम रिकॉर्ड के नाम पर कोई पैक नहीं बनाऊँगा। बैंक शाखा में लिखित शिकायत दीजिए और तारीख़ वाली पावती लीजिए — मैं चेकलिस्ट भेज रहा हूँ।"})
             await e.act(inc, "escalate_to_human", {"queue": "Paytm Support", "summary": "Freeze notice for a non-Paytm payment"})
             inc.status = "with_human"
             inc.headline = "Not a Paytm payment. Honest checklist only."
@@ -894,8 +913,9 @@ class OfflinePlanner:
         if conflict:
             inc.decisive = {"label": "Decisive evidence", "text": f"Notice says {rs(f.get('amount'))}; Paytm record for UTR {utr} says {rs(st['amount'])}"}
             await e.act(inc, "generate_evidence_pack", {"utr": utr, "notice_amount": f.get("amount")})
-            await e.act(inc, "notify_merchant", {"text": f"⚠️ Notice mein {rs(f.get('amount'))} likha hai, par Paytm record mein usi UTR ka payment {rs(st['amount'])} hai. Galat tathyon wala pack bank ko dena aapko nuksaan karega. Bank se notice ki sahi copy maangiye; main Paytm Risk ko bhi bata raha hoon.",
-                                                "speak": "नोटिस और पेटीएम रिकॉर्ड में रकम अलग है। मैं गलत पैक नहीं बनाऊँगा।"})
+            await e.act(inc, "notify_merchant", {"text": f"⚠️ The notice says {rs(f.get('amount'))}, but Paytm's record for that UTR says {rs(st['amount'])}. A pack with wrong facts would hurt you at the bank. Ask the bank for a correct copy of the notice; I'm telling Paytm Risk too.",
+                                                "hi": f"⚠️ नोटिस में {rs(f.get('amount'))} लिखा है, पर पेटीएम रिकॉर्ड में उसी UTR का भुगतान {rs(st['amount'])} है। गलत तथ्यों वाला पैक बैंक को देना आपको नुकसान करेगा। बैंक से नोटिस की सही कॉपी माँगिए; मैं पेटीएम रिस्क को भी बता रहा हूँ।",
+                                                "speak": "नोटिस और पेटीएम रिकॉर्ड में रकम अलग है। मैं गलत पैक नहीं बनाऊँगा।", "speak_en": "The notice and Paytm's record show different amounts. I won't build a wrong pack."})
             await e.act(inc, "escalate_to_human", {"queue": "Paytm Risk", "summary": f"Notice/record amount conflict on UTR {utr}"})
             inc.status = "with_human"
             inc.headline = "Stopped: notice contradicts the record"
@@ -923,10 +943,13 @@ class OfflinePlanner:
         await e.call(inc, "get_sop_clocks", {"hold_date": f.get("hold_date")})
         pack = res.get("result", {})
         await e.act(inc, "notify_merchant", {
-            "text": (f"📄 Aapka case taiyaar hai. Notice sirf ek {rs(st['amount'])} ke payment ka hai — woh ek normal sale thi jo {st['created_at'][:10]} ko aapke bank mein settle hui.\n"
-                     "Agla kadam (SOP ke hisaab se, aap hi kar sakti hain):\n1) Bank branch mein likhit shikayat dijiye\n2) Yeh signed pack dikhaiye\n3) Dated acknowledgement zaroor lijiye — wahi se bank ka 7 din ka clock chalta hai.\n"
-                     "Koi bhi 'complaint wapas' karwane ke paise maange to mat dijiye."),
-            "speak": "आपका केस तैयार है। बैंक शाखा में लिखित शिकायत दीजिए और तारीख वाली पावती ज़रूर लीजिए।",
+            "text": (f"📄 Your case is ready. The notice is about one {rs(st['amount'])} payment, a normal sale that settled to your bank on {st['created_at'][:10]}.\n"
+                     "Next (under the SOP, only you can do this):\n1) File a written complaint at your branch\n2) Show them this signed pack\n3) Get a dated acknowledgement; the bank's 7-day clock starts from it.\n"
+                     "If anyone asks for money to 'withdraw the complaint', don't pay."),
+            "hi": (f"📄 आपका केस तैयार है। नोटिस सिर्फ़ एक {rs(st['amount'])} के भुगतान का है — वह एक सामान्य बिक्री थी जो {st['created_at'][:10]} को आपके बैंक में सेटल हुई।\n"
+                   "अगला कदम (SOP के अनुसार, सिर्फ़ आप कर सकती हैं):\n1) बैंक शाखा में लिखित शिकायत दीजिए\n2) यह हस्ताक्षरित पैक दिखाइए\n3) तारीख़ वाली पावती ज़रूर लीजिए — वहीं से बैंक के 7 दिन गिने जाते हैं।\n"
+                   "कोई 'शिकायत वापस' करवाने के पैसे माँगे तो मत दीजिए।"),
+            "speak": "आपका केस तैयार है। बैंक शाखा में लिखित शिकायत दीजिए और तारीख वाली पावती ज़रूर लीजिए।", "speak_en": "Your case is ready. File a written complaint at your branch and get a dated acknowledgement.",
             "extra": {"pack": pack.get("token"), "verify_url": pack.get("verify_url")}})
         await e.act(inc, "schedule_followup", {"after_seconds": 86400, "purpose": "Ask for the bank's dated acknowledgement (starts the 7-day clock)"})
         e.tick_plan(inc, "Hand over a branch kit and track the clock")
@@ -939,8 +962,7 @@ class OfflinePlanner:
     async def scam(self, inc, u):
         e = self.e
         await self.think(inc, "Demand for money to 'withdraw a complaint'. Nothing in the SOP grievance route involves paying anyone. This matches a known extortion pattern on frozen merchants.", "warn")
-        await e.act(inc, "notify_merchant", {"text": f"🛑 Mat dijiye. Freeze hatane ya complaint wapas karwane ke liye SOP mein kisi ko paise dene ka koi kadam nahi hai. Call ka number note kijiye aur 1930 / cybercrime.gov.in pe report kijiye. Maine Paytm Risk ko bata diya hai.",
-                                            "speak": "पैसे मत दीजिए। उन्नीस सौ तीस पर रिपोर्ट कीजिए।"})
+        await e.act(inc, "notify_merchant", {"text": f"🛑 Don't pay. Nothing in the SOP involves paying anyone to lift a freeze or withdraw a complaint. Note the caller's number and report it on 1930 or cybercrime.gov.in. I've told Paytm Risk.", "hi": "🛑 पैसे मत दीजिए। फ्रीज़ हटाने या शिकायत वापस करवाने के लिए SOP में किसी को पैसे देने का कोई कदम नहीं है। कॉल का नंबर नोट कीजिए और 1930 / cybercrime.gov.in पर रिपोर्ट कीजिए। मैंने पेटीएम रिस्क को बता दिया है।", "speak": "पैसे मत दीजिए। उन्नीस सौ तीस पर रिपोर्ट कीजिए।", "speak_en": "Don't pay. Report it on nineteen thirty."})
         await e.act(inc, "escalate_to_human", {"queue": "Paytm Risk", "summary": f"Merchant reports extortion call demanding {rs(u.get('amount'))}"})
         if inc.kind == "scam":
             inc.outcome_verified = True
@@ -952,20 +974,22 @@ class OfflinePlanner:
         await self.think(inc, "Merchant wants payouts sent to a different account. Checking policy.")
         r = await e.act(inc, "change_settlement_account", {"new_account": "merchant's other account"})
         if r["status"] == "DENIED":
-            await e.act(inc, "notify_merchant", {"text": "🙏 Yeh main nahi karunga. Aapka account cyber-cell freeze mein hai; freeze ke beech paisa doosre account mein bhejna kanoon se bachne jaisa lag sakta hai aur aapka case kharab kar sakta hai. Aapka paisa Paytm ke paas surakshit hai. Paytm Risk ka ek vyakti aapse baat karega.",
-                                                "speak": "यह मैं नहीं करूँगा। आपका पैसा पेटीएम के पास सुरक्षित है।"})
+            await e.act(inc, "notify_merchant", {"text": "🙏 I won't do that. Your account is under a cyber-cell freeze; moving money to another account now could look like evading the law and hurt your case. Your money is safe with Paytm. Someone from Paytm Risk will call you.",
+                                                "hi": "🙏 यह मैं नहीं करूँगा। आपका खाता साइबर-सेल फ्रीज़ में है; फ्रीज़ के बीच पैसा दूसरे खाते में भेजना कानून से बचने जैसा लग सकता है और आपका केस बिगाड़ सकता है। आपका पैसा पेटीएम के पास सुरक्षित है। पेटीएम रिस्क से कोई आपसे बात करेगा।",
+                                                "speak": "यह मैं नहीं करूँगा। आपका पैसा पेटीएम के पास सुरक्षित है।", "speak_en": "I won't do that. Your money is safe with Paytm."})
             await e.act(inc, "escalate_to_human", {"queue": "Paytm Risk", "summary": "Merchant asked to re-route payouts during an active freeze"})
         else:
-            await e.act(inc, "notify_merchant", {"text": "Account badalne ke liye Paytm Ops verification karega."})
+            await e.act(inc, "notify_merchant", {"text": "Paytm Ops will verify before any account change.", "hi": "खाता बदलने के लिए पेटीएम ऑप्स सत्यापन करेगा।"})
             inc.status = "waiting_approval"
 
     async def status(self, inc):
         live = [i for i in self.e.incidents.values() if i.status not in ("resolved", "refused") and i.id != inc.id]
         if not live:
-            text = "Abhi koi khula case nahi hai."
+            text, hi = "No open cases right now.", "अभी कोई खुला केस नहीं है।"
         else:
-            text = "Khule case: " + "; ".join(f"{i.title} — {i.headline or i.status}" for i in live)
-        await self.e.act(inc, "notify_merchant", {"text": text})
+            text = "Open cases: " + "; ".join(f"{i.title} — {i.headline or i.status}" for i in live)
+            hi = f"खुले केस: {len(live)}"
+        await self.e.act(inc, "notify_merchant", {"text": text, "hi": hi})
         inc.outcome_verified = True
         await self.e.act(inc, "resolve_incident", {"outcome": "Status shared"})
 
@@ -973,8 +997,7 @@ class OfflinePlanner:
         e = self.e
         r = await e.call(inc, "ask_sop", {"question": q})
         cites = ", ".join(f"para {c['id']}" for c in r["citations"])
-        await e.act(inc, "notify_merchant", {"text": f"📘 {r['answer']}\n\n(Source: MHA/I4C SOP, {cites}. Hamara saar hai; asli PDF dekh sakte hain.)",
-                                            "speak": None, "extra": {"citations": r["citations"]}})
+        await e.act(inc, "notify_merchant", {"text": f"📘 {r['answer']}\n\n(Source: MHA/I4C SOP, {cites}. Our summary; you can read the original PDF.)", "speak": None, "extra": {"citations": r["citations"]}})
         if inc.kind == "question":
             inc.outcome_verified = True
             inc.headline = "Answered from the SOP, with citations."
@@ -983,7 +1006,7 @@ class OfflinePlanner:
     async def bank_ack(self, inc):
         e = self.e
         if inc.kind != "freeze":
-            await e.act(inc, "notify_merchant", {"text": "Kis shikayat ka acknowledgement? Pehle freeze ka case shuru kijiye."})
+            await e.act(inc, "notify_merchant", {"text": "Acknowledgement for which complaint? Start a freeze case first.", "hi": "किस शिकायत की पावती? पहले फ्रीज़ का केस शुरू कीजिए।"})
             inc.status = "waiting_merchant"
             return
         today = e.world.now.date().isoformat()
@@ -998,9 +1021,10 @@ class OfflinePlanner:
         due = c["clocks"][0]["due"]
         await e.act(inc, "schedule_followup", {"after_seconds": 5 * 86400, "purpose": "Day 5: remind Meena, the bank has 2 days left"})
         await e.act(inc, "schedule_followup", {"after_seconds": 7 * 86400 + 60, "purpose": "Day 7: bank deadline, check and prepare an escalation letter"})
-        await e.act(inc, "notify_merchant", {"text": f"⏱️ Bank ka 7 din ka clock aaj se shuru: {due} tak bank ko aapki shikayat aage bhejni hai (SOP 10.1(a)). "
-                                                    "Main 5ve aur 7ve din khud check karunga. 90 din ki do alag tareekhein bhi dikha raha hoon, kyunki SOP mein dono likhi hain.",
-                                            "speak": "बैंक का सात दिन का समय आज से शुरू। मैं खुद याद दिलाऊँगा।"})
+        await e.act(inc, "notify_merchant", {"text": f"⏱️ The bank's 7-day clock starts today: it must forward your complaint by {due} (SOP 10.1(a)). "
+                                                    "I'll check on day 5 and day 7 myself. I'm also showing both 90-day dates, because the SOP mentions both.",
+                                            "hi": f"⏱️ बैंक के 7 दिन आज से शुरू: {due} तक बैंक को आपकी शिकायत आगे भेजनी है (SOP 10.1(a))। मैं 5वें और 7वें दिन ख़ुद जाँचूँगा। 90 दिन की दोनों तारीख़ें भी दिखा रहा हूँ, क्योंकि SOP में दोनों लिखी हैं।",
+                                            "speak": "बैंक का सात दिन का समय आज से शुरू। मैं खुद याद दिलाऊँगा।", "speak_en": "The bank's seven days start today. I'll remind you myself."})
         inc.status = "watching"
         inc.headline = f"Bank's 7-day clock running. Due {due}."
 
@@ -1012,14 +1036,13 @@ class OfflinePlanner:
         if action == "initiate_refund":
             await self._after_refund(inc)
         elif action == "draft_escalation":
-            await e.act(inc, "notify_merchant", {"text": "✅ Chitthi taiyaar. Branch mein de dijiye ya email kar dijiye; signed pack saath mein hai. Main aage bhi nazar rakhunga."})
+            await e.act(inc, "notify_merchant", {"text": "✅ Letter ready. Hand it in at the branch or email it; the signed pack goes with it. I'll keep watching.", "hi": "✅ चिट्ठी तैयार। शाखा में दे दीजिए या ईमेल कर दीजिए; हस्ताक्षरित पैक साथ में है। मैं आगे भी नज़र रखूँगा।"})
             inc.headline = "Escalation letter signed off by Meena."
             inc.status = "with_human"
         elif action == "release_settlement_hold":
             rel = inc.facts.get("released", {})
             lien = (inc.facts.get("case_events", {}).get("io_decision") or {}).get("lien")
-            await e.act(inc, "notify_merchant", {"text": f"🎉 Aapka account phir se chalu hai. Paytm ke paas ruka {rs(rel.get('released'))} aapke account mein bhej diya. Sirf {rs(lien)} police case tak ruka rahega.",
-                                                "speak": "आपका खाता फिर से चालू है। रुका हुआ पैसा आपके खाते में भेज दिया।"})
+            await e.act(inc, "notify_merchant", {"text": f"🎉 Your account is working again. I've sent the {rs(rel.get('released'))} Paytm was holding to your account. Only {rs(lien)} stays held for the police case.", "hi": f"🎉 आपका खाता फिर से चालू है। पेटीएम के पास रुके {rs(rel.get('released'))} आपके खाते में भेज दिए। सिर्फ़ {rs(lien)} पुलिस केस तक रुके रहेंगे।", "speak": "आपका खाता फिर से चालू है। रुका हुआ पैसा आपके खाते में भेज दिया।", "speak_en": "Your account is working again. Your held money has been sent to your account."})
             await e.act(inc, "schedule_followup", {"after_seconds": 76 * 86400, "purpose": "90-day review: both SOP anchors for the remaining hold"})
             for p in inc.plan:
                 p["state"] = "done"
@@ -1033,22 +1056,20 @@ class OfflinePlanner:
             dd = next(x for x in e.world.disputes if x["dispute_id"] == inc.facts["dispute_id"])
             left = datetime.fromisoformat(dd["respond_by"]) - e.world.now
             e.tick_plan(inc, "Ask Meena one question"); e.tick_plan(inc, "Reply before the deadline")
-            await e.act(inc, "notify_merchant", {"text": f"✅ Jawab chala gaya, deadline se {int(left.total_seconds() // 3600)} ghante pehle: payment ka record, bill, aur aapki baat (aapke naam se). Faisla aate hi bataunga.",
-                                                "speak": "जवाब चला गया। फैसला आते ही बताऊँगा।"})
+            await e.act(inc, "notify_merchant", {"text": f"✅ Reply sent, {int(left.total_seconds() // 3600)} hours before the deadline: the payment record, the bill, and your statement (in your name). I'll tell you as soon as there's a decision.", "hi": f"✅ जवाब चला गया, समय-सीमा से {int(left.total_seconds() // 3600)} घंटे पहले: भुगतान का रिकॉर्ड, बिल, और आपकी बात (आपके नाम से)। फ़ैसला आते ही बताऊँगा।", "speak": "जवाब चला गया। फैसला आते ही बताऊँगा।", "speak_en": "Reply sent. I'll tell you when there's a decision."})
             await e.act(inc, "schedule_followup", {"after_seconds": 8 * 3600, "purpose": "Check the chargeback outcome"})
             inc.status = "watching"
             inc.headline = f"Replied {int(left.total_seconds() // 3600)} h before the deadline. Watching the outcome."
         elif action == "draft_lien_request":
             L = inc.facts.get("lien_request", {})
-            await e.act(inc, "notify_merchant", {"text": f"✅ Request taiyaar: hold sirf {L.get('disputed_text', '')} tak. Ise signed pack ke saath branch mein dijiye aur dated acknowledgement lijiye.",
-                                                "speak": "चिट्ठी तैयार है। शाखा में पैक के साथ दीजिए और तारीख वाली पावती लीजिए।"})
+            await e.act(inc, "notify_merchant", {"text": f"✅ Request ready: hold only {L.get('disputed_text', '')}. Take it to your branch with the signed pack and get a dated acknowledgement.", "hi": f"✅ अनुरोध तैयार: रोक सिर्फ़ {L.get('disputed_text', '')} तक। इसे हस्ताक्षरित पैक के साथ शाखा में दीजिए और तारीख़ वाली पावती लीजिए।", "speak": "चिट्ठी तैयार है। शाखा में पैक के साथ दीजिए और तारीख वाली पावती लीजिए।", "speak_en": "Your request is ready. Take it to the branch with the pack and get a dated acknowledgement."})
             inc.headline = "Pack and lien-limiting request ready for the branch."
             inc.status = "with_human"
         elif action == "request_settlement_hold":
             e.tick_plan(inc, "Protect new sales (two-key hold)")
-            await e.act(inc, "notify_merchant", {"text": "✅ Ab se aapke payouts Paytm settlement balance mein surakshit rahenge. Kisi doosre account mein kuch nahi gaya." +
-                                                ("" if "disputed_txn" in inc.facts else " Notice bhejiye to aage badhte hain."),
-                                                "speak": "आपके पैसे पेटीएम के पास सुरक्षित हैं।"})
+            await e.act(inc, "notify_merchant", {"text": "✅ From now on your payouts stay safe in your Paytm settlement balance. Nothing went to any other account." + ("" if "disputed_txn" in inc.facts else " Send the notice and we'll take the next step."),
+                                                "hi": "✅ अब से आपके पेआउट पेटीएम सेटलमेंट बैलेंस में सुरक्षित रहेंगे। किसी दूसरे खाते में कुछ नहीं गया।" + ("" if "disputed_txn" in inc.facts else " नोटिस भेजिए तो आगे बढ़ते हैं।"),
+                                                "speak": "आपके पैसे पेटीएम के पास सुरक्षित हैं।", "speak_en": "Your money is safe with Paytm."})
             inc.status = "waiting_merchant" if "disputed_txn" not in inc.facts else "with_human"
             inc.headline = "Payouts held safely. Waiting for the notice." if "disputed_txn" not in inc.facts else inc.headline
             await self._propose_lien(inc)
@@ -1056,8 +1077,9 @@ class OfflinePlanner:
     async def followup(self, inc, purpose):
         e = self.e
         if purpose.startswith("Remind Meena: chargeback"):
-            await e.act(inc, "notify_merchant", {"text": f"⏱️ Yaad dilana: {rs(inc.money.get('amount'))} ke chargeback ka jawab 6 ghante mein dena hai. Kya aapne saman diya tha?",
-                                                "speak": "चार्जबैक का जवाब छह घंटे में देना है।", "extra": {"approval": inc.id}})
+            await e.act(inc, "notify_merchant", {"text": f"⏱️ Reminder: the reply to the {rs(inc.money.get('amount'))} chargeback is due in 6 hours. Did you hand over the goods?",
+                                                "hi": f"⏱️ याद दिलाना: {rs(inc.money.get('amount'))} के चार्जबैक का जवाब 6 घंटे में देना है। क्या आपने सामान दिया था?",
+                                                "speak": "चार्जबैक का जवाब छह घंटे में देना है।", "speak_en": "The chargeback reply is due in six hours.", "extra": {"approval": inc.id}})
             return
         if purpose.startswith("Check the chargeback outcome"):
             r = await e.call(inc, "get_disputes", {})
@@ -1069,8 +1091,9 @@ class OfflinePlanner:
             await e.step(inc, "evidence", stamp="KEPT" if won else dd["status"], title="Follow-up: dispute desk re-checked", tone="good" if won else "bad",
                          verdict=f"{rs(dd['amount'])} stays with Meena" if won else f"Decided for the payer ({dd['status']})",
                          rows=[{"field": "Decision", "claim": "replied in time", "truth": dd["status"], "match": won}])
-            await e.act(inc, "notify_merchant", {"text": f"✅ Chargeback jeet gaye: {rs(dd['amount'])} aapka hi raha." if won else f"Chargeback ka faisla customer ke haq mein gaya. Kavach ne waqt par jawab diya tha.",
-                                                "speak": "चार्जबैक जीत गए, पैसा आपका रहा।" if won else None})
+            await e.act(inc, "notify_merchant", {"text": f"✅ Chargeback won: the {rs(dd['amount'])} stays yours." if won else "The chargeback was decided for the customer. Kavach had replied on time.",
+                                                "hi": f"✅ चार्जबैक जीत गए: {rs(dd['amount'])} आपके ही रहे।" if won else "चार्जबैक का फ़ैसला ग्राहक के पक्ष में गया। कवच ने समय पर जवाब दिया था।",
+                                                "speak": "चार्जबैक जीत गए, पैसा आपका रहा।" if won else None, "speak_en": "Chargeback won. The money stays yours." if won else None})
             inc.outcome_verified = True
             for p in inc.plan:
                 p["state"] = "done"
@@ -1091,8 +1114,9 @@ class OfflinePlanner:
                          rows=[{"field": "Payout", "claim": "tomorrow 9:00", "truth": f"{b['batch_id']} {b['status']}", "match": ok},
                                {"field": "Bank UTR", "claim": "—", "truth": b.get("bank_utr") or "—", "match": ok}])
             if ok:
-                await e.act(inc, "notify_merchant", {"text": f"☀️ Kal wala {rs(inc.money.get('amount'))} aaj subah ke payout {b['batch_id']} mein aapke bank pahunch gaya (UTR {b['bank_utr']}). Case band kar raha hoon.",
-                                                    "speak": "कल वाला पैसा आज सुबह बैंक में पहुँच गया।"})
+                await e.act(inc, "notify_merchant", {"text": f"☀️ Yesterday's {rs(inc.money.get('amount'))} reached your bank in this morning's payout {b['batch_id']} (UTR {b['bank_utr']}). Closing the case.",
+                                                    "hi": f"☀️ कल वाले {rs(inc.money.get('amount'))} आज सुबह के पेआउट {b['batch_id']} में आपके बैंक पहुँच गए (UTR {b['bank_utr']})। केस बंद कर रहा हूँ।",
+                                                    "speak": "कल वाला पैसा आज सुबह बैंक में पहुँच गया।", "speak_en": "Yesterday's money reached your bank this morning."})
                 inc.outcome_verified = True
                 await e.step(inc, "verify", action="final re-check", ok=True, check=f"Settlement engine: {b['batch_id']} SETTLED and includes this payment")
                 for p in inc.plan:
@@ -1129,8 +1153,9 @@ class OfflinePlanner:
                     await e.act(inc, "reconcile_payment", {"utr": st["utr"], "bill_id": inc.facts["bill_id"]})
                 await e.act(inc, "issue_verified_receipt", {"txn_id": txn})
                 await self._tell_customer(inc, f"Your bank has confirmed it: {rs(st['amount'])} received by Meena Kirana Store (UPI Ref {st['utr']}). Thank you!")
-                await e.act(inc, "notify_merchant", {"text": f"✅ {rs(st['amount'])} aa gaya (UPI Ref {st['utr']}). Customer ko receipt bhej di. Ab saman de dijiye — sirf ek baar paisa kata.",
-                                                    "speak": f"{st['amount']} रुपये आ गए। अब सामान दे दीजिए।"})
+                await e.act(inc, "notify_merchant", {"text": f"✅ {rs(st['amount'])} has arrived (UPI Ref {st['utr']}). I've sent the customer a receipt. You can hand over the goods; they were charged only once.",
+                                                    "hi": f"✅ {rs(st['amount'])} आ गए (UPI Ref {st['utr']})। ग्राहक को रसीद भेज दी। अब सामान दे दीजिए — पैसा सिर्फ़ एक बार कटा।",
+                                                    "speak": f"{st['amount']} रुपये आ गए। अब सामान दे दीजिए।", "speak_en": f"{st['amount']} rupees arrived. You can hand over the goods."})
                 await self._close(inc, txn, "SUCCESS", f"Pending payment landed; {rs(st['amount'])} receipted once")
             else:
                 await e.step(inc, "evidence", stamp="FAILED", title="Follow-up: switch re-checked", tone="bad", verdict="PENDING → FAILED",
@@ -1144,10 +1169,11 @@ class OfflinePlanner:
             if len(inc.plan) > 3:
                 e.tick_plan(inc, inc.plan[3]["text"])
             if inc.kind == "duplicate":
-                await e.act(inc, "notify_merchant", {"text": f"✅ Duplicate {rs(inc.facts['amount'])} customer ko wapas mil gaya (refund {r['refund_id']}). Sirf ek baar refund hua.",
-                                                    "speak": "डुप्लिकेट पैसा ग्राहक को वापस मिल गया।"})
+                await e.act(inc, "notify_merchant", {"text": f"✅ The duplicate {rs(inc.facts['amount'])} is back with the customer (refund {r['refund_id']}). Refunded exactly once.",
+                                                    "hi": f"✅ डुप्लिकेट {rs(inc.facts['amount'])} ग्राहक को वापस मिल गए (रिफंड {r['refund_id']})। सिर्फ़ एक बार रिफंड हुआ।",
+                                                    "speak": "डुप्लिकेट पैसा ग्राहक को वापस मिल गया।", "speak_en": "The duplicate money is back with the customer."})
             else:
-                await e.act(inc, "notify_merchant", {"text": f"✅ {self._who(inc)} ka purana {rs(r['amount'])} wapas unke account mein pahunch gaya ({r['refund_id']})."})
+                await e.act(inc, "notify_merchant", {"text": f"✅ {self._who(inc)}'s earlier {rs(r['amount'])} is back in their account ({r['refund_id']}).", "hi": f"✅ {self._who(inc)} के पुराने {rs(r['amount'])} वापस उनके खाते में पहुँच गए ({r['refund_id']})।"})
             if inc.channel == "whatsapp":
                 await self._tell_customer(inc, f"Your refund {r['refund_id']} of {rs(r['amount'])} has been credited back to your account.")
             again = await e.call(inc, "get_refund_status", {"refund_id": inc.facts["refund_id"]})
@@ -1166,8 +1192,9 @@ class OfflinePlanner:
                     f["fired"], f["cancelled"] = True, "bank submitted"
             await e.step(inc, "evidence", stamp="BANK FILED", title="Bank desk", tone="good", verdict=f"The bank filed in {days} days, inside the SOP's 7",
                          rows=[{"field": "Grievance module", "claim": "within 7 days", "truth": f"{ev['bank_submission'].get('ref')} · day {days}", "match": True}])
-            await e.act(inc, "notify_merchant", {"text": f"✅ Bank ne aapki shikayat {days} din mein grievance module par bhej di (ref {ev['bank_submission'].get('ref')}). SOP ke 7 din se pehle. Ab jaanch adhikari ka faisla aayega; Kavach nazar rakhega.",
-                                                "speak": "बैंक ने आपकी शिकायत आगे भेज दी।"})
+            await e.act(inc, "notify_merchant", {"text": f"✅ Your bank filed your complaint on the grievance module in {days} days (ref {ev['bank_submission'].get('ref')}), inside the SOP's 7. Next is the investigating officer's decision; Kavach is watching.",
+                                                "hi": f"✅ बैंक ने आपकी शिकायत {days} दिन में ग्रीवेंस मॉड्यूल पर भेज दी (रेफ़ {ev['bank_submission'].get('ref')})। SOP के 7 दिन से पहले। अब जाँच अधिकारी का फ़ैसला आएगा; कवच नज़र रखेगा।",
+                                                "speak": "बैंक ने आपकी शिकायत आगे भेज दी।", "speak_en": "Your bank has forwarded your complaint."})
             inc.headline = f"Bank filed on day {days}. Waiting for the officer."
         elif purpose.startswith("Bank desk update: io_decision"):
             lien = inc.facts["case_events"]["io_decision"].get("lien")
@@ -1185,29 +1212,28 @@ class OfflinePlanner:
                 return
             res = await e.act(inc, "release_settlement_hold", {"reason": "Officer limited the hold; ₹1 validation credited"})
             if res["status"] == "NEEDS_APPROVAL":
-                await e.act(inc, "notify_merchant", {"text": f"Achhi khabar: jaanch adhikari ne hold sirf {rs(lien)} tak seemit kiya hai, aur aapka bank ab paisa le raha hai. Paytm Risk ki manzoori milte hi aapka ruka hua paisa aapke account mein bhej dunga.",
-                                                    "speak": "अच्छी खबर। रोक सिर्फ विवादित रकम तक है।"})
+                await e.act(inc, "notify_merchant", {"text": f"Good news: the investigating officer has limited the hold to {rs(lien)}, and your bank is accepting money again. As soon as Paytm Risk approves, I'll send your held money to your account.",
+                                                    "hi": f"अच्छी ख़बर: जाँच अधिकारी ने रोक सिर्फ़ {rs(lien)} तक सीमित कर दी है, और आपका बैंक अब पैसा ले रहा है। पेटीएम रिस्क की मंज़ूरी मिलते ही आपका रुका हुआ पैसा आपके खाते में भेज दूँगा।",
+                                                    "speak": "अच्छी खबर। रोक सिर्फ विवादित रकम तक है।", "speak_en": "Good news. The hold is now only on the disputed amount."})
                 inc.headline = "Officer limited the hold. Release waiting for Paytm Risk."
         elif purpose.startswith("90-day review"):
-            await e.act(inc, "notify_merchant", {"text": "⏱️ 90 din ki do tareekhein paas hain (SOP mein dono likhi hain). Bank se poochiye ki ₹2,400 ka hold kab tak hai; Kavach dono dates par nazar rakh raha hai."})
+            await e.act(inc, "notify_merchant", {"text": "⏱️ Both 90-day dates are coming up (the SOP mentions both). Ask your bank how long the remaining hold lasts; Kavach is watching both dates.", "hi": "⏱️ 90 दिन की दोनों तारीख़ें पास हैं (SOP में दोनों लिखी हैं)। बैंक से पूछिए कि बची हुई रोक कब तक है; कवच दोनों तारीख़ों पर नज़र रख रहा है।"})
         elif purpose.startswith("Day 5"):
             if "bank_submission" in inc.facts.get("case_events", {}):
                 return
             due = (inc.facts.get("clocks") or [{}])[0].get("due")
-            await e.act(inc, "notify_merchant", {"text": f"⏱️ Yaad dilana: bank ke paas {due} tak 2 din bache hain. Branch se poochiye ki shikayat grievance module mein gayi ya nahi. Mile to reference bhejiye.",
-                                                "speak": "बैंक के पास दो दिन बचे हैं।"})
+            await e.act(inc, "notify_merchant", {"text": f"⏱️ Reminder: the bank has 2 days left, until {due}. Ask your branch whether your complaint has gone to the grievance module, and send me the reference if you get it.", "hi": f"⏱️ याद दिलाना: बैंक के पास {due} तक 2 दिन बचे हैं। शाखा से पूछिए कि शिकायत ग्रीवेंस मॉड्यूल में गई या नहीं। रेफ़रेंस मिले तो भेजिए।", "speak": "बैंक के पास दो दिन बचे हैं।", "speak_en": "The bank has two days left."})
             inc.headline = f"Day 5 of 7. Reminder sent; bank due {due}."
         elif purpose.startswith("Day 7"):
             if "bank_submission" in inc.facts.get("case_events", {}):
-                await e.act(inc, "notify_merchant", {"text": "Bank ne shikayat bhej di hai. Ab jaanch adhikari ke 15 din chalenge (SOP 10.1(b))."})
+                await e.act(inc, "notify_merchant", {"text": "The bank has forwarded your complaint. The investigating officer now has 15 days (SOP 10.1(b)).", "hi": "बैंक ने शिकायत भेज दी है। अब जाँच अधिकारी के 15 दिन चलेंगे (SOP 10.1(b))।"})
                 return
             await self.think(inc, "Day 7 and no submission recorded. The SOP route says the bank should have submitted by now. "
                                   "Kavach can't contact the bank itself (P7), but it can draft a letter for Meena to sign.", "warn")
             r = await e.act(inc, "draft_escalation", {"to": "Grievance Officer, " + MERCHANT["settlement_bank"].replace("Bank account ", "Bank (a/c ") + ")",
                                                        "reason": "No confirmation of grievance submission within 7 days"})
             if r["status"] == "NEEDS_APPROVAL":
-                await e.act(inc, "notify_merchant", {"text": "⚠️ 7 din poore, bank ne shikayat bhejne ki khabar nahi di. Main aapke naam se bank ke grievance officer ko chitthi bana doon?",
-                                                    "speak": "सात दिन पूरे हो गए। बैंक को चिट्ठी बना दूँ?", "extra": {"approval": inc.id}})
+                await e.act(inc, "notify_merchant", {"text": "⚠️ 7 days are up and the bank hasn't confirmed forwarding your complaint. Shall I draft a letter to the bank's grievance officer in your name?", "hi": "⚠️ 7 दिन पूरे, बैंक ने शिकायत भेजने की ख़बर नहीं दी। मैं आपके नाम से बैंक के ग्रीवेंस अधिकारी को चिट्ठी बना दूँ?", "speak": "सात दिन पूरे हो गए। बैंक को चिट्ठी बना दूँ?", "speak_en": "Seven days are up. Shall I draft a letter to the bank?", "extra": {"approval": inc.id}})
                 inc.headline = "Day 7 passed. Escalation letter waiting for Meena's OK."
         elif purpose.startswith("Ask for the bank"):
-            await e.act(inc, "notify_merchant", {"text": "Namaste Meena ji — kya bank ne aapki shikayat ka dated acknowledgement diya? Uski photo bhejiye; usi din se bank ka 7 din ka clock chalta hai."})
+            await e.act(inc, "notify_merchant", {"text": "Namaste Meena ji, did the bank give you a dated acknowledgement for your complaint? Send me a photo of it; the bank's 7-day clock starts from that date.", "hi": "नमस्ते मीना जी — क्या बैंक ने आपकी शिकायत की तारीख़ वाली पावती दी? उसकी फ़ोटो भेजिए; उसी दिन से बैंक के 7 दिन गिने जाते हैं।"})

@@ -10,13 +10,13 @@ import re
 from typing import Any
 
 INTENTS: list[tuple[str, list[str]]] = [
-    ("scam_call", [r"call|phone|फोन|कॉल|banda|aadmi|कोई", r"maang|mang|demand|मांग|माँग|paise do|pay karo|withdraw|(complaint|case|शिकायत)\s*(wapas|वापस)|settle kar|\d[\d,]*\s*(do|de do|bhejo|दो)\b.*(khatam|band|hata)|case khatam"]),
+    ("scam_call", [r"call|phone|फोन|कॉल|banda|aadmi|कोई|someone|somebody|caller|a man|a person|asking", r"maang|mang|demand|asking for|wants|मांग|माँग|paise do|pay karo|withdraw|(complaint|case|शिकायत)\s*(wapas|वापस)|settle kar|\d[\d,]*\s*(do|de do|bhejo|दो)\b.*(khatam|band|hata)|case khatam"]),
     ("bank_ack", [r"acknowledg|\back\b|pavti|paavti|पावती|receiving|complaint (le li|de di|jama)|shikayat (le li|de di|jama)|शिकायत (ले ली|दे दी)"]),
-    ("sop_question", [r"kitne din|kab tak|kaun (file|de|kar)|how many days|who can|niyam|\brule|\bsop\b|कितने दिन|कब तक|(beta|beti|bhai|papa).{0,20}(file|shikayat|complaint)"]),
-    ("change_settlement_account", [r"(doosr|dusr|dusre|other|another|new|naya|दूसर|नया)\w*\s*(bank\s*)?(account|a/c|khata|खात)|account\s*(badal|change)|खाता\s*बदल"]),
+    ("sop_question", [r"kitne din|kab tak|kaun (file|de|kar)|how many days|who can|what is an? \w+|niyam|\brule|\bsop\b|क्या होता है|कितने दिन|कब तक|(beta|beti|bhai|papa).{0,20}(file|shikayat|complaint)"]),
+    ("change_settlement_account", [r"(doosr|dusr|dusre|other|another|new|naya|दूसर|नया)\S*\s*(bank\s*)?(account|a/c|khata|खात)|account\s*(badal|change)|खाता\s*बदल"]),
     ("duplicate_charge", [r"do\s*baar|2\s*baar|twice|double|duplicate|दो\s*बार|dobara\s*kat|dubara\s*kat|charged\s*two"]),
     ("account_freeze", [r"freez|frozen|फ्रीज|hold|lien|cyber|साइबर|account\s*(band|block)|khata\s*band|खाता\s*बंद|debit\s*band|ब्लॉक"]),
-    ("settlement_missing", [r"settlement|सेटलमेंट|payout|kal\s*ka\s*paisa|कल\s*का\s*पैसा|bank\s*(mein|me|में)\s*(nahi|nahin|नहीं)\s*(aaya|aya|आया)|account\s*(mein|me)\s*(nahi|nahin)\s*(aaya|aya)|paise\s*nahi\s*aaye"]),
+    ("settlement_missing", [r"settlement|सेटलमेंट|payout|पेआउट|yesterday'?s?\s*money|when will (my|the)?\s*(money|payment|payout)|kal\s*ka\s*paisa|कल\s*का\s*पैसा|bank\s*(mein|me|में)\s*(nahi|nahin|नहीं)\s*(aaya|aya|आया)|account\s*(mein|me)\s*(nahi|nahin)\s*(aaya|aya)|paise\s*nahi\s*aaye"]),
     ("payment_claim", [r"bhej\s*diya|bheja|paid|pay\s*kar\s*diya|kar\s*diya|भेज\s*दिया|पे\s*कर|screenshot|स्क्रीनशॉट|soundbox|साउंडबॉक्स|nahi\s*bola|नहीं\s*बोला|payment\s*(aaya|aya|hua)"]),
     ("status_query", [r"kya\s*hua|status|update|क्या\s*हुआ|aage\s*kya"]),
 ]

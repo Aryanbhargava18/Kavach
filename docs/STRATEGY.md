@@ -63,7 +63,50 @@ Merchants pay nothing.
 
 **Scale anchor, not a forecast:** about 1.64 crore merchants on device subscriptions (Paytm Q2 FY27). How many freezes and chargebacks they see each month is data only Paytm has. The pilot measures it before anyone multiplies.
 
-## Feasibility, cost and rollout (also live in the app: top bar → Business case)
+## Built for an Indian merchant, not an ideal user
+- **Language first, the way Paytm and PhonePe do it.** The first screen asks English or हिन्दी, with English as the default and a one-tap EN/हि toggle. Every message exists in proper English and Devanagari Hindi; there's no Latin-script Hinglish. The Soundbox speaks in her chosen language. The same string table extends to the AI Soundbox's 11 languages.
+- **Voice and icons carry the meaning.** Low-literacy users can run the whole case by listening and tapping one big button. There's never more than one decision on screen.
+- **Trust before anything else.** Indian merchants are rightly trained to distrust "your account is frozen" messages. Every alert says it's inside the Paytm app and that Kavach never asks for OTP, PIN or money. The extortion pattern ("pay to withdraw the complaint") is flagged, not answered.
+- **She types the way she talks.** The interpreter understands English, Devanagari Hindi and Hinglish, because that's how merchants actually type, even though Kavach replies in clean English or Hindi.
+- **The branch visit is unavoidable, so Kavach makes it short.** It tells her exactly what to ask for (NCRP number, notice, disputed amount) and what to bring (signed pack, request letter), and to always get a dated acknowledgement.
+- **Shared and low-end phones.** No login, no app install for the demo, Indian rupee formatting, and large tap targets. In production this would be a screen inside Paytm for Business, not a separate app.
+
+## Integration and scale (how Paytm would actually run it)
+**Shape: event consumers, not a chatbot.** Each watcher subscribes to a feed Paytm already produces:
+
+| Watcher | Feed inside Paytm | Volume pattern |
+|---|---|---|
+| Payout returns | Settlement return file (daily, per bank) | One batch a day; returns are a tiny fraction of payouts |
+| Debit freeze | Paytm UPI app PSP responses (code `YE`) for merchants' own payments | Streaming; filter on one code |
+| Chargeback clock | Dispute desk events | Streaming; low volume |
+| Live read path | Transaction Status API (`v3/order/status`), already wired | On demand |
+
+**Why it scales:**
+- The work grows with *incidents*, not with merchants. 1.64 crore merchants generate a daily return file, but only the rows with a freeze code open a case.
+- The decision core is deterministic Python, a median of 4 tool calls per case, with no model in the loop. A model is used only to phrase or understand language, so Paytm's own 4B Indic model, or any small model, is enough.
+- Every case is a small state machine (per-merchant, idempotent on UTR, dispute ID and batch ID). That partitions naturally by merchant ID and can run as stateless workers over a queue.
+- Follow-ups are timers, not polling: the engine wakes on callbacks (settlement run, dispute decision, bank desk update), with polls only as backup.
+
+**How Paytm plugs it in (same engine, swap the adapter):**
+1. **Read:** settlement returns, PSP responses, dispute events, and the Transaction Status API (live in this repo). Each is one adapter behind an existing tool name.
+2. **Act:** settlement hold and release (settlement config), the dispute reply API, the nodal queue, notifications to Paytm for Business, and Soundbox voice. Every write still passes the same policy rules (P6, P9, P13, P17–P20).
+3. **Approve:** the Paytm Risk console gets the second key, and Legal owns the neutral template.
+4. **Sell:** the bank grievance desk is an API plus a page, delivered through Paytm Intelligence.
+
+**Rollout, safest first:**
+1. **Shadow mode** on 90 days of history, with no merchant contact.
+2. **Alerts and clocks only.**
+3. **Actions with approvals.**
+4. **One bank on the Pi desk.**
+
+**What Paytm would need to decide:**
+- data access for the three feeds;
+- the Risk SLA for guarded cases;
+- Legal's sign-off on holds and the request letter;
+- DPDP-aligned retention (obligations from 13 May 2027);
+- an HSM key for signing.
+
+## Feasibility, cost and rollout
 **The full arc Kavach runs:** detect → protect (two keys) → prove (signed, SOP-routed) → ask for a narrower hold → the bank files through the bank desk → the officer decides → Kavach verifies with a ₹1 credit → Paytm Risk releases → the 90-day clocks are watched. In the demo, the bank and the officer are simulated.
 
 **Unit economics we can measure today (synthetic):**

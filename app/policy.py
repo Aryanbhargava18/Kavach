@@ -215,7 +215,7 @@ def risk_guard(world) -> bool:
 def _notify_merchant(world, args, ctx):
     if FULL_VPA.search(args.get("text", "")) and MERCHANT["vpa"] not in args.get("text", ""):
         return deny("P8", "Merchant message would expose a payer's full UPI handle.")
-    if risk_guard(world) and args.get("template") != "legal_neutral" and CASE_DETAIL.search(args.get("text", "") + " " + str(args.get("speak") or "")):
+    if risk_guard(world) and args.get("template") != "legal_neutral" and CASE_DETAIL.search(" ".join(str(args.get(k) or "") for k in ("text", "hi", "speak", "speak_en"))):
         return deny("P17", "Paytm Risk holds two independent signals on this merchant. Case details could tip off a mule operator; only Legal's neutral template may go out.")
     return allow("Message to the account owner.")
 

@@ -41,6 +41,7 @@
 .sheet { transform: translateY(100%); visibility: hidden; transition: transform .35s cubic-bezier(.2,.8,.2,1), visibility 0s .35s; } .sheet.on { transform: translateY(0); visibility: visible; transition: transform .35s cubic-bezier(.2,.8,.2,1); }
 .scrim { opacity: 0; pointer-events: none; transition: opacity .25s; } .scrim.on { opacity: 1; pointer-events: auto; }
 .push { transform: translate(-50%, -150%); transition: transform .4s cubic-bezier(.2,.8,.2,1); } .push.on { transform: translate(-50%, 0); }
+html[lang="hi"] .eyebrow, html[lang="hi"] [class*="tracking-"] { letter-spacing: 0 !important; text-transform: none !important; }
 .no-scrollbar { scrollbar-width: none; } .no-scrollbar::-webkit-scrollbar { display: none; }
 html.embed #gate, html.embed .sim-tag, html.embed #ask { display: none !important; }
 @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition: none !important; } }
@@ -55,20 +56,24 @@ html.embed #gate, html.embed .sim-tag, html.embed #ask { display: none !importan
     <div class="relative">
       <div class="size-16 rounded-2xl bg-white/10 ring-1 ring-white/20 grid place-items-center mb-8 backdrop-blur"><i data-lucide="shield-check" class="size-8 text-sky"></i></div>
       <p class="eyebrow !text-sky mb-3">Paytm for Business · Kavach Shield</p>
-      <h1 class="text-[40px] leading-[1.02] font-bold tracking-tight">Aap Meena hain.</h1>
-      <p class="mt-4 text-[16px] leading-relaxed text-white/75">Meena Kirana Store, Lucknow. Phone haath mein rakhiye, awaaz chalu rakhiye. Paise ke saath kuch bhi galat ho, Kavach pehle batayega.</p>
-      <button id="start" type="button" class="mt-8 w-full h-14 rounded-2xl bg-white text-navy text-[17px] font-semibold flex items-center justify-center gap-2 active:scale-[.98] transition">Main Meena hoon · Shuru karo <i data-lucide="arrow-right" class="size-5"></i></button>
-      <p class="mt-4 text-center text-[12px] text-white/50">Synthetic demo. No real money, bank or police systems.</p>
+      <h1 class="text-[34px] leading-[1.05] font-bold tracking-tight">Choose your language</h1>
+      <p class="mt-1 text-[24px] font-semibold text-white/80">अपनी भाषा चुनें</p>
+      <p class="mt-4 text-[15px] leading-relaxed text-white/70">Meena Kirana Store, Lucknow. Keep this phone in your hand with the sound on.</p>
+      <div class="mt-7 grid grid-cols-2 gap-3">
+        <button type="button" data-start="en" class="h-20 rounded-2xl bg-white text-navy flex flex-col items-center justify-center active:scale-[.98] transition"><span class="text-[20px] font-bold">English</span><span class="text-[12px] text-ink-3">Default</span></button>
+        <button type="button" data-start="hi" class="h-20 rounded-2xl bg-white/10 ring-1 ring-white/25 text-white flex flex-col items-center justify-center active:scale-[.98] transition"><span class="text-[22px] font-bold">हिन्दी</span><span class="text-[12px] text-white/60">Hindi</span></button>
+      </div>
+      <p class="mt-5 text-center text-[12px] text-white/50">Synthetic demo. No real money, bank or police systems.</p>
     </div>
   </div>
 
   <header class="sticky top-0 z-30 bg-page/80 backdrop-blur-xl px-4 pt-[calc(10px+env(safe-area-inset-top))] pb-3 flex items-center gap-3">
     <div class="size-10 rounded-2xl bg-gradient-to-br from-sky to-navy-2 grid place-items-center text-white shadow-lg shadow-sky/20"><i data-lucide="shield-check" class="size-5"></i></div>
     <div class="flex-1 min-w-0">
-      <p class="text-[11.5px] text-ink-3 truncate">Paytm for Business · Meena Kirana Store</p>
-      <p class="text-[17px] font-semibold tracking-tight leading-tight">Kavach Shield</p>
+      <p class="text-[11.5px] text-ink-3 truncate">Meena Kirana Store <span class="sim-tag">· SIMULATED</span></p>
+      <p class="text-[17px] font-semibold tracking-tight leading-tight whitespace-nowrap">Kavach Shield</p>
     </div>
-    <span class="sim-tag text-[10px] font-semibold tracking-wider text-ink-3 ring-1 ring-ink-3/40 rounded-full px-2 py-0.5">SIMULATED</span>
+    <button id="lang" type="button" class="h-9 px-1 rounded-full bg-white ring-1 ring-line flex items-center text-[12px] font-semibold" aria-label="Language"><span data-l="en" class="px-2.5 h-7 rounded-full grid place-items-center">EN</span><span data-l="hi" class="px-2.5 h-7 rounded-full grid place-items-center">हि</span></button>
     <button id="bell" type="button" class="relative size-10 rounded-full bg-white ring-1 ring-line grid place-items-center" aria-label="Messages">
       <i data-lucide="bell" class="size-[18px] text-navy-2"></i><span id="unread" hidden class="absolute -top-0.5 -right-0.5 min-w-[18px] h-[18px] px-1 rounded-full bg-bad text-white text-[10px] font-bold grid place-items-center"></span>
     </button>
@@ -77,7 +82,7 @@ html.embed #gate, html.embed .sim-tag, html.embed #ask { display: none !importan
   <main id="app" class="px-4 flex flex-col gap-3"></main>
 </div>
 
-<button id="ask" type="button" aria-label="Kavach se poochiye" class="fixed z-30 right-4 bottom-[calc(18px+env(safe-area-inset-bottom))] size-14 rounded-full bg-navy text-white grid place-items-center shadow-[0_12px_30px_-8px_rgba(0,27,68,.6)] active:scale-95 transition">
+<button id="ask" type="button" aria-label="Ask Kavach" class="fixed z-30 right-4 bottom-[calc(18px+env(safe-area-inset-bottom))] size-14 rounded-full bg-navy text-white grid place-items-center shadow-[0_12px_30px_-8px_rgba(0,27,68,.6)] active:scale-95 transition">
   <i data-lucide="sparkles" class="size-6 text-sky"></i>
 </button>
 
@@ -86,28 +91,28 @@ html.embed #gate, html.embed .sim-tag, html.embed #ask { display: none !importan
   <div class="pt-2.5 pb-3 px-4 bg-white border-b border-line">
     <div class="mx-auto mb-2.5 h-1 w-10 rounded-full bg-line"></div>
     <div class="flex items-center gap-3"><div class="size-9 rounded-xl bg-gradient-to-br from-sky to-navy-2 grid place-items-center text-white"><i data-lucide="sparkles" class="size-4"></i></div>
-      <div class="flex-1"><p class="font-semibold leading-tight">Kavach</p><p class="text-[12px] text-ink-3">Hindi ya Hinglish mein poochiye</p></div>
+      <div class="flex-1"><p class="font-semibold leading-tight">Kavach</p><p class="text-[12px] text-ink-3" data-t="askSub"></p></div>
       <button type="button" data-close class="size-9 rounded-full bg-page grid place-items-center" aria-label="Close"><i data-lucide="x" class="size-4"></i></button></div>
   </div>
   <div id="chat" class="flex-1 overflow-y-auto px-4 py-4 flex flex-col gap-2.5"></div>
   <div id="chips" class="no-scrollbar flex gap-2 overflow-x-auto px-4 py-2.5"></div>
   <form id="compose" autocomplete="off" class="flex items-center gap-2 px-3 pt-2 pb-[calc(12px+env(safe-area-inset-bottom))] bg-white border-t border-line">
     <label class="size-11 shrink-0 rounded-full bg-sky-50 text-navy-2 grid place-items-center cursor-pointer"><input class="camin" type="file" accept="image/*" capture="environment" hidden><i data-lucide="camera" class="size-5"></i></label>
-    <input id="t" type="text" placeholder="Likhiye…" aria-label="Message to Kavach" class="flex-1 min-w-0 h-11 rounded-full bg-page px-4 text-[16px] outline-none focus:ring-2 focus:ring-sky/40">
+    <input id="t" type="text" placeholder="Type…" aria-label="Message to Kavach" class="flex-1 min-w-0 h-11 rounded-full bg-page px-4 text-[16px] outline-none focus:ring-2 focus:ring-sky/40">
     <button type="submit" class="size-11 shrink-0 rounded-full bg-navy-2 text-white grid place-items-center" aria-label="Send"><i data-lucide="arrow-up" class="size-5"></i></button>
   </form>
 </section>
 
 <section id="letter" class="sheet fixed z-50 inset-x-0 bottom-0 mx-auto max-w-[480px] h-[84dvh] bg-white rounded-t-[28px] flex flex-col overflow-hidden">
   <div class="px-4 pt-2.5 pb-3 border-b border-line"><div class="mx-auto mb-2.5 h-1 w-10 rounded-full bg-line"></div>
-    <div class="flex items-center gap-3"><div class="size-9 rounded-xl bg-warn-50 text-warn grid place-items-center"><i data-lucide="file-signature" class="size-4"></i></div><p class="flex-1 font-semibold">Bank ke liye request</p>
+    <div class="flex items-center gap-3"><div class="size-9 rounded-xl bg-warn-50 text-warn grid place-items-center"><i data-lucide="file-signature" class="size-4"></i></div><p class="flex-1 font-semibold" data-t="letterTitle"></p>
       <button type="button" data-close class="size-9 rounded-full bg-page grid place-items-center" aria-label="Close"><i data-lucide="x" class="size-4"></i></button></div></div>
   <pre id="lettertext" class="flex-1 overflow-y-auto whitespace-pre-wrap p-5 text-[13.5px] leading-relaxed font-sans text-ink"></pre>
 </section>
 
 <div id="push" class="push fixed z-[60] left-1/2 top-2 w-[calc(100%-16px)] max-w-[464px] rounded-[22px] bg-white/90 backdrop-blur-xl ring-1 ring-black/5 shadow-2xl px-3.5 py-3 flex gap-3 cursor-pointer">
   <div class="size-9 shrink-0 rounded-xl bg-gradient-to-br from-sky to-navy-2 grid place-items-center text-white"><i data-lucide="shield-check" class="size-[18px]"></i></div>
-  <div class="min-w-0"><p class="text-[12.5px] font-semibold">Kavach <span class="text-ink-3 font-normal">· abhi</span></p><p id="pushtext" class="text-[14px] text-ink-2 line-clamp-2"></p></div>
+  <div class="min-w-0"><p class="text-[12.5px] font-semibold">Kavach <span class="text-ink-3 font-normal" data-t="now"></span></p><p id="pushtext" class="text-[14px] text-ink-2 line-clamp-2"></p></div>
 </div>
 <input id="cam" class="camin" type="file" accept="image/*" capture="environment" hidden>
 
@@ -116,13 +121,44 @@ html.embed #gate, html.embed .sim-tag, html.embed #ask { display: none !importan
 const $ = (q) => document.querySelector(q);
 const EMBED = new URLSearchParams(location.search).has("embed");
 if (EMBED) document.documentElement.classList.add("embed");
+const L = {
+  en: { askSub: "Ask in English or Hindi", letterTitle: "Request to your bank", now: "· now", shieldOn: "Shield on", todaySales: "Today's sales", payments: "Payments", nextPayout: "Next payout",
+    whatDid: "What Kavach did", nothingYet: "Nothing needed yet. Kavach is watching.", nextStep: "Your next step", watching: "Kavach is watching", daysLeft: "days left", done: "Done", working: "Kavach at work",
+    fwd: "Send bank SMS + notice", photo: "Take a photo", whereMoney: "Where your money is", frozenSub: "frozen at your bank · your figure", more: "× more", disputed: "disputed", frozen: "frozen",
+    clocks: "Deadlines Kavach is watching", progress: "Case progress", docs: "Your documents", verify: "Verify", read: "Read", stake: "At stake", replied: "Reply sent", before: "before the deadline",
+    deadline: "reply deadline", listen: "Listen to Kavach", team: "Paytm team", account: "Account", chatEmpty: "Ask anything: payouts, refunds, freezes, the SOP.",
+    d: "days", h: "hours", m: "min", fwdMsg: "Here is the bank SMS and police notice. 3.1 lakh is stuck.", branchMsg: "The bank took my complaint, I have the acknowledgement.", photoMsg: "This notice came, please check.",
+    chips: { cb: ["What is a chargeback?", "When will yesterday's money come?"], case: ["How many days does the bank get?", "Send the payout to another account", "Someone is asking for 20,000 to withdraw the complaint"], home: ["When will yesterday's money come?"] } },
+  hi: { askSub: "हिन्दी या English में पूछिए", letterTitle: "बैंक के लिए अनुरोध", now: "· अभी", shieldOn: "शील्ड चालू", todaySales: "आज की बिक्री", payments: "भुगतान", nextPayout: "अगला पेआउट",
+    whatDid: "कवच ने क्या किया", nothingYet: "अभी कुछ करना नहीं पड़ा। कवच नज़र रख रहा है।", nextStep: "आपका अगला कदम", watching: "कवच देख रहा है", daysLeft: "दिन बचे", done: "हो गया", working: "कवच काम पर",
+    fwd: "बैंक का SMS + नोटिस भेजो", photo: "फ़ोटो खींचो", whereMoney: "आपका पैसा कहाँ है", frozenSub: "बैंक में रुका हुआ · आपका बताया हुआ", more: "× ज़्यादा", disputed: "विवादित", frozen: "रुका",
+    clocks: "कवच इन समय-सीमाओं पर नज़र रख रहा है", progress: "केस कहाँ तक पहुँचा", docs: "आपके दस्तावेज़", verify: "जाँचें", read: "पढ़ें", stake: "दाँव पर", replied: "जवाब गया", before: "समय-सीमा से पहले",
+    deadline: "जवाब की समय-सीमा", listen: "कवच को सुनिए", team: "पेटीएम टीम", account: "खाता", chatEmpty: "कुछ भी पूछिए: पेआउट, रिफंड, फ्रीज़, SOP।",
+    d: "दिन", h: "घंटे", m: "मिनट", fwdMsg: "बैंक का SMS और पुलिस का नोटिस यह है। 3.1 लाख अटके हैं।", branchMsg: "बैंक ने शिकायत ले ली, पावती मिल गई।", photoMsg: "यह नोटिस आया है, देखिए।",
+    chips: { cb: ["चार्जबैक क्या होता है?", "कल का पैसा कब आएगा?"], case: ["बैंक को कितने दिन मिलते हैं?", "पेआउट दूसरे खाते में भेज दो", "कोई 20 हज़ार माँग रहा है शिकायत वापस लेने के लिए"], home: ["कल का पैसा कब आएगा?"] } },
+};
+let LANG = (() => { const q = new URLSearchParams(location.search).get("lang"); if (q === "hi" || q === "en") return q; try { return localStorage.getItem("kavach.lang") || "en"; } catch { return "en"; } })();
+const T = (k) => (L[LANG] || L.en)[k];
+const msgText = (m) => (LANG === "hi" && m.hi) ? m.hi : m.text;
+const msgSpeak = (m) => LANG === "hi" ? m.speak : (m.speak_en || null);
+function applyLang() {
+  document.documentElement.lang = LANG;
+  document.querySelectorAll("[data-t]").forEach((el) => { el.textContent = T(el.dataset.t); });
+  document.querySelectorAll("#lang [data-l]").forEach((el) => { const on = el.dataset.l === LANG; el.classList.toggle("bg-navy-2", on); el.classList.toggle("text-white", on); el.classList.toggle("text-ink-3", !on); });
+  $("#t").placeholder = LANG === "hi" ? "लिखिए…" : "Type…";
+}
+function setLang(l, fromServer) {
+  LANG = l === "hi" ? "hi" : "en"; try { localStorage.setItem("kavach.lang", LANG); } catch { /* private mode */ }
+  if (!fromServer && !EMBED) post("/api/merchant/lang", { lang: LANG });     // her profile, so the Soundbox and every channel follow
+  S.keys = new Set(); applyLang(); refresh(); renderChat();
+}
 const S = { view: null, chat: [], drafts: [], audio: false, sarvam: false, unread: 0, lastSay: null, keys: new Set(), nums: {} };
 const esc = (s) => String(s ?? "").replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
 const rs = (n) => n == null ? "₹—" : "₹" + Number(n).toLocaleString("en-IN");
 const tm = (iso) => { try { return new Date(iso).toLocaleTimeString("en-IN", { hour: "numeric", minute: "2-digit" }); } catch { return ""; } };
 const post = (u, b) => fetch(u, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify(b) }).then((r) => r.json()).catch(() => null);
 const icon = (n, cls = "size-5") => `<i data-lucide="${n}" class="${cls}"></i>`;
-const left = (secs) => secs >= 86400 ? `${Math.floor(secs / 86400)} din` : secs >= 3600 ? `${Math.floor(secs / 3600)} ghante` : `${Math.max(1, Math.round(secs / 60))} min`;
+const left = (secs) => secs >= 86400 ? `${Math.floor(secs / 86400)} ${T("d")}` : secs >= 3600 ? `${Math.floor(secs / 3600)} ${T("h")}` : `${Math.max(1, Math.round(secs / 60))} ${T("m")}`;
 
 // ---------------------------------------------------------------- voice: Sarvam Bulbul when live, else the phone's own Hindi voice
 const voiceQ = []; let speaking = false;
@@ -130,13 +166,13 @@ function speak(t) { if (!S.audio || !t || EMBED) return; voiceQ.push(t); if (!sp
 async function nextVoice() {
   const t = voiceQ.shift(); if (!t) { speaking = false; return; }
   speaking = true;
-  if (S.sarvam) { try { const a = new Audio(`/api/tts?text=${encodeURIComponent(t)}&lang=hi-IN`); a.onended = nextVoice; a.onerror = () => say(t); await a.play(); return; } catch { /* fall back */ } }
+  if (S.sarvam) { try { const a = new Audio(`/api/tts?text=${encodeURIComponent(t)}&lang=${LANG === "hi" ? "hi-IN" : "en-IN"}`); a.onended = nextVoice; a.onerror = () => say(t); await a.play(); return; } catch { /* fall back */ } }
   say(t);
 }
 function say(t) {
   if (!("speechSynthesis" in window)) return nextVoice();
-  const u = new SpeechSynthesisUtterance(t); u.lang = "hi-IN";
-  const v = speechSynthesis.getVoices().find((x) => /hi[-_]IN/i.test(x.lang)); if (v) u.voice = v;
+  const u = new SpeechSynthesisUtterance(t); u.lang = LANG === "hi" ? "hi-IN" : "en-IN";
+  const v = speechSynthesis.getVoices().find((x) => (LANG === "hi" ? /hi[-_]IN/i : /en[-_]IN/i).test(x.lang)); if (v) u.voice = v;
   u.onend = nextVoice; u.onerror = nextVoice; speechSynthesis.speak(u);
 }
 
@@ -158,38 +194,38 @@ function hero(k, tone, pill, title, sub, opts = {}) {
     <p class="relative mt-2.5 text-[15px] leading-relaxed text-white/80">${esc(sub)}</p>
     ${opts.trust ? `<p class="relative mt-3 flex items-start gap-1.5 text-[12px] text-white/60">${icon("lock", "size-3.5 mt-0.5 shrink-0")}<span>${esc(opts.trust)}</span></p>` : ""}
     ${opts.extra || ""}
-    ${opts.listen && S.lastSay ? `<button data-listen type="button" class="relative mt-4 inline-flex items-center gap-2 h-10 px-4 rounded-full bg-white/10 ring-1 ring-white/15 text-[14px] font-medium backdrop-blur active:scale-95 transition">${icon("volume-2", "size-4")}Kavach ko suniye</button>` : ""}
+    ${opts.listen && S.lastSay ? `<button data-listen type="button" class="relative mt-4 inline-flex items-center gap-2 h-10 px-4 rounded-full bg-white/10 ring-1 ring-white/15 text-[14px] font-medium backdrop-blur active:scale-95 transition">${icon("volume-2", "size-4")}${T("listen")}</button>` : ""}
   </section>`;
 }
 function home(v) {
   const nx = new Date(v.today.next_payout);
-  const kv = `<div class="relative mt-5 grid grid-cols-3 gap-2">${[["Aaj ki sale", `<span class="num" data-count="${v.today.sales}">${rs(v.today.sales)}</span>`], ["Payments", `<span class="num">${v.today.count}</span>`],
-    ["Agla payout", `${nx.toLocaleDateString("en-IN", { day: "numeric", month: "short" })}, ${tm(v.today.next_payout)}`]].map(([a, b]) =>
+  const kv = `<div class="relative mt-5 grid grid-cols-3 gap-2">${[[T("todaySales"), `<span class="num" data-count="${v.today.sales}">${rs(v.today.sales)}</span>`], [T("payments"), `<span class="num">${v.today.count}</span>`],
+    [T("nextPayout"), `${nx.toLocaleDateString("en-IN", { day: "numeric", month: "short" })}, ${tm(v.today.next_payout)}`]].map(([a, b]) =>
     `<div class="rounded-2xl bg-white/10 ring-1 ring-white/10 p-3"><p class="text-[11px] text-white/60">${a}</p><p class="mt-1 text-[15px] font-semibold">${b}</p></div>`).join("")}</div>`;
   const feed = v.feed.length ? v.feed.map((f) => `<div class="flex gap-3 py-3 first:pt-0 border-t first:border-0 border-line"><div class="size-9 shrink-0 rounded-xl bg-ok-50 text-ok grid place-items-center">${icon("check", "size-4")}</div>
       <div class="min-w-0"><p class="text-[14.5px] font-semibold leading-snug">${esc(f.title)}</p><p class="text-[13px] text-ink-2 leading-snug mt-0.5">${esc(f.text)}</p></div></div>`).join("")
-    : `<div class="flex items-center gap-3 text-ink-2 text-[14px]"><div class="size-9 shrink-0 rounded-xl bg-sky-50 text-sky grid place-items-center">${icon("radar", "size-4")}</div>Abhi kuch karna nahi pada. Kavach nazar rakh raha hai.</div>`;
-  return hero("home", "ok", "Shield on", v.shield.title, v.shield.sub, { extra: kv })
-    + `<section data-k="feed" class="card p-5"><p class="eyebrow mb-3">Kavach ne kya kiya</p>${feed}</section>` + clocks(v.clocks);
+    : `<div class="flex items-center gap-3 text-ink-2 text-[14px]"><div class="size-9 shrink-0 rounded-xl bg-sky-50 text-sky grid place-items-center">${icon("radar", "size-4")}</div>${T("nothingYet")}</div>`;
+  return hero("home", "ok", T("shieldOn"), v.shield.title, v.shield.sub, { extra: kv })
+    + `<section data-k="feed" class="card p-5"><p class="eyebrow mb-3">${T("whatDid")}</p>${feed}</section>` + clocks(v.clocks);
 }
 function action(a) {
   if (!a) return "";
   const k = `act-${a.kind}-${a.title}`;
-  if (a.kind === "wait") return `<section data-k="${k}" class="act wait card p-5"><div class="flex items-center gap-2 eyebrow">${icon("hourglass", "size-3.5")}Kavach dekh raha hai</div>
-    <div class="mt-3 flex items-end gap-3"><p class="num text-[48px] leading-none font-bold text-navy-2">${Math.max(a.days_left, 0)}</p><p class="pb-1.5 text-[15px] font-semibold text-ink-2">din bache</p></div>
+  if (a.kind === "wait") return `<section data-k="${k}" class="act wait card p-5"><div class="flex items-center gap-2 eyebrow">${icon("hourglass", "size-3.5")}${T("watching")}</div>
+    <div class="mt-3 flex items-end gap-3"><p class="num text-[48px] leading-none font-bold text-navy-2">${Math.max(a.days_left, 0)}</p><p class="pb-1.5 text-[15px] font-semibold text-ink-2">${T("daysLeft")}</p></div>
     <h3 class="mt-3 text-[18px] font-semibold tracking-tight">${esc(a.title)}</h3><p class="mt-1.5 text-[14.5px] leading-relaxed text-ink-2">${esc(a.body)}</p></section>`;
   if (a.kind === "done" || a.kind === "info") {
     const ok = a.kind === "done";
-    return `<section data-k="${k}" class="act ${ok ? "done" : "wait"} card p-5 ${ok ? "ring-2 !ring-ok/30" : ""}"><div class="flex items-center gap-2 eyebrow ${ok ? "!text-ok" : ""}">${icon(ok ? "circle-check-big" : "loader", "size-3.5")}${ok ? "Ho gaya" : "Kavach kaam par"}</div>
+    return `<section data-k="${k}" class="act ${ok ? "done" : "wait"} card p-5 ${ok ? "ring-2 !ring-ok/30" : ""}"><div class="flex items-center gap-2 eyebrow ${ok ? "!text-ok" : ""}">${icon(ok ? "circle-check-big" : "loader", "size-3.5")}${ok ? T("done") : T("working")}</div>
       <h3 class="mt-2.5 text-[20px] font-semibold tracking-tight">${esc(a.title)}</h3><p class="mt-1.5 text-[14.5px] leading-relaxed text-ink-2">${esc(a.body)}</p></section>`;
   }
   const fwd = S.drafts.find((d) => d.next_doc);
   const btns = a.kind === "approve" ? `<button class="btn-primary" data-yes="${esc(a.incident)}">${icon("check", "size-5")}${esc(a.cta)}</button><button class="btn-ghost mt-2" data-no="${esc(a.incident)}">${esc(a.secondary)}</button>`
-    : a.kind === "notice" ? `${fwd ? `<button class="btn-primary" data-fwd>${icon("forward", "size-5")}Bank ka SMS + notice bhejo</button>` : ""}<button class="${fwd ? "btn-ghost mt-2" : "btn-primary"}" data-cam>${icon("camera", "size-5")}Photo kheecho</button>`
+    : a.kind === "notice" ? `${fwd ? `<button class="btn-primary" data-fwd>${icon("forward", "size-5")}${T("fwd")}</button>` : ""}<button class="${fwd ? "btn-ghost mt-2" : "btn-primary"}" data-cam>${icon("camera", "size-5")}${T("photo")}</button>`
     : a.kind === "branch" ? `<button class="btn-primary" data-branch>${icon("building-2", "size-5")}${esc(a.cta)}</button>` : "";
   return `<section data-k="${k}" class="act card p-5 ring-2 !ring-sky/40 relative overflow-hidden">
     <div class="absolute inset-x-0 top-0 h-24 bg-gradient-to-b from-sky-50 to-transparent pointer-events-none"></div>
-    <div class="relative flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.12em] text-[#0083B8]"><span class="pulse-dot size-1.5 rounded-full bg-sky text-sky"></span>Aapka agla kadam</div>
+    <div class="relative flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.12em] text-[#0083B8]"><span class="pulse-dot size-1.5 rounded-full bg-sky text-sky"></span>${T("nextStep")}</div>
     <h3 class="relative mt-2.5 text-[21px] leading-tight font-semibold tracking-tight">${esc(a.title)}</h3>
     <p class="relative mt-2 mb-4 text-[14.5px] leading-relaxed text-ink-2">${esc(a.body)}</p>${btns}</section>`;
 }
@@ -199,11 +235,11 @@ function money(v) {
   const pct = L && D ? Math.max(1.4, (D.amount / L.amount) * 100) : 0;
   const ICON = { locked: "lock", disputed: "triangle-alert", safe: "shield-check", back: "banknote", still: "lock-keyhole", was: "history" };
   const TC = { bad: "bg-bad-50 text-bad", warn: "bg-warn-50 text-warn", good: "bg-ok-50 text-ok", muted: "bg-page text-ink-3" };
-  return `<section data-k="money" class="card p-5"><p class="eyebrow">Aapka paisa kahan hai</p>
-    ${L ? `<div class="mt-3 flex items-end justify-between gap-3"><div><p class="num text-[34px] leading-none font-bold" data-count="${L.amount}">${rs(L.amount)}</p><p class="mt-1.5 text-[12.5px] text-ink-3">bank mein ruka hua · aapka bataya hua</p></div>
-      ${v.ratio ? `<span class="ratio shrink-0 inline-flex items-center gap-1 h-8 px-3 rounded-full bg-bad-50 text-bad text-[13px] font-bold">${icon("trending-up", "size-3.5")}${v.ratio}× zyada</span>` : ""}</div>
+  return `<section data-k="money" class="card p-5"><p class="eyebrow">${T("whereMoney")}</p>
+    ${L ? `<div class="mt-3 flex items-end justify-between gap-3"><div><p class="num text-[34px] leading-none font-bold" data-count="${L.amount}">${rs(L.amount)}</p><p class="mt-1.5 text-[12.5px] text-ink-3">${T("frozenSub")}</p></div>
+      ${v.ratio ? `<span class="ratio shrink-0 inline-flex items-center gap-1 h-8 px-3 rounded-full bg-bad-50 text-bad text-[13px] font-bold">${icon("trending-up", "size-3.5")}${v.ratio}${T("more")}</span>` : ""}</div>
       ${D ? `<div class="mt-4 h-3 rounded-full bg-bad-50 overflow-hidden" role="img" aria-label="${rs(D.amount)} disputed of ${rs(L.amount)} frozen"><div class="bar h-full rounded-full bg-warn" data-w="${pct}"></div></div>
-        <div class="mt-1.5 flex justify-between text-[11.5px] text-ink-3"><span>vivadit ${rs(D.amount)}</span><span>ruka ${rs(L.amount)}</span></div>` : ""}` : ""}
+        <div class="mt-1.5 flex justify-between text-[11.5px] text-ink-3"><span>${T("disputed")} ${rs(D.amount)}</span><span>${T("frozen")} ${rs(L.amount)}</span></div>` : ""}` : ""}
     <div class="mt-3">${v.money.map((m) => `<div class="flex items-center gap-3 py-3 border-t border-line"><div class="size-9 shrink-0 rounded-xl grid place-items-center ${TC[m.tone] || TC.muted}">${icon(ICON[m.key] || "circle", "size-4")}</div>
       <div class="flex-1 min-w-0"><p class="text-[14.5px] font-semibold leading-tight">${esc(m.label)}</p><p class="text-[12px] text-ink-3 mt-0.5">${esc(m.source)}</p></div>
       <p class="num text-[17px] font-bold ${m.tone === "good" ? "text-ok" : m.tone === "muted" ? "text-ink-3 line-through font-medium" : ""}" data-count="${m.amount}">${rs(m.amount)}</p></div>`).join("")}</div></section>`;
@@ -212,7 +248,7 @@ function clocks(c) {
   if (!c || !c.length) return "";
   const R = 20, C = 2 * Math.PI * R;
   const COL = { ok: "#00B9F1", bad: "#E11D48", wait: "#D97706" };
-  return `<section data-k="clocks" class="card p-5 pr-0"><p class="eyebrow pr-5">Kavach in ghadiyon par nazar rakh raha hai</p>
+  return `<section data-k="clocks" class="card p-5 pr-0"><p class="eyebrow pr-5">${T("clocks")}</p>
     <div class="clks no-scrollbar mt-3 flex gap-2.5 overflow-x-auto pr-5 snap-x">${c.map((k) => {
       const span = k.key === "payout" || String(k.key).startsWith("CB") ? 86400 : String(k.key).includes("90") ? 90 * 86400 : 15 * 86400;
       const frac = Math.min(1, k.secs_left / span);
@@ -225,7 +261,7 @@ function clocks(c) {
 }
 function tracker(steps) {
   const done = steps.filter((s) => s.state === "done").length;
-  return `<section data-k="trk" class="card p-5"><div class="flex items-center justify-between"><p class="eyebrow">Case kahan tak pahuncha</p><p class="num text-[12px] font-semibold text-ink-3">${done}/${steps.length}</p></div>
+  return `<section data-k="trk" class="card p-5"><div class="flex items-center justify-between"><p class="eyebrow">${T("progress")}</p><p class="num text-[12px] font-semibold text-ink-3">${done}/${steps.length}</p></div>
     <div class="mt-3 h-1.5 rounded-full bg-page overflow-hidden"><div class="bar h-full rounded-full bg-gradient-to-r from-sky to-ok" data-w="${(done / steps.length) * 100}"></div></div>
     <ol class="trk mt-4">${steps.map((s, i) => {
       const dot = s.state === "done" ? `<div class="size-7 rounded-full bg-ok text-white grid place-items-center">${icon("check", "size-4")}</div>`
@@ -240,19 +276,19 @@ function tracker(steps) {
 }
 function docs(d) {
   if (!d || !d.length) return "";
-  return `<section data-k="docs" class="card p-5"><p class="eyebrow mb-3">Aapke documents</p><div class="grid gap-2.5">${d.map((x) => x.kind === "pack"
+  return `<section data-k="docs" class="card p-5"><p class="eyebrow mb-3">${T("docs")}</p><div class="grid gap-2.5">${d.map((x) => x.kind === "pack"
     ? `<a class="doc flex items-center gap-3 rounded-2xl ring-1 ring-line p-3.5 active:scale-[.99] transition" href="${esc(x.verify)}" target="_blank" rel="noopener"><div class="size-11 shrink-0 rounded-xl bg-sky-50 text-navy-2 grid place-items-center">${icon("file-check-2", "size-5")}</div>
-        <div class="flex-1 min-w-0"><p class="text-[14.5px] font-semibold">${esc(x.label)}</p><p class="text-[12.5px] text-ink-3">${esc(x.sub)}</p></div><span class="flex items-center gap-0.5 text-[13px] font-semibold text-navy-2">Verify${icon("chevron-right", "size-4")}</span></a>`
+        <div class="flex-1 min-w-0"><p class="text-[14.5px] font-semibold">${esc(x.label)}</p><p class="text-[12.5px] text-ink-3">${esc(x.sub)}</p></div><span class="flex items-center gap-0.5 text-[13px] font-semibold text-navy-2">${T("verify")}${icon("chevron-right", "size-4")}</span></a>`
     : `<button class="doc flex items-center gap-3 rounded-2xl ring-1 ring-line p-3.5 text-left active:scale-[.99] transition" type="button" data-letter><div class="size-11 shrink-0 rounded-xl bg-warn-50 text-warn grid place-items-center">${icon("file-signature", "size-5")}</div>
-        <div class="flex-1 min-w-0"><p class="text-[14.5px] font-semibold">${esc(x.label)}</p><p class="text-[12.5px] text-ink-3">${esc(x.sub)}</p></div><span class="flex items-center gap-0.5 text-[13px] font-semibold text-navy-2">Padhiye${icon("chevron-right", "size-4")}</span></button>`).join("")}</div></section>`;
+        <div class="flex-1 min-w-0"><p class="text-[14.5px] font-semibold">${esc(x.label)}</p><p class="text-[12.5px] text-ink-3">${esc(x.sub)}</p></div><span class="flex items-center gap-0.5 text-[13px] font-semibold text-navy-2">${T("read")}${icon("chevron-right", "size-4")}</span></button>`).join("")}</div></section>`;
 }
 function stake(v) {
   if (!v.stake) return "";
   const s = v.stake;
-  return `<section data-k="stake" class="card p-5"><p class="eyebrow">Daav par</p>
+  return `<section data-k="stake" class="card p-5"><p class="eyebrow">${T("stake")}</p>
     <div class="mt-3 flex items-end justify-between gap-3"><p class="num text-[34px] leading-none font-bold" data-count="${s.amount}">${rs(s.amount)}</p>
-      ${s.replied ? `<div class="text-right"><p class="flex items-center gap-1 justify-end text-[17px] font-bold text-ok">${icon("circle-check", "size-4")}Jawab gaya</p><p class="text-[12px] text-ink-3">deadline se ${left(s.secs_left)} pehle</p></div>`
-        : `<div class="text-right"><p class="num text-[26px] leading-none font-bold text-bad">${left(s.secs_left)}</p><p class="mt-1 text-[12px] text-ink-3">jawab ki deadline</p></div>`}</div>
+      ${s.replied ? `<div class="text-right"><p class="flex items-center gap-1 justify-end text-[17px] font-bold text-ok">${icon("circle-check", "size-4")}${T("replied")}</p><p class="text-[12px] text-ink-3">${left(s.secs_left)} ${T("before")}</p></div>`
+        : `<div class="text-right"><p class="num text-[26px] leading-none font-bold text-bad">${left(s.secs_left)}</p><p class="mt-1 text-[12px] text-ink-3">${T("deadline")}</p></div>`}</div>
     <ul class="mt-4 grid gap-2.5">${v.proof.map((p) => `<li class="flex items-start gap-3"><div class="size-7 shrink-0 rounded-full grid place-items-center ${p.ok ? "bg-ok-50 text-ok" : "bg-warn-50 text-warn"}">${icon(p.ok ? "check" : "circle-help", "size-4")}</div>
       <p class="flex-1 text-[13.5px] leading-snug pt-1">${esc(p.label)}</p><span class="shrink-0 mt-0.5 text-[10.5px] font-semibold text-ink-3 ring-1 ring-line rounded-full px-2 py-0.5">${esc(p.tier)}</span></li>`).join("")}</ul></section>`;
 }
@@ -261,9 +297,9 @@ function render() {
   const v = S.view; if (!v) return;
   let html;
   if (v.mode === "home") html = home(v);
-  else if (v.mode === "neutral") html = hero("neutral", "wait", "Paytm team", v.shield.title, v.shield.sub);
-  else if (v.case === "chargeback") html = hero("cb", v.shield.tone, v.shield.account, v.shield.title, v.shield.sub, { listen: true }) + action(v.action) + stake(v) + clocks(v.clocks) + tracker(v.steps);
-  else html = hero(v.released ? "freeze-ok" : "freeze", v.shield.tone, "Account " + v.shield.account, v.shield.title, v.shield.sub, { listen: true, trust: v.shield.trust })
+  else if (v.mode === "neutral") html = hero("neutral", "wait", T("team"), v.shield.title, v.shield.sub);
+  else if (v.case === "chargeback") html = hero("cb", v.shield.tone, v.shield.account, v.shield.title, v.shield.sub, { listen: true, trust: v.shield.trust }) + action(v.action) + stake(v) + clocks(v.clocks) + tracker(v.steps);
+  else html = hero(v.released ? "freeze-ok" : "freeze", v.shield.tone, T("account") + " " + v.shield.account, v.shield.title, v.shield.sub, { listen: true, trust: v.shield.trust })
     + action(v.action) + money(v) + clocks(v.clocks) + tracker(v.steps) + docs(v.docs);
   const app = $("#app");
   app.innerHTML = html;
@@ -295,9 +331,9 @@ function animateIn(root) {
 function bind() {
   document.querySelectorAll("[data-yes]").forEach((b) => b.onclick = () => { b.disabled = true; haptic(); post("/api/approve", { incident_id: b.dataset.yes, approver: "merchant", yes: true }); });
   document.querySelectorAll("[data-no]").forEach((b) => b.onclick = () => { b.disabled = true; post("/api/approve", { incident_id: b.dataset.no, approver: "merchant", yes: false }); });
-  document.querySelectorAll("[data-fwd]").forEach((b) => b.onclick = () => { const d = S.drafts.find((x) => x.next_doc); if (!d) return; b.disabled = true; haptic(); send("Bank ka SMS aur police ka notice yeh hai. Account mein 3.1 lakh atak gaye.", d.next_doc); S.drafts = []; });
+  document.querySelectorAll("[data-fwd]").forEach((b) => b.onclick = () => { const d = S.drafts.find((x) => x.next_doc); if (!d) return; b.disabled = true; haptic(); send(T("fwdMsg"), d.next_doc); S.drafts = []; });
   document.querySelectorAll("[data-cam]").forEach((b) => b.onclick = () => $("#cam").click());
-  document.querySelectorAll("[data-branch]").forEach((b) => b.onclick = () => { b.disabled = true; haptic(); send("Bank ne complaint le li, acknowledgement mil gaya."); });
+  document.querySelectorAll("[data-branch]").forEach((b) => b.onclick = () => { b.disabled = true; haptic(); send(T("branchMsg")); });
   document.querySelectorAll("[data-listen]").forEach((b) => b.onclick = () => { S.audio = true; speak(S.lastSay); });
   document.querySelectorAll("[data-letter]").forEach((b) => b.onclick = () => { const d = S.view.docs.find((x) => x.kind === "letter"); $("#lettertext").textContent = d ? d.text : ""; openSheet("#letter"); });
 }
@@ -307,14 +343,12 @@ const haptic = () => { if (navigator.vibrate) navigator.vibrate(12); };
 function renderChat() {
   const items = S.chat.filter((m) => m.who === "kavach" || m.who === "merchant");
   $("#chat").innerHTML = items.length ? items.map((m) => m.who === "merchant"
-    ? `<div class="self-end max-w-[84%] rounded-[20px] rounded-br-md bg-navy-2 text-white px-3.5 py-2.5 text-[15px] leading-snug whitespace-pre-wrap">${esc(m.text)}<p class="mt-1 text-[10.5px] text-white/60 text-right">${tm(m.at)}</p></div>`
-    : `<div class="self-start max-w-[86%] rounded-[20px] rounded-bl-md bg-white ring-1 ring-line px-3.5 py-2.5 text-[15px] leading-snug whitespace-pre-wrap">${esc(m.text)}<p class="mt-1 text-[10.5px] text-ink-3">${tm(m.at)}</p></div>`).join("")
-    : `<div class="m-auto text-center text-ink-3 text-[14px]">${icon("message-circle", "size-8 mx-auto mb-2 text-ink-3")}Payout, refund, freeze, SOP: kuch bhi poochiye.</div>`;
+    ? `<div class="self-end max-w-[84%] rounded-[20px] rounded-br-md bg-navy-2 text-white px-3.5 py-2.5 text-[15px] leading-snug whitespace-pre-wrap">${esc(msgText(m))}<p class="mt-1 text-[10.5px] text-white/60 text-right">${tm(m.at)}</p></div>`
+    : `<div class="self-start max-w-[86%] rounded-[20px] rounded-bl-md bg-white ring-1 ring-line px-3.5 py-2.5 text-[15px] leading-snug whitespace-pre-wrap">${esc(msgText(m))}<p class="mt-1 text-[10.5px] text-ink-3">${tm(m.at)}</p></div>`).join("")
+    : `<div class="m-auto text-center text-ink-3 text-[14px]">${icon("message-circle", "size-8 mx-auto mb-2 text-ink-3")}${T("chatEmpty")}</div>`;
   $("#chat").scrollTop = 1e9;
   const v = S.view, out = [];
-  if (v && v.case === "chargeback") out.push("Chargeback kya hota hai?", "Kal ka paisa kab aayega?");
-  else if (v && v.mode === "case") out.push("Bank ko kitne din milte hain?", "Payout doosre account mein bhej do", "Ek aadmi 20 hazaar maang raha hai complaint wapas lene ke liye");
-  else out.push("Kal ka paisa kab aayega?");
+  out.push(...T("chips")[v && v.case === "chargeback" ? "cb" : v && v.mode === "case" ? "case" : "home"]);
   $("#chips").innerHTML = ""; out.forEach((t) => { const b = document.createElement("button"); b.type = "button"; b.className = "chip"; b.textContent = t; b.onclick = () => send(t); $("#chips").appendChild(b); });
   const n = $("#unread"); n.hidden = !S.unread; n.textContent = S.unread;
   if (window.lucide) lucide.createIcons();
@@ -330,12 +364,13 @@ function closeAll() { document.querySelectorAll(".sheet").forEach((s) => s.class
 
 // ---------------------------------------------------------------- live
 let vt = null;
-function refresh() { clearTimeout(vt); vt = setTimeout(async () => { S.view = await fetch("/api/merchant/view").then((r) => r.json()).catch(() => S.view); render(); renderChat(); }, 160); }
+function refresh() { clearTimeout(vt); vt = setTimeout(async () => { S.view = await fetch(`/api/merchant/view?lang=${LANG}`).then((r) => r.json()).catch(() => S.view); render(); renderChat(); }, 160); }
 async function boot() {
   if (window.lucide) lucide.createIcons();
   const st = await fetch("/api/state").then((r) => r.json());
+  if (EMBED && st.merchant_lang && st.merchant_lang !== LANG) { LANG = st.merchant_lang; applyLang(); }
   S.chat = st.chat || []; S.drafts = st.drafts || [];
-  const lastK = [...S.chat].reverse().find((m) => m.who === "kavach" && m.speak); S.lastSay = lastK ? lastK.speak : null;
+  const lastK = [...S.chat].reverse().find((m) => m.who === "kavach" && msgSpeak(m)); S.lastSay = lastK ? msgSpeak(lastK) : null;
   fetch("/api/integrations").then((r) => r.json()).then((x) => { S.sarvam = !!x.sarvam; }).catch(() => {});
   refresh();
   const es = new EventSource("/api/stream");
@@ -344,14 +379,16 @@ async function boot() {
     if (ev.type === "phone") {
       const msg = ev.message; if (msg.extra && msg.extra.doc_id) S.drafts = [];
       S.chat.push(msg);
-      if (msg.who === "kavach") { if (msg.speak) S.lastSay = msg.speak; speak(msg.speak); if (!$("#sheet").classList.contains("on")) { S.unread++; push(msg.text); } }
+      if (msg.who === "kavach") { const sp = msgSpeak(msg); if (sp) S.lastSay = sp; speak(sp); if (!$("#sheet").classList.contains("on")) { S.unread++; push(msgText(msg)); } }
       renderChat(); refresh();
     } else if (ev.type === "incident" || ev.type === "world" || ev.type === "step") refresh();
     else if (ev.type === "draft") { S.drafts = [ev.draft]; refresh(); }
+    else if (ev.type === "lang") { if (ev.lang !== LANG) setLang(ev.lang, true); }
     else if (ev.type === "reset") { S.chat = []; S.drafts = []; S.unread = 0; S.lastSay = null; S.keys = new Set(); S.nums = {}; refresh(); }
   };
 }
-$("#start").onclick = () => { S.audio = true; const g = $("#gate"); g.remove(); if ("speechSynthesis" in window) speechSynthesis.speak(new SpeechSynthesisUtterance(" ")); };
+document.querySelectorAll("[data-start]").forEach((b) => b.onclick = () => { S.audio = true; $("#gate").remove(); if ("speechSynthesis" in window) speechSynthesis.speak(new SpeechSynthesisUtterance(" ")); setLang(b.dataset.start); });
+$("#lang").onclick = () => setLang(LANG === "hi" ? "en" : "hi");
 if (EMBED) $("#gate").remove();
 const openChat = () => { openSheet("#sheet"); S.unread = 0; renderChat(); };
 $("#ask").onclick = openChat; $("#bell").onclick = openChat;
@@ -363,9 +400,10 @@ document.querySelectorAll(".camin").forEach((inp) => inp.onchange = async (e) =>
   const file = e.target.files[0]; if (!file) return;
   const fd = new FormData(); fd.append("kind", "notice"); fd.append("file", file);
   const r = await fetch("/api/upload", { method: "POST", body: fd }).then((x) => x.json()).catch(() => null);
-  if (r && r.doc_id) send("Yeh notice aaya hai, dekho.", r.doc_id);
+  if (r && r.doc_id) send(T("photoMsg"), r.doc_id);
   e.target.value = "";
 });
+applyLang();
 boot();
 </script>
 </body>

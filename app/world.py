@@ -34,7 +34,7 @@ MERCHANT = {
     "settlement_bank": "Bank account XX4471",
     "soundbox_id": "SBX-7781",
     "typical_ticket": [150, 3000],
-    "language": "hi",
+    "language": "en",      # the merchant's chosen language: drives the app, notifications and the Soundbox voice
 }
 
 POS_WEBHOOK = "https://pos.meenakirana.example/hooks/paytm"   # synthetic

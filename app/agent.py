@@ -260,7 +260,7 @@ class Engine:
         w = self.world
         if action == "notify_merchant":
             m = w.send_message("merchant", "app", a["text"], inc.id)
-            self._phone("kavach", a["text"], inc.id, speak=a.get("speak"), extra=a.get("extra"))
+            self._phone("kavach", a["text"], inc.id, speak=a.get("speak"), extra=a.get("extra"), hi=a.get("hi"), speak_en=a.get("speak_en"))
             return {"msg_id": m["msg_id"], "summary": "Message delivered in Paytm for Business app (simulated)"}
         if action == "send_customer_update_simulated":
             ch = "whatsapp" if inc.channel == "whatsapp" else "counter card"
@@ -337,7 +337,8 @@ class Engine:
             letter = self._escalation_letter(inc, a)
             inc.facts["escalation_letter"] = letter
             m = w.send_message("merchant", "app", letter["en"], inc.id)
-            self._phone("kavach", "✉️ Bank ke grievance officer ke liye chitthi taiyaar hai (aapke naam se). Neeche padh lijiye:\n\n" + letter["en"], inc.id)
+            self._phone("kavach", "✉️ A letter to the bank's grievance officer is ready, in your name. Read it below:\n\n" + letter["en"], inc.id,
+                        hi="✉️ बैंक के ग्रीवेंस अधिकारी के लिए चिट्ठी तैयार है (आपके नाम से)। नीचे पढ़िए:\n\n" + letter["en"])
             return {"msg_id": m["msg_id"], "summary": f"Escalation letter to {a['to']} approved by Meena; ready to hand in or email"}
         if action == "issue_live_pack":
             r = w.live_checks[a["order_id"]]
@@ -390,8 +391,8 @@ class Engine:
             letter = self._lien_letter(inc, a)
             inc.facts["lien_request"] = letter
             m = w.send_message("merchant", "app", letter["en"], inc.id)
-            self._phone("kavach", "✉️ Bank ke liye chitthi taiyaar (aapke naam se): hold sirf vivadit rakam tak seemit karne ki request. Neeche padh lijiye:\n\n" + letter["en"],
-                        inc.id, extra={"letter": "lien"})
+            self._phone("kavach", "✉️ Your request to the bank is ready, in your name: hold only the disputed amount. Read it below:\n\n" + letter["en"],
+                        inc.id, extra={"letter": "lien"}, hi="✉️ बैंक के लिए अनुरोध तैयार है (आपके नाम से): रोक सिर्फ़ विवादित रकम तक। नीचे पढ़िए:\n\n" + letter["en"])
             return {"msg_id": m["msg_id"], "summary": f"Lien-limiting request approved by Meena: hold {letter['disputed_text']} of {letter['locked_text']}; ready to hand in at the branch"}
         if action == "resolve_incident":
             inc.status = "resolved"
@@ -469,8 +470,10 @@ class Engine:
         rec = automation.emit(event, {"incident": inc.id, "kind": inc.kind, "merchant": MERCHANT["name"], **payload}, at=self.world.now.isoformat())
         self._emit("automation", {"record": rec})
 
-    def _phone(self, who: str, text: str, inc_id: str | None = None, speak: str | None = None, extra: dict | None = None) -> None:
-        m = {"who": who, "text": text, "at": self.world.now.isoformat(), "incident": inc_id, "speak": speak, "extra": extra or {}}
+    def _phone(self, who: str, text: str, inc_id: str | None = None, speak: str | None = None, extra: dict | None = None,
+               hi: str | None = None, speak_en: str | None = None) -> None:
+        """One message, both languages: English by default, Hindi (Devanagari) if Meena picked it. The app chooses."""
+        m = {"who": who, "text": text, "hi": hi, "at": self.world.now.isoformat(), "incident": inc_id, "speak": speak, "speak_en": speak_en, "extra": extra or {}}
         self.chat.append(m)
         self._emit("phone", {"message": m})
 
