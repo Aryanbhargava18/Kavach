@@ -111,11 +111,8 @@ function setClock(iso) { $("#clock").textContent = tm(iso, true); }
 function renderIntegrations(i) {
   S.intg = i;
   const chip = (name, on, title, always) => (on || always) ? `<span class="ichip ${on ? "on" : ""}" title="${esc(title)}">${name}</span>` : "";   // off integrations stay out of the way
-  $("#intg").innerHTML = chip("Paytm " + (i.paytm_env === "production" ? "prod" : "staging"), i.paytm, i.paytm ? "live: Paytm Transaction Status API on your MID" : "offline: set PAYTM_MID and PAYTM_MERCHANT_KEY", true) + chip("Sarvam", i.sarvam, i.sarvam ? `live: ${i.models.chat}, ${i.models.stt}, ${i.models.tts}` : "offline: set SARVAM_API_KEY")
-    + chip("n8n", i.n8n, i.n8n ? "events posted to your n8n webhook" : "offline: events kept in a local log")
-    + chip("Cognee", i.cognee, i.cognee ? "SOP retrieval via Cognee" : "offline: local SOP retrieval")
-    + chip("OCR", i.ocr, i.ocr ? "Tesseract reads images" : "install tesseract")
-    + `<span class="ichip on" title="Planner">${i.planner === "offline" ? "rules planner" : i.planner + " planner"}</span>`;
+  $("#intg").innerHTML = i.paytm ? chip("Paytm " + (i.paytm_env === "production" ? "prod" : "staging"), i.paytm, i.paytm ? "live: Paytm Transaction Status API on your MID" : "offline: set PAYTM_MID and PAYTM_MERCHANT_KEY", true) + chip("Sarvam", i.sarvam, i.sarvam ? `live: ${i.models.chat}, ${i.models.stt}, ${i.models.tts}` : "offline: set SARVAM_API_KEY")
+    : "";   // only what is actually live earns a spot in the top bar; the rest is under the hood
 }
 
 // ===================================================================== inbox
@@ -664,7 +661,10 @@ $$(".seg button").forEach((b) => b.onclick = () => {
   $("#app").classList.toggle("desk-view", S.view === "desk");
   $("#desk").hidden = S.view !== "desk";
   if (S.view === "desk") loadDesk();
+  $("#drawer").hidden = true;
+  $("#back-live").hidden = S.view === "stage";
 });
+$("#back-live").onclick = () => $('.seg button[data-view="stage"]').click();
 async function loadDesk() { renderDesk(await fetch("/api/desk").then((r) => r.json())); }
 function renderDesk(v) {
   S.desk = v;

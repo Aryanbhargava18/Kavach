@@ -357,6 +357,11 @@ h1, h2, h3, h4, p { margin: 0; }
 @keyframes slide { from { transform: translateX(40px); opacity: 0; } }
 .drawer header { display: flex; justify-content: space-between; align-items: center; padding: 14px 18px; border-bottom: 1px solid var(--line); }
 .dtabs { display: flex; gap: 4px; }
+.drawer header { flex-wrap: wrap; gap: 10px; }
+.drawer .seg { background: var(--paper); order: 3; width: 100%; }
+.drawer .seg button { color: var(--ink-3); flex: 1; padding: 7px 12px; }
+.drawer .seg button.on { background: var(--ink); color: #fff; }
+#back-live[hidden] { display: none; }
 .dtabs button { border: 0; background: none; padding: 6px 10px; border-radius: 8px; font-weight: 600; font-size: 14px; color: var(--ink-3); }
 .dtabs button.on { background: var(--paper); color: var(--ink); }
 .dclose { border: 0; background: none; font-size: 18px; color: var(--ink-3); }

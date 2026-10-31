@@ -26,15 +26,15 @@
     <span id="sb-line">Soundbox</span>
   </div>
   <div class="spacer"></div>
-  <div class="seg" role="tablist" aria-label="View"><button data-view="stage" class="on" role="tab">Live</button><button data-view="work" role="tab">Console</button><button data-view="desk" role="tab">Paytm Risk desk</button></div>
   <span class="intg" id="intg"></span>
   <span class="clock"><time id="clock">--:--</time></span>
   <button class="tbtn" id="open-phone" title="Hand a judge Meena's phone"><i data-lucide="smartphone"></i>Phone</button>
+  <button class="tbtn" id="back-live" hidden><i data-lucide="arrow-left"></i>Back to live</button>
   <a class="tbtn" href="/ops" title="Paytm Ops: a whole day's payout returns"><i data-lucide="layers"></i>Ops</a>
-  <button class="tbtn" id="open-sys"><i data-lucide="server"></i>Systems</button>
   <button class="tbtn" id="open-eval"><i data-lucide="flask-conical"></i>Results</button>
+  <button class="tbtn icon" id="open-sys" aria-label="Under the hood" title="Under the hood: Paytm systems, agent console, Risk desk"><i data-lucide="server"></i></button>
   <button class="tbtn icon" id="sound" aria-pressed="true" aria-label="Sound"><i data-lucide="volume-2"></i></button>
-  <button class="tbtn" id="reset"><i data-lucide="rotate-ccw"></i>Reset</button>
+  <button class="tbtn icon" id="reset" aria-label="Start over" title="Start over"><i data-lucide="rotate-ccw"></i></button>
 </header>
 
 <section class="stage" id="stage" aria-label="Kavach live">
@@ -73,8 +73,7 @@
       <p class="sub" id="sub">It watches every payment, refund and payout, fixes what it safely can, and tells Meena out loud.</p>
       <div class="go-row" id="go-row">
         <button class="go" data-scn="payout_bounce">Meena's bank freezes her account</button>
-        <button class="ghost" data-scn="chargeback">A chargeback clock</button>
-        <button class="ghost" id="st-menu-open2">Judge challenges</button>
+        <button class="ghost" data-scn="chargeback">A customer disputes a payment</button>
       </div>
     </div>
   </div>
@@ -92,25 +91,23 @@
     <p class="result" id="result">Nothing to fix yet.</p>
     <div class="band-acts">
       <span id="next-acts"></span>
-      <button class="menu-btn" id="st-menu-open" aria-haspopup="true"><i data-lucide="play"></i>Run a scenario</button>
+      <button class="menu-btn" id="st-menu-open" aria-haspopup="true"><i data-lucide="list"></i>More situations</button>
     </div>
     <div class="st-menu" id="st-menu" hidden>
-      <p>Each one changes what really happened in Paytm's systems (simulated). Kavach has to find out on its own.</p>
-      <button data-scn="payout_bounce" class="hero"><b>Meena's bank freezes her account</b><small>Nobody tells her. The next payout bounces; Kavach notices first.</small></button>
-      <button data-scn="live_check" class="hero"><b>LIVE: check a real Paytm order</b><small>Paytm's Transaction Status API on your staging MID. Signs only what Paytm returns.</small></button>
-      <button data-scn="skip_days" data-days="13" class="hero"><b>⏩ 12 days later: the bank and the officer act</b><small>Simulated bank desk + IO. Kavach verifies with ₹1, then releases with Paytm Risk.</small></button>
-      <button data-scn="chargeback" class="hero"><b>Chargeback: a reply clock nobody is watching</b><small>Silence = money netted. Kavach proves what it can, asks Meena the rest.</small></button>
-      <button data-scn="supplier_declined" class="hero"><b>Debit freeze: her payment to a supplier is refused</b><small>Payouts still land. Kavach reads her bank's YE code.</small></button>
-      <button data-scn="payout_bounce" data-mule="true"><b>Payout bounces, but Risk has mule signals</b><small>Kavach checks first and withholds details</small></button>
-      <button data-scn="live_payment" class="hero"><b>A payment comes in; the billing app misses it</b><small>Nobody complains. Kavach catches it.</small></button>
-      <button data-scn="customer_claim" data-mode="success_missed"><b>Customer says paid; shop says no</b><small>Rahul writes in on WhatsApp</small></button>
-      <button data-scn="customer_claim" data-mode="fake_amount"><b>Screenshot ₹4,200, bank says ₹2,400</b><small>Priya</small></button>
-      <button data-scn="customer_claim" data-mode="pending"><b>Payment still pending</b><small>Imran</small></button>
-      <button data-scn="customer_claim" data-mode="refund_initiated"><b>Refund already on its way back</b><small>Farah</small></button>
-      <button data-scn="customer_claim" data-mode="replay"><b>Same payment shown for a second bill</b><small>Vikas</small></button>
-      <button data-scn="customer_claim" data-mode="fake_utr"><b>Reference that doesn't exist</b><small>Deepak</small></button>
-      <button data-scn="duplicate"><b>Charged twice</b><small>Sunita · ₹2,450</small></button>
-      <button data-scn="freeze"><b>Bank froze Meena's account</b><small>cyber-fraud hold notice</small></button>
+      <p>Each one changes what really happens in Paytm's (simulated) systems. Kavach has to notice on its own.</p>
+      <h4>Bank freezes and payouts</h4>
+      <button data-scn="payout_bounce" class="hero"><b>Meena's bank freezes her account</b><small>Nobody tells her. Her next payout bounces and Kavach notices first.</small></button>
+      <button data-scn="skip_days" data-days="13" class="hero"><b>Skip 12 days: the bank and the officer reply</b><small>Kavach checks the account with ₹1, then releases the money with Paytm Risk.</small></button>
+      <button data-scn="supplier_declined"><b>Her payment to a supplier is refused</b><small>Money still comes in, but she can't pay out. Kavach reads the bank's decline code.</small></button>
+      <button data-scn="payout_bounce" data-mule="true"><b>Same bounce, but Paytm Risk has fraud signals</b><small>Kavach checks first and does not reveal the case.</small></button>
+      <h4>Disputes and "I paid"</h4>
+      <button data-scn="chargeback" class="hero"><b>A customer disputes a payment</b><small>The reply deadline nobody watches. If missed, the money is deducted.</small></button>
+      <button data-scn="live_payment"><b>A payment comes in; the billing app misses it</b><small>Nobody complains. Kavach catches it.</small></button>
+      <button data-scn="customer_claim" data-mode="fake_amount"><b>Screenshot says ₹4,200, bank says ₹2,400</b><small>Kavach trusts the bank, not the picture.</small></button>
+      <button data-scn="customer_claim" data-mode="pending"><b>Customer's payment is still pending</b><small>Kavach doesn't ask them to pay twice.</small></button>
+      <button data-scn="duplicate"><b>Customer charged twice</b><small>₹2,450, 37 seconds apart.</small></button>
+      <h4>Real Paytm</h4>
+      <button data-scn="live_check" class="hero"><b>Check a real Paytm order</b><small>Paytm's Transaction Status API on your staging account. Needs your keys in .env.</small></button>
     </div>
   </footer>
 </section>
@@ -227,6 +224,7 @@
 
 <aside class="drawer" id="drawer" aria-label="Paytm systems" hidden>
   <header><nav class="dtabs"><button data-tab="systems" class="on">Paytm systems</button><button data-tab="automation">Automations (n8n)</button></nav>
+    <div class="seg" role="tablist" aria-label="View"><button data-view="stage" class="on" role="tab">Live</button><button data-view="work" role="tab">Agent console</button><button data-view="desk" role="tab">Risk desk</button></div>
     <button class="dclose" id="close-drawer" aria-label="Close">✕</button></header>
   <div class="dpane" data-pane="systems"><div id="sys"></div></div>
   <div class="dpane" data-pane="automation" hidden><p class="dnote" id="auto-note"></p><ol class="autolog" id="autolog"></ol></div>

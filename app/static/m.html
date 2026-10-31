@@ -70,8 +70,8 @@ html.embed #gate, html.embed .sim-tag, html.embed #ask { display: none !importan
   <header class="sticky top-0 z-30 bg-page/80 backdrop-blur-xl px-4 pt-[calc(10px+env(safe-area-inset-top))] pb-3 flex items-center gap-3">
     <div class="size-10 rounded-2xl bg-gradient-to-br from-sky to-navy-2 grid place-items-center text-white shadow-lg shadow-sky/20"><i data-lucide="shield-check" class="size-5"></i></div>
     <div class="flex-1 min-w-0">
-      <p class="text-[11.5px] text-ink-3 truncate">Meena Kirana Store <span class="sim-tag">· SIMULATED</span></p>
-      <p class="text-[17px] font-semibold tracking-tight leading-tight whitespace-nowrap">Kavach Shield</p>
+      <p class="text-[11.5px] text-ink-3 truncate">Meena Kirana Store <span class="sim-tag">· Simulated</span></p>
+      <p class="text-[17px] font-semibold tracking-tight leading-tight truncate">Kavach Shield</p>
     </div>
     <button id="lang" type="button" class="h-9 px-1 rounded-full bg-white ring-1 ring-line flex items-center text-[12px] font-semibold" aria-label="Language"><span data-l="en" class="px-2.5 h-7 rounded-full grid place-items-center">EN</span><span data-l="hi" class="px-2.5 h-7 rounded-full grid place-items-center">हि</span></button>
     <button id="bell" type="button" class="relative size-10 rounded-full bg-white ring-1 ring-line grid place-items-center" aria-label="Messages">
@@ -121,6 +121,7 @@ html.embed #gate, html.embed .sim-tag, html.embed #ask { display: none !importan
 const $ = (q) => document.querySelector(q);
 const EMBED = new URLSearchParams(location.search).has("embed");
 if (EMBED) document.documentElement.classList.add("embed");
+if (EMBED) document.addEventListener("keydown", (e) => { if (!e.target.closest("input, textarea") && /^(ArrowRight|[123rR])$/.test(e.key)) parent.postMessage({ kavachKey: e.key }, location.origin); });   // presenter keys still work after tapping the phone
 const L = {
   en: { askSub: "Ask in English or Hindi", letterTitle: "Request to your bank", now: "· now", shieldOn: "Shield on", todaySales: "Today's sales", payments: "Payments", nextPayout: "Next payout",
     whatDid: "What Kavach did", nothingYet: "Nothing needed yet. Kavach is watching.", nextStep: "Your next step", watching: "Kavach is watching", daysLeft: "days left", done: "Done", working: "Kavach at work",
@@ -200,13 +201,13 @@ function hero(k, tone, pill, title, sub, opts = {}) {
 function home(v) {
   const nx = new Date(v.today.next_payout);
   const kv = `<div class="relative mt-5 grid grid-cols-3 gap-2">${[[T("todaySales"), `<span class="num" data-count="${v.today.sales}">${rs(v.today.sales)}</span>`], [T("payments"), `<span class="num">${v.today.count}</span>`],
-    [T("nextPayout"), `${nx.toLocaleDateString("en-IN", { day: "numeric", month: "short" })}, ${tm(v.today.next_payout)}`]].map(([a, b]) =>
+    [T("nextPayout"), `${esc(v.today.next_payout_day || nx.toLocaleDateString("en-IN", { day: "numeric", month: "short" }))}<br><span class="text-white/70 font-medium text-[13px]">${tm(v.today.next_payout)}</span>`]].map(([a, b]) =>
     `<div class="rounded-2xl bg-white/10 ring-1 ring-white/10 p-3"><p class="text-[11px] text-white/60">${a}</p><p class="mt-1 text-[15px] font-semibold">${b}</p></div>`).join("")}</div>`;
   const feed = v.feed.length ? v.feed.map((f) => `<div class="flex gap-3 py-3 first:pt-0 border-t first:border-0 border-line"><div class="size-9 shrink-0 rounded-xl bg-ok-50 text-ok grid place-items-center">${icon("check", "size-4")}</div>
       <div class="min-w-0"><p class="text-[14.5px] font-semibold leading-snug">${esc(f.title)}</p><p class="text-[13px] text-ink-2 leading-snug mt-0.5">${esc(f.text)}</p></div></div>`).join("")
     : `<div class="flex items-center gap-3 text-ink-2 text-[14px]"><div class="size-9 shrink-0 rounded-xl bg-sky-50 text-sky grid place-items-center">${icon("radar", "size-4")}</div>${T("nothingYet")}</div>`;
   return hero("home", "ok", T("shieldOn"), v.shield.title, v.shield.sub, { extra: kv })
-    + `<section data-k="feed" class="card p-5"><p class="eyebrow mb-3">${T("whatDid")}</p>${feed}</section>` + clocks(v.clocks);
+    + `<section data-k="feed" class="card p-5"><p class="eyebrow mb-3">${T("whatDid")}</p>${feed}</section>` + clocks(v.clocks.filter((k) => k.key !== "payout"));   // next payout is already in the card above
 }
 function action(a) {
   if (!a) return "";
@@ -252,7 +253,7 @@ function clocks(c) {
     <div class="clks no-scrollbar mt-3 flex gap-2.5 overflow-x-auto pr-5 snap-x">${c.map((k) => {
       const span = k.key === "payout" || String(k.key).startsWith("CB") ? 86400 : String(k.key).includes("90") ? 90 * 86400 : 15 * 86400;
       const frac = Math.min(1, k.secs_left / span);
-      return `<div class="snap-start shrink-0 w-[172px] rounded-2xl ring-1 ${k.tone === "bad" ? "ring-bad/25 bg-bad-50/60" : "ring-line bg-white"} p-3.5">
+      return `<div class="snap-start shrink-0 ${c.length === 1 ? "w-[calc(100%-20px)]" : "w-[172px]"} rounded-2xl ring-1 ${k.tone === "bad" ? "ring-bad/25 bg-bad-50/60" : "ring-line bg-white"} p-3.5">
         <div class="flex items-center gap-3"><svg viewBox="0 0 48 48" class="size-12 -rotate-90 shrink-0"><circle class="ring-track" cx="24" cy="24" r="${R}" fill="none" stroke-width="5"/>
           <circle class="ring-fill" cx="24" cy="24" r="${R}" fill="none" stroke="${COL[k.tone] || COL.ok}" stroke-width="5" stroke-linecap="round" stroke-dasharray="${C}" stroke-dashoffset="${C * (1 - frac)}"/></svg>
           <div class="min-w-0"><p class="text-[12.5px] font-semibold leading-tight text-ink-2">${esc(k.label)}</p><p class="num text-[17px] font-bold ${k.tone === "bad" ? "text-bad" : "text-navy-2"}">${left(k.secs_left)}</p></div></div>

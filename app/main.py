@@ -89,6 +89,12 @@ def run_bg(coro) -> None:
 
 @app.get("/", response_class=HTMLResponse)
 def index():
+    return FileResponse(STATIC / "home.html")
+
+
+@app.get("/classic", response_class=HTMLResponse)
+def classic():
+    """The earlier presenter stage (systems map + console), kept as a fallback."""
     return FileResponse(STATIC / "index.html")
 
 

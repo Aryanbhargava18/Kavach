@@ -43,7 +43,7 @@ def clocks(world, engine) -> list[dict[str, Any]]:
     netted = sum(d["amount"] for d in world.disputes if d["status"] in ("DEEMED_VALID", "ACCEPTED", "LOST") and not d.get("netted_in"))
     if unsettled:
         out.append({"key": "payout", "label": t("Next payout", "अगला पेआउट"), "due": world.next_settlement.isoformat(), "amount": sum(x["amount"] for x in unsettled) - netted,
-                    "note": t("T+1 · Kavach confirms it reaches your bank", "T+1 · कवच पक्का करेगा कि बैंक पहुँचा") if not world.settlement_config.get("paused")
+                    "note": t("Kavach checks it reaches your bank", "कवच पक्का करेगा कि बैंक पहुँचा") if not world.settlement_config.get("paused")
                     else t("Stays safe with Paytm (hold)", "पेटीएम के पास सुरक्षित रहेगा (रोक)"), "tone": "ok"})
     for d in world.disputes:
         if d["status"] == "OPEN":
@@ -130,7 +130,8 @@ def _home(world, engine) -> dict[str, Any]:
     return {
         "mode": "home", "lang": _lang.get(),
         "shield": {"tone": "ok", "title": t("All good", "सब ठीक है"), "sub": t("Kavach is watching every payment, refund and payout for you.", "कवच आपके हर भुगतान, रिफंड और पेआउट पर नज़र रख रहा है।")},
-        "today": {"sales": sum(x["amount"] for x in sales), "count": len(sales), "next_payout": world.next_settlement.isoformat()},
+        "today": {"sales": sum(x["amount"] for x in sales), "count": len(sales), "next_payout": world.next_settlement.isoformat(),
+                  "next_payout_day": t("Tomorrow", "कल") if (world.next_settlement.date() - world.now.date()).days == 1 else (t("Today", "आज") if world.next_settlement.date() == world.now.date() else world.next_settlement.strftime("%-d %b"))},
         "clocks": clocks(world, engine),
         "feed": [{"title": i.title, "text": i.headline or "", "state": "done" if i.status == "resolved" else "working", "at": i.updated_at}
                  for i in sorted(fixes, key=lambda i: i.updated_at, reverse=True)[:4]],

@@ -695,9 +695,9 @@ class OfflinePlanner:
             due, due_en = "कल " + due, "tomorrow " + due_en
         plan = ["Notice the chargeback", "Gather what Paytm's records prove", "Say what they don't prove", "Ask Meena one question", "Reply before the deadline", "Watch the outcome"]
         e.set_plan(inc, plan)
-        await e.step(inc, "intake", text=f"Dispute desk: chargeback {d['dispute_id']} on {rs(d['amount'])} · \"{d['reason']}\" · reply by {due} or it is deemed valid",
+        await e.step(inc, "intake", text=f"Dispute desk: chargeback {d['dispute_id']} on {rs(d['amount'])} · \"{d['reason']}\" · reply by {due_en} or it is deemed valid",
                      intent="chargeback", amount=d["amount"], utrs=[d["utr"]], language="system", engine="dispute-monitor", sender="monitor")
-        await self.think(inc, f"Nobody has told Meena. If nobody replies by {due}, the chargeback is deemed valid and {rs(d['amount'])} comes out of her next payout. "
+        await self.think(inc, f"Nobody has told Meena. If nobody replies by {due_en}, the chargeback is deemed valid and {rs(d['amount'])} comes out of her next payout. "
                               "She doesn't watch the dispute desk. I do.", "warn")
         e.tick_plan(inc, plan[0])
         await e.act(inc, "create_support_case", {"summary": f"Chargeback {d['dispute_id']} {rs(d['amount'])} ({d['reason']}); found by Kavach's dispute monitor", "channel": "monitor"})
@@ -727,7 +727,7 @@ class OfflinePlanner:
                               "I won't invent delivery proof. Only Meena can say it, and her answer goes in labelled as hers.", "warn")
         e.tick_plan(inc, plan[2])
         inc.decisive = {"label": "Decisive evidence", "text": f"Payment and bill proven; handover only Meena can state"}
-        inc.money = {"amount": d["amount"], "label": f"at stake · reply by {due}"}
+        inc.money = {"amount": d["amount"], "label": f"at stake · reply by {due_en}"}
         res = await e.act(inc, "submit_dispute_response", {"dispute_id": d["dispute_id"], "evidence": ev, "merchant_attests_handover": True})
         if res["status"] == "NEEDS_APPROVAL":
             await e.act(inc, "notify_merchant", {
@@ -742,7 +742,7 @@ class OfflinePlanner:
             await e.act(inc, "schedule_followup", {"after_seconds": max(600, int((datetime.fromisoformat(d["respond_by"]) - e.world.now).total_seconds()) - 6 * 3600),
                                                   "purpose": "Remind Meena: chargeback reply due in 6 hours"})
             inc.status = "waiting_approval"
-            inc.headline = f"Chargeback {rs(d['amount'])}: waiting for Meena's one answer before {due}."
+            inc.headline = f"Chargeback {rs(d['amount'])}: waiting for Meena's one answer before {due_en}."
 
     async def after_decline(self, inc, action) -> bool:
         """Meena said no. For a chargeback that means the goods were not handed over: accept it, don't fight it."""

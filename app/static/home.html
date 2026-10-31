@@ -1,0 +1,142 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#EEF1F5">
+<title>Kavach for Paytm for Business</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cpath d='M16 2 4 6v9c0 7 5 12.5 12 15 7-2.5 12-8 12-15V6z' fill='%23002E6E'/%3E%3Cpath d='m10 16 4.5 4.5L23 12' stroke='%2300B9F1' stroke-width='3' fill='none'/%3E%3C/svg%3E">
+<!-- Open-source UI stack, vendored so it runs offline: Tailwind CSS (browser build), Lucide icons, Motion, Geist -->
+<script src="/static/vendor/tailwind.browser.js"></script>
+<script src="/static/vendor/lucide.min.js"></script>
+<script src="/static/vendor/motion.js"></script>
+<script src="/static/home.js" defer></script>
+<style>
+@font-face { font-family: "Geist"; src: url(/static/vendor/fonts/Geist-Variable.woff2) format("woff2"); font-weight: 100 900; font-display: swap; }
+@font-face { font-family: "Geist Mono"; src: url(/static/vendor/fonts/GeistMono-Variable.woff2) format("woff2"); font-weight: 100 900; font-display: swap; }
+@font-face { font-family: "Anek"; src: url(/static/fonts/anek-devanagari.woff2) format("woff2"); font-weight: 100 800; unicode-range: U+0900-097F,U+200C-200D,U+20B9,U+25CC; }
+</style>
+<style type="text/tailwindcss">
+@theme {
+  --font-sans: "Geist", "Anek", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: "Geist Mono", ui-monospace, monospace;
+  --color-navy: #001B44; --color-navy-2: #002E6E; --color-sky: #00B9F1; --color-sky-50: #E8F8FE;
+  --color-ink: #0A1628; --color-ink-2: #475569; --color-ink-3: #94A3B8; --color-line: #E7ECF3; --color-page: #EEF1F5;
+  --color-ok: #059669; --color-ok-50: #ECFDF5; --color-warn: #D97706; --color-warn-50: #FFFBEB; --color-bad: #E11D48; --color-bad-50: #FFF1F2;
+}
+@layer base { html, body { @apply bg-page text-ink font-sans antialiased; } .num { font-variant-numeric: tabular-nums; letter-spacing: -0.02em; } }
+@layer components {
+  .label { @apply text-[11px] font-semibold uppercase tracking-[0.14em] text-ink-3; }
+  .k { @apply inline-grid place-items-center min-w-5 h-5 px-1 rounded-[5px] bg-white/10 ring-1 ring-white/20 font-mono text-[10.5px] text-white/80; }
+  .dock-b { @apply whitespace-nowrap h-9 px-3 rounded-xl text-[13px] font-medium text-white/85 hover:bg-white/10 hover:text-white flex items-center gap-2 transition disabled:opacity-40; }
+}
+.phone { border-radius: 52px; padding: 11px; background: linear-gradient(150deg, #3A3F4B, #0E1118 35%, #20242E 70%, #0B0D12);
+  box-shadow: 0 0 0 1px rgba(0,0,0,.6), inset 0 0 0 1.5px rgba(255,255,255,.12), 0 50px 90px -30px rgba(0,27,68,.45), 0 20px 40px -20px rgba(0,0,0,.3); }
+.phone iframe { border-radius: 42px; display: block; width: 100%; height: 100%; background: #F4F6FA; }
+/* Meena's Soundbox: the physical device, drawn */
+.sbx { position: relative; width: 196px; height: 250px; border-radius: 34px 34px 40px 40px; background: linear-gradient(180deg, #0F2C63, #001B44 60%, #00132F);
+  box-shadow: inset 0 2px 0 rgba(255,255,255,.14), inset 0 -10px 24px rgba(0,0,0,.35), 0 40px 60px -28px rgba(0,27,68,.55), 0 10px 20px -10px rgba(0,0,0,.3); }
+.sbx .grille { position: absolute; left: 22px; right: 22px; top: 22px; height: 112px; border-radius: 22px;
+  background: radial-gradient(circle, rgba(255,255,255,.22) 1.5px, transparent 2px) 0 0 / 11px 11px; }
+.sbx .lcd { position: absolute; left: 18px; right: 18px; bottom: 50px; height: 50px; border-radius: 12px; background: #06101F; box-shadow: inset 0 2px 6px rgba(0,0,0,.7);
+  display: grid; place-items: center; font: 600 17px var(--font-mono); color: #7CF0C5; letter-spacing: .04em; text-shadow: 0 0 10px rgba(124,240,197,.55); overflow: hidden; white-space: nowrap; padding: 0 10px; }
+.sbx .lcd.alert { color: #FFC24A; text-shadow: 0 0 10px rgba(255,194,74,.6); }
+.sbx .brand { position: absolute; left: 0; right: 0; bottom: 18px; text-align: center; font: 700 12px var(--font-sans); letter-spacing: .02em; color: rgba(255,255,255,.75); }
+.sbx .brand b { color: #00B9F1; }
+.sbx.speaking .grille { animation: thump .42s ease-in-out infinite alternate; }
+@keyframes thump { to { transform: scale(1.025); filter: brightness(1.35); } }
+.waves, .waves::after { position: absolute; inset: 0; border-radius: inherit; pointer-events: none; border: 1.5px solid rgba(0,185,241,.55); opacity: 0; }
+.waves::after { content: ""; inset: -1.5px; }
+.sbx.speaking .waves { animation: wave 1.6s ease-out infinite; } .sbx.speaking .waves::after { animation: wave 1.6s ease-out .8s infinite; }
+@keyframes wave { 0% { opacity: .9; transform: scale(1); } 100% { opacity: 0; transform: scale(1.16); } }
+.win { box-shadow: 0 1px 2px rgba(10,22,40,.05), 0 30px 60px -30px rgba(10,22,40,.28); }
+.row-in { animation: rowin .45s cubic-bezier(.2,.8,.2,1) both; } @keyframes rowin { from { opacity: 0; transform: translateY(6px); } }
+.live-dot { position: relative; } .live-dot::after { content: ""; position: absolute; inset: -3px; border-radius: 999px; border: 2px solid currentColor; animation: ping 1.8s cubic-bezier(0,0,.2,1) infinite; }
+@keyframes ping { 75%, 100% { transform: scale(2); opacity: 0; } }
+.no-scrollbar { scrollbar-width: none; } .no-scrollbar::-webkit-scrollbar { display: none; }
+.menu[hidden] { display: block; opacity: 0; transform: translateY(6px); pointer-events: none; } .menu { transition: opacity .18s, transform .18s; }
+dialog::backdrop { background: rgba(10,22,40,.35); backdrop-filter: blur(4px); }
+@media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition: none !important; } }
+</style>
+</head>
+<body class="h-dvh overflow-hidden flex flex-col">
+
+<main class="flex-1 min-h-0 w-full max-w-[1500px] mx-auto px-6 pt-6 pb-20 grid gap-8 grid-cols-[minmax(320px,370px)_220px_1fr]">
+
+  <!-- 1 · Meena's phone: the real app -->
+  <section class="min-h-0 flex flex-col">
+    <div class="phone flex-1 min-h-0 max-h-[820px]"><iframe id="phone" src="/m?embed=1" title="Meena's Paytm for Business app with Kavach"></iframe></div>
+    <p class="label mt-3 text-center">Meena's phone · Paytm for Business</p>
+  </section>
+
+  <!-- 2 · her Soundbox -->
+  <section class="min-h-0 flex flex-col items-center justify-center gap-6">
+    <div class="sbx" id="sbx"><span class="waves"></span><div class="grille"></div><div class="lcd" id="lcd">₹ 0</div><div class="brand"><b>Paytm</b> Soundbox</div></div>
+    <p class="label -mt-2">Meena's Soundbox</p>
+    <div class="w-full min-h-[120px]">
+      <p id="heard-t" hidden class="text-[11px] font-medium text-ink-3 mb-2 text-center">What she heard</p>
+      <ol id="heard" class="space-y-2"></ol>
+    </div>
+  </section>
+
+  <!-- 3 · Paytm's internal desk, where Kavach's cases land -->
+  <section class="min-h-0 flex flex-col">
+    <div class="win flex-1 min-h-0 flex flex-col bg-white rounded-[20px] ring-1 ring-black/[0.06] overflow-hidden">
+      <div class="shrink-0 h-11 px-4 flex items-center gap-3 bg-[#F7F8FA] border-b border-line">
+        <span class="flex gap-1.5"><i class="size-3 rounded-full bg-[#FF5F57]"></i><i class="size-3 rounded-full bg-[#FEBC2E]"></i><i class="size-3 rounded-full bg-[#28C840]"></i></span>
+        <span class="flex-1 mx-6 h-7 rounded-lg bg-white ring-1 ring-line flex items-center justify-center gap-1.5 text-[12px] text-ink-3"><i data-lucide="lock" class="size-3"></i>risk-desk.paytm.internal / kavach</span>
+        <a href="/ops" class="text-[12px] font-medium text-navy-2 hover:underline">Return file →</a>
+      </div>
+      <div class="shrink-0 px-6 pt-5 pb-4 flex items-center gap-3 border-b border-line">
+        <span class="size-9 rounded-xl bg-navy-2 text-white grid place-items-center"><i data-lucide="shield-check" class="size-[18px]"></i></span>
+        <div class="flex-1 min-w-0"><b class="block text-[15px] font-semibold">Paytm Risk &amp; Ops desk</b><span class="block text-[12.5px] text-ink-3">Cases Kavach opened · you approve anything that moves money</span></div>
+        <span class="text-[12px] text-ink-3 flex items-center gap-1.5"><i data-lucide="clock-3" class="size-3.5"></i><b id="clock" class="font-mono font-medium text-ink-2 num">--:--</b></span>
+      </div>
+      <div id="queue" class="shrink-0 px-4 py-2 flex gap-1.5 overflow-x-auto no-scrollbar border-b border-line" hidden></div>
+      <div class="flex-1 min-h-0 overflow-y-auto no-scrollbar" id="desk-scroll">
+        <div id="empty" class="h-full grid place-items-center text-center px-10">
+          <div><span class="mx-auto size-12 rounded-2xl bg-ok-50 text-ok grid place-items-center"><i data-lucide="check" class="size-6"></i></span>
+          <p class="mt-4 text-[17px] font-semibold">No open cases</p><p class="mt-1 text-[14px] text-ink-2 max-w-[44ch]">Kavach is watching Meena Kirana Store's payments, payouts, refunds and disputes.</p></div>
+        </div>
+        <div id="case" hidden></div>
+      </div>
+    </div>
+    <p class="label mt-3 text-center">Paytm's side</p>
+  </section>
+</main>
+
+<!-- presenter dock: demo controls, deliberately apart from the product -->
+<div class="fixed left-1/2 -translate-x-1/2 bottom-4 z-30">
+  <div class="relative flex items-center gap-1 p-1.5 rounded-2xl bg-[#0B1220]/92 backdrop-blur-xl ring-1 ring-white/10 shadow-[0_20px_40px_-12px_rgba(0,0,0,.45)]">
+    <span class="pl-2.5 pr-2 text-[11px] font-semibold uppercase tracking-[0.14em] text-white/40">Demo</span>
+    <button class="dock-b" data-scn="payout_bounce"><span class="k">1</span>Bank freezes her account</button>
+    <button class="dock-b" data-scn="chargeback"><span class="k">2</span>Customer disputes</button>
+    <button class="dock-b" data-scn="live_payment"><span class="k">3</span>Bill missed a payment</button>
+    <span class="w-px h-5 bg-white/15 mx-1"></span>
+    <button class="dock-b" id="skip" hidden><span class="k">→</span><span id="skip-t">Skip ahead</span></button>
+    <button class="dock-b" id="more" aria-label="More situations"><i data-lucide="ellipsis" class="size-4"></i></button>
+    <button class="dock-b" id="sound" aria-pressed="true" aria-label="Sound"><i data-lucide="volume-2" class="size-4"></i></button>
+    <button class="dock-b" id="reset" aria-label="Start over" title="Start over (R)"><i data-lucide="rotate-ccw" class="size-4"></i></button>
+    <div id="menu" hidden class="menu absolute right-0 bottom-[calc(100%+10px)] w-[360px] max-h-[70vh] overflow-y-auto no-scrollbar rounded-2xl bg-[#0B1220] ring-1 ring-white/10 p-2 shadow-2xl">
+      <button data-scn="supplier_declined" class="mi"><b>Her payment to a supplier is refused</b><small>Debit-only freeze; Kavach reads the bank's code</small></button>
+      <button data-scn="payout_bounce" data-mule="true" class="mi"><b>Bounce on a merchant Risk has flagged</b><small>Kavach checks first and reveals nothing</small></button>
+      <button data-scn="customer_claim" data-mode="fake_amount" class="mi"><b>Screenshot ₹4,200, bank says ₹2,400</b><small>Trusts the bank, not the picture</small></button>
+      <button data-scn="customer_claim" data-mode="pending" class="mi"><b>Customer's payment still pending</b><small>Nobody pays twice</small></button>
+      <button data-scn="duplicate" class="mi"><b>Customer charged twice</b><small>₹2,450, 37 s apart</small></button>
+      <button data-scn="live_check" class="mi"><b>Check a real Paytm order</b><small>Transaction Status API, your staging keys</small></button>
+      <button id="open-eval" class="mi"><b>Evaluation results</b><small>243 incidents + 240 generated cases</small></button>
+      <a href="/classic" class="mi"><b>Engineer's view</b><small>Every tool call and policy decision</small></a>
+    </div>
+  </div>
+</div>
+
+<dialog id="dlg" class="bg-white rounded-3xl p-0 w-[min(720px,92vw)] max-h-[86vh] m-auto">
+  <div class="flex items-center justify-between px-6 h-14 border-b border-line"><b id="dlg-t" class="text-[15px] font-semibold"></b><form method="dialog"><button class="size-9 rounded-full grid place-items-center hover:bg-page" aria-label="Close"><i data-lucide="x" class="size-[18px]"></i></button></form></div>
+  <div id="dlg-b" class="p-6 overflow-y-auto max-h-[calc(86vh-56px)]"></div>
+</dialog>
+<style type="text/tailwindcss">
+.mi { @apply block w-full text-left px-3 py-2.5 rounded-xl hover:bg-white/[0.07] transition; }
+.mi b { @apply block text-[13.5px] font-semibold text-white; } .mi small { @apply block text-[12px] text-white/50 mt-0.5; }
+</style>
+</body>
+</html>
