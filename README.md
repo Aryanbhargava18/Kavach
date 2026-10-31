@@ -7,12 +7,26 @@ Everything here runs on synthetic data. No real money, messages, banks or police
 
 ---
 
+## How Kavach answers the brief
+*"AI teammates that don't just respond; they get the job done: handle a customer-service workflow end to end, take actions across systems, escalate to humans only when needed."*
+
+| The brief | Kavach | See it |
+|---|---|---|
+| Goes beyond answering | Opens the case itself from Paytm's own signals (a bounced payout, a declined payment, a dispute) before the merchant asks | `/world` → freeze her account; her phone reacts on its own |
+| Understands context | Reads payouts, payments, Paytm Risk signals, the police notice and the government SOP; answers vague questions ("when will it come?") from her real records | `/case` → Understood |
+| Makes decisions | Checks Risk before warning anyone, refuses a notice that contradicts the record, shows the rule behind every decision | `/case` → Decided |
+| Acts across systems | Settlement engine, dispute desk, billing app, refunds, evidence signer, nodal queue, app and Soundbox: about 12 systems in one case | `/case` → Systems |
+| Works with humans, escalates only when needed | Meena decides what's hers; Paytm Risk approves anything that moves money; a human queue only if it can't resolve | `/desk` → Your approval |
+| Measurable outcomes | Time to notice, time to tell the merchant, actions taken and re-checked, human decisions, unsafe steps blocked, money protected; 243 + 240 simulated cases | `/case` tiles · `docs/PITCH.md` |
+
+**Quick start:** `pip install -r requirements.txt && python run.py`, then open `/` (projector), `/m` (Meena's app), `/soundbox`, `/desk` (Paytm's staff website), `/world` (the simulator: customer, bank, police) and `/case` (one case end to end). Online: `docs/DEPLOY.md`. The story in plain words: `docs/PITCH.md`. How to demo: `docs/DEMO_SCRIPT.md`.
+
 ## Live on Paytm (staging)
 The read path runs on Paytm's real **Transaction Status API** (`v3/order/status`), signed with Paytm's official `paytmchecksum` library.
 1. Paytm Business dashboard → Developer settings → test mode: copy the **MID** and **merchant key** into `.env` as `PAYTM_MID` and `PAYTM_MERCHANT_KEY` (`PAYTM_ENV=staging` is the default).
 2. Make any test transaction on that MID and copy its **Order ID**.
 3. `make paytm-check ORDER=<order id>` → must print `OK: Paytm answered.`
-4. In the app: Run a scenario → **LIVE: check a real Paytm order**. The UPI tile shows **LIVE · Paytm API**; every other tile says **SIMULATED**, because payout returns, PSP decline codes and the dispute desk aren't open to outside developers.
+4. In the app: dock **⋯** → **Check a real Paytm order**. That source shows **LIVE · Paytm API** on Paytm's desk and in the case story; every other source says **SIMULATED**, because payout returns, PSP decline codes and the dispute desk aren't open to outside developers.
 
 Kavach never signs a pack unless Paytm's own API said SUCCESS, asked twice (rule P20). No keys means it says so; it never fakes a live answer.
 
