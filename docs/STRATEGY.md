@@ -63,6 +63,26 @@ Merchants pay nothing.
 
 **Scale anchor, not a forecast:** about 1.64 crore merchants on device subscriptions (Paytm Q2 FY27). How many freezes and chargebacks they see each month is data only Paytm has. The pilot measures it before anyone multiplies.
 
+## Feasibility, cost and rollout (also live in the app: top bar → Business case)
+**The full arc Kavach runs:** detect → protect (two keys) → prove (signed, SOP-routed) → ask for a narrower hold → the bank files through the bank desk → the officer decides → Kavach verifies with a ₹1 credit → Paytm Risk releases → the 90-day clocks are watched. In the demo, the bank and the officer are simulated.
+
+**Unit economics we can measure today (synthetic):**
+- 6.6 verified actions per everyday incident; a median of 4 tool calls per money-clock case.
+- 0 model calls in offline mode.
+- 3 taps from the merchant and 2 from Paytm Risk per freeze case.
+
+The cost side is mostly compute and two human approvals. The benefit side needs Paytm's numbers (listed in the app), so we don't invent a ROI.
+
+**Rollout, safest first:**
+1. **Shadow mode:** run on 90 days of history with no merchant contact, and count what would have been caught, and how early.
+2. **Alerts and clocks only.**
+3. **Actions with approvals.**
+4. **One bank on the Pi desk.**
+
+Each phase has its own risk, and the guard rails (P6, P17, P18, P19) apply from day one.
+
+**What's high-feasibility now:** the payout-return, PSP-decline and dispute-desk watchers, the ₹1 validation, the 9.5(ii) draft and the voice. Paytm already holds these signals. **What needs sign-off:** the holds and releases (Risk + Legal) and the tipping-off template. **What needs a partner:** the bank desk.
+
 ## Where it plugs into Paytm
 | Kavach piece | Paytm system | Demo status |
 |---|---|---|
@@ -84,7 +104,7 @@ Merchants pay nothing.
   - 0 chargeback replies filed without Meena; 0 invented delivery proof.
   - **Mutation test:** remove the planner's guard and P17 still blocks every leak. Remove both and 30/30 leak.
 - **Everyday incidents:** 243 generated scenarios versus a screenshot-trusting bot.
-- **45 automated tests.** All synthetic: this validates logic and guardrails, not real-world detection or dispute win rates.
+- **48 automated tests.** All synthetic: this validates logic and guardrails, not real-world detection or dispute win rates.
 
 ## What we need from Paytm to make it real
 1. Read access to the settlement return file and to PSP response codes for merchants' own payments.

@@ -142,3 +142,17 @@ As a Paytm Intelligence operations module, priced per verified resolution, not p
 **Isn't this a chatbot with extra steps?**
 Meena's app has no chat on its main screen. It shows a status, where her money is, the clocks Kavach is holding, and one next step, with chat as an optional side sheet. Every money decision is a rule that re-reads Paytm's records, every action is re-verified, and a mutation test proves the guardrails are load-bearing.
 
+## The full arc
+
+**Kavach can't unfreeze anything. So what's the payoff?**
+Two things the merchant feels. First, new sales stay safe with Paytm from the first morning instead of bouncing or getting trapped. Second, the moment the officer narrows the hold, her money comes back. The bank files through Paytm's bank desk, so Paytm learns the decision from its own product. Kavach then sends a ₹1 validation credit, because it doesn't take a status on trust before moving money, and Paytm Risk releases the held payouts to her own registered account (rule P19). In the demo, the bank and the officer are simulated; we don't claim their timeline.
+
+**Why would a bank use your desk?**
+SOP 10.1 gives it 7 days to check and file each grievance, and I4C's own table shows most are pending. The desk hands it a signed, SOP-mapped case with what's verified and what the bank still owes. That's the Paytm Intelligence product.
+
+**How would you roll this out without hurting anyone?**
+Shadow mode first: run the watchers on 90 days of Paytm history with no merchant contact, and count what would have been caught, and how early. Then alerts only, then actions with approvals, then one bank. The guard rails are on from day one.
+
+**What does it cost to run?**
+In offline mode there are no model calls. The decisions are rules, and we measured a median of 4 tool calls per money-clock case. A model is used only for Hindi language, so a small Indic model is enough. The human cost is two Paytm Risk taps per freeze case. The benefit side needs Paytm's own rates (freezes, chargebacks deemed valid, nodal minutes), and the Business case panel lists exactly which ones.
+

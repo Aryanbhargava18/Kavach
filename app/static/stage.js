@@ -286,7 +286,7 @@
     let h = "";
     if (inc.pending && inc.pending.approvers && inc.pending.approvers.length) {
       h = `Waiting for <b>${inc.pending.approvers.map((a) => APPROVER[a] || a).join(" and ")}</b> to approve. Kavach won't ${esc(VERB[inc.pending.action] || inc.pending.action.replace(/_/g, " "))} on its own.`;
-    } else if (inc.kind === "freeze" && inc.facts && inc.facts.proactive && !(inc.decisive && inc.decisive.label === "Why Kavach held back") && steps.some((s) => s.kind === "action" && s.action === "notify_merchant")) {
+    } else if (inc.kind === "freeze" && inc.facts && inc.facts.proactive && !inc.facts.released && !(inc.decisive && inc.decisive.label === "Why Kavach held back") && steps.some((s) => s.kind === "action" && s.action === "notify_merchant")) {
       const warned = steps.find((s) => s.kind === "action" && s.action === "notify_merchant");
       const viaPsp = steps.some((x) => x.kind === "intake" && x.engine === "psp-monitor");
       h = viaPsp ? `Explained to Meena in <b class="good">${dur(secs(inc.created_at, warned.at))}</b>, the moment her own payment bounced, before more payouts got trapped.`
