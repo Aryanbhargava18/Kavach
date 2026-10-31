@@ -107,8 +107,8 @@ function setClock(iso) { $("#clock").textContent = tm(iso, true); }
 
 function renderIntegrations(i) {
   S.intg = i;
-  const chip = (name, on, title) => `<span class="ichip ${on ? "on" : ""}" title="${esc(title)}">${name}</span>`;
-  $("#intg").innerHTML = chip("Paytm " + (i.paytm_env === "production" ? "prod" : "staging"), i.paytm, i.paytm ? "live: Paytm Transaction Status API on your MID" : "offline: set PAYTM_MID and PAYTM_MERCHANT_KEY") + chip("Sarvam", i.sarvam, i.sarvam ? `live: ${i.models.chat}, ${i.models.stt}, ${i.models.tts}` : "offline: set SARVAM_API_KEY")
+  const chip = (name, on, title, always) => (on || always) ? `<span class="ichip ${on ? "on" : ""}" title="${esc(title)}">${name}</span>` : "";   // off integrations stay out of the way
+  $("#intg").innerHTML = chip("Paytm " + (i.paytm_env === "production" ? "prod" : "staging"), i.paytm, i.paytm ? "live: Paytm Transaction Status API on your MID" : "offline: set PAYTM_MID and PAYTM_MERCHANT_KEY", true) + chip("Sarvam", i.sarvam, i.sarvam ? `live: ${i.models.chat}, ${i.models.stt}, ${i.models.tts}` : "offline: set SARVAM_API_KEY")
     + chip("n8n", i.n8n, i.n8n ? "events posted to your n8n webhook" : "offline: events kept in a local log")
     + chip("Cognee", i.cognee, i.cognee ? "SOP retrieval via Cognee" : "offline: local SOP retrieval")
     + chip("OCR", i.ocr, i.ocr ? "Tesseract reads images" : "install tesseract")

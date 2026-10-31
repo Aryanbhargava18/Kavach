@@ -109,7 +109,8 @@ def _chargeback(world, engine, inc) -> dict[str, Any]:
 def _home(world, engine) -> dict[str, Any]:
     today = world.now.date()
     sales = [t for t in world.transactions if t["status"] == "SUCCESS" and t["payee_vpa"] == MERCHANT["vpa"] and t["created_at"].date() == today]
-    fixes = [i for i in engine.incidents.values() if i.kind not in ("freeze", "chargeback") and not _guarded(i)]
+    fixes = [i for i in engine.incidents.values() if i.kind not in ("freeze", "chargeback") and not _guarded(i)
+             and not (i.kind == "live_check" and not i.facts.get("pack"))]
     return {
         "mode": "home",
         "shield": {"tone": "ok", "title": "Sab theek hai", "sub": "Kavach har payment, refund aur payout par nazar rakh raha hai."},
