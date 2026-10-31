@@ -148,8 +148,10 @@ class LLMPlanner(OfflinePlanner):
         """One model call. Appends the assistant turn to msgs in the provider's format and returns
         (texts, tool_calls[{id, name, args}])."""
         if self.provider == "sarvam":
-            j = await sarvam.chat([{"role": "system", "content": SYSTEM}] + msgs, sarvam.openai_tools(tools.llm_tool_specs()))
+            j = await sarvam.chat([{"role": "system", "content": SYSTEM}] + msgs, sarvam.openai_tools(tools.llm_tool_specs()), max_tokens=4096)
             m = j["choices"][0]["message"]
+            if not m.get("tool_calls") and not (m.get("content") or "").strip() and j["choices"][0].get("finish_reason") == "length":
+                raise RuntimeError("model ran out of tokens before answering")   # empty is not "done": hand over to the playbook
             calls = []
             for c in m.get("tool_calls") or []:
                 try:

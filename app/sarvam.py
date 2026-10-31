@@ -58,7 +58,7 @@ def client() -> httpx.AsyncClient:
 async def chat(messages: list[dict[str, Any]], tools: list[dict[str, Any]] | None = None, *,
                response_format: dict[str, Any] | None = None, max_tokens: int = 1200, reasoning: str = "low") -> dict[str, Any]:
     body: dict[str, Any] = {"model": CHAT_MODEL, "messages": messages, "max_tokens": max_tokens, "temperature": 0.2,
-                            "reasoning_effort": reasoning}
+                            "reasoning_effort": reasoning if reasoning in ("low", "medium", "high") else "low"}   # Sarvam accepts only these three
     if tools:
         body["tools"] = tools
         body["tool_choice"] = "auto"
