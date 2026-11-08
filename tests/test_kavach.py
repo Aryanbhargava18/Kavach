@@ -97,6 +97,25 @@ def test_two_key_hold():
     assert policy.evaluate(w, "request_settlement_hold", {}, {"approvals": {"merchant", "paytm_ops"}}).verdict == "ALLOW"
 
 
+def test_policy_unregistered_action_and_open_paths():
+    w = World()
+    d = policy.evaluate(w, "unregistered_custom_action", {}, {})
+    assert d.verdict == "DENY" and d.rule == "P7"
+    assert "not an action Kavach is permitted to take" in d.reason
+    assert policy.evaluate(w, "escalate_to_human", {}, {}).verdict == "ALLOW"
+    assert policy.evaluate(w, "create_support_case", {}, {}).verdict == "ALLOW"
+
+
+def test_policy_constants_and_rules_registry():
+    from datetime import timedelta
+    assert policy.DUPLICATE_WINDOW == timedelta(minutes=10)
+    assert policy.MAX_FOLLOWUPS == 8
+    for code in ("P1", "P2", "P3", "P4", "P5", "P6", "P7", "P8", "P9", "P10",
+                 "P11", "P12", "P13", "P14", "P15", "P16", "P17", "P18", "P19", "P20"):
+        assert code in policy.RULES
+        assert len(policy.RULES[code].strip()) > 10
+
+
 # ------------------------------------------------------------------ OCR
 def test_ocr_reads_edited_screenshot_as_shown():
     w = World(); shot = w.inject_customer_claim(mode="fake_amount", amount=4200)
@@ -185,6 +204,15 @@ def test_proof_valid_then_tamper_detected():
         from datetime import timedelta
         assert proof.verify(tok, None, w.now + timedelta(days=200))["result"] == "EXPIRED"
     run(go())
+
+
+def test_proof_unknown_token_and_fingerprint():
+    from datetime import datetime, timezone
+    now = datetime.now(timezone.utc)
+    res = proof.verify("nonexistent_demo_token", None, now)
+    assert res["result"] == "UNKNOWN"
+    fp = proof.fingerprint()
+    assert isinstance(fp, str) and len(fp) == 64
 
 
 # ------------------------------------------------------------------ sop / nlu
